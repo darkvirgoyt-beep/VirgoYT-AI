@@ -1,10 +1,10 @@
 # VirgoYT AI - Autonomous AI Software Engineer Platform
 
-[![VirgoYT AI CI/CD](https://github.com/darkvirgoyt/virgoyt-ai-platform/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/darkvirgoyt/virgoyt-ai-platform/actions/workflows/build-and-deploy.yml)
+[![VirgoYT AI CI/CD](https://github.com/darkvirgoyt-beep/VirgoYT-AI/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/darkvirgoyt-beep/VirgoYT-AI/actions/workflows/build-and-deploy.yml)
 [![Live Cloud Applet](https://img.shields.io/badge/Live%20Applet-Online-06b6d4)](https://ais-pre-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-6366f1)](https://github.com/darkvirgoyt)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-6366f1)](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases)
 
-**VirgoYT AI** is a state-of-the-art autonomous AI Software Engineer platform and multi-agent development ecosystem designed to build, test, refactor, and deploy modern applications across 14+ languages and frameworks.
+**VirgoYT AI** is an enterprise-grade autonomous AI Software Engineer platform and multi-agent development ecosystem designed to build, test, refactor, and deploy modern applications across 14+ languages and frameworks.
 
 ---
 
@@ -37,10 +37,11 @@
 
 ## 🚀 GitHub Actions CI/CD Pipeline
 
-The `.github/workflows/build-and-deploy.yml` workflow automatically runs on every push:
+The `.github/workflows/android-build.yml` workflow automatically runs on every push:
 
 - **🤖 Android Test & APK Build**:
   - Sets up JDK 17 & Android SDK.
+  - Automatically provisions debug signing keystore & environment secrets.
   - Runs unit tests via `./gradlew testDebugUnitTest`.
   - Builds both Debug (`assembleDebug`) and Release APKs (`assembleRelease`).
   - Uploads APK binaries to GitHub Actions artifacts for instant download.
@@ -77,7 +78,8 @@ The compiled APK will be located at:
 
 ## 🔗 Live URLs & Access
 
-- **Official Web App (GitHub Pages Hosted)**: [https://darkvirgoyt.github.io/VirgoYT-AI/](https://darkvirgoyt.github.io/VirgoYT-AI/)
-- **GitHub Repository**: [https://github.com/darkvirgoyt/VirgoYT-AI](https://github.com/darkvirgoyt/VirgoYT-AI)
-- **APK Releases**: [https://github.com/darkvirgoyt/VirgoYT-AI/releases](https://github.com/darkvirgoyt/VirgoYT-AI/releases)
+- **Official Web App (GitHub Pages Hosted)**: [https://darkvirgoyt-beep.github.io/VirgoYT-AI/](https://darkvirgoyt-beep.github.io/VirgoYT-AI/)
+- **GitHub Repository**: [https://github.com/darkvirgoyt-beep/VirgoYT-AI](https://github.com/darkvirgoyt-beep/VirgoYT-AI)
+- **APK Releases**: [https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases)
 - **Developer Live Preview**: [https://ais-dev-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app](https://ais-dev-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app)
+

@@ -145,7 +145,7 @@ class DatabaseAiEngine {
                 executionTimeMs = 3L,
                 rowsAffected = 5,
                 resultsJson = """[
-  {"username": "darkvirgoyt", "title": "Valkyrie Open World", "framework": "Unreal Engine 5.4"},
+  {"username": "darkvirgoyt-beep", "title": "Valkyrie Open World", "framework": "Unreal Engine 5.4"},
   {"username": "developer", "title": "SaaS Cloud Workspace", "framework": "Next.js 15"},
   {"username": "admin", "title": "FastAPI Vector Hub", "framework": "FastAPI"}
 ]"""

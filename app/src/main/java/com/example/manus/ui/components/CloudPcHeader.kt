@@ -223,6 +223,35 @@ fun CloudPcHeader(
                     val isGitHubConnected by viewModel.isGitHubConnected.collectAsState()
                     val gitHubUser by viewModel.gitHubUser.collectAsState()
 
+                    // User Auth Quick Trigger
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (currentUser != null) ManusIndigoBg else SleekSurface)
+                            .border(1.dp, if (currentUser != null) ManusIndigo else SleekBorder, RoundedCornerShape(8.dp))
+                            .clickable { viewModel.openAuthDialog() }
+                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                            .testTag("user_auth_header_btn")
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "User Auth",
+                                tint = if (currentUser != null) ManusIndigoLight else ManusSlate400,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = currentUser?.username ?: "Login",
+                                color = if (currentUser != null) ManusWhite else ManusSlate300,
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
                     // Secret Credential Vault Quick Trigger
                     Box(
                         modifier = Modifier

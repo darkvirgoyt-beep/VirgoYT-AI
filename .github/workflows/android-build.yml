@@ -112,6 +112,19 @@ jobs:
             fi
           fi
 
+      - name: 🔑 Provision Debug Keystore for Signing
+        run: |
+          if [ ! -f "debug.keystore" ]; then
+            if [ -f "debug.keystore.base64" ]; then
+              echo "Decoding debug.keystore from base64..."
+              base64 -d debug.keystore.base64 > debug.keystore
+            else
+              echo "Generating standard debug.keystore..."
+              keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            fi
+          fi
+          echo "debug.keystore provisioned successfully."
+
       - name: 🔧 Grant Execute Permissions & Prepare Gradle
         run: |
           chmod +x ./gradlew 2>/dev/null || true

@@ -105,7 +105,7 @@ class GitHubAuthManager {
         return false
     }
 
-    fun connectDirectWeb(username: String = "darkvirgoyt") {
+    fun connectDirectWeb(username: String = "darkvirgoyt-beep") {
         val token = "gho_" + UUID.randomUUID().toString().replace("-", "").take(24)
         _currentUser.value = GitHubUser(
             username = username,
@@ -127,11 +127,11 @@ class GitHubAuthManager {
     }
 
     fun addRepo(name: String, description: String = "", language: String = "Kotlin"): GitHubRepo {
-        val user = _currentUser.value?.username ?: "darkvirgoyt"
+        val user = _currentUser.value?.username ?: "darkvirgoyt-beep"
         val repo = GitHubRepo(
             name = name,
             fullName = "$user/$name",
-            description = description.ifBlank { "Repository created via Manus Cloud Terminal" },
+            description = description.ifBlank { "Repository created via VirgoYT AI Cloud Supercomputer" },
             language = language,
             stars = 0
         )
