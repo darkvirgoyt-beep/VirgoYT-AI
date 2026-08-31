@@ -112,23 +112,44 @@ jobs:
             fi
           fi
 
-      - name: 🔧 Grant Execute Permissions for gradlew
-        run: chmod +x ./gradlew || true
+      - name: 🔧 Grant Execute Permissions & Prepare Gradle
+        run: |
+          chmod +x ./gradlew 2>/dev/null || true
+          # If gradlew wrapper jar is missing in repo, generate/fallback to gradle
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "Generating gradle wrapper via gradle..."
+            gradle wrapper || true
+          fi
 
       - name: 🧪 Run Unit & Robolectric Tests
         env:
           _JAVA_OPTIONS: "-Djava.awt.headless=true"
-        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace -Djava.awt.headless=true
+        run: |
+          if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew testDebugUnitTest --no-daemon --stacktrace -Djava.awt.headless=true
+          else
+            gradle testDebugUnitTest --no-daemon --stacktrace -Djava.awt.headless=true
+          fi
 
       - name: 📦 Build Debug APK
         env:
           _JAVA_OPTIONS: "-Djava.awt.headless=true"
-        run: ./gradlew assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+        run: |
+          if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+          else
+            gradle assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+          fi
 
       - name: 🚀 Build Release APK
         env:
           _JAVA_OPTIONS: "-Djava.awt.headless=true"
-        run: ./gradlew assembleRelease --no-daemon --stacktrace -Djava.awt.headless=true || echo "Release build completed with signing fallback"
+        run: |
+          if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleRelease --no-daemon --stacktrace -Djava.awt.headless=true || echo "Release build completed with signing fallback"
+          else
+            gradle assembleRelease --no-daemon --stacktrace -Djava.awt.headless=true || echo "Release build completed with signing fallback"
+          fi
 
       - name: 📤 Upload Debug APK Artifact
         uses: actions/upload-artifact@v4

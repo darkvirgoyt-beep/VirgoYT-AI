@@ -261,61 +261,130 @@
       color: var(--emerald);
     }
 
-    /* Agent Swarm List */
+    /* Glassmorphism & Neon Holographic Theme */
     .agent-swarm-container {
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      height: 380px;
+      height: 440px;
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--cyan) rgba(3, 7, 18, 0.6);
     }
+    .agent-swarm-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .agent-swarm-container::-webkit-scrollbar-track {
+      background: rgba(3, 7, 18, 0.4);
+      border-radius: 9999px;
+    }
+    .agent-swarm-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--cyan), var(--indigo));
+      border-radius: 9999px;
+      box-shadow: 0 0 8px var(--cyan-glow);
+    }
+
     .agent-card {
-      background: #070e20;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 14px;
+      position: relative;
+      background: rgba(11, 23, 49, 0.45);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(6, 182, 212, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.8), rgba(99, 102, 241, 0.8), transparent);
+      opacity: 0.7;
     }
     .agent-card:hover {
-      border-color: var(--cyan);
-      background: var(--bg-card-hover);
+      background: rgba(19, 34, 71, 0.65);
+      border-color: rgba(6, 182, 212, 0.75);
+      box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.22), 0 0 20px rgba(6, 182, 212, 0.15), inset 0 1px 2px 0 rgba(6, 182, 212, 0.5);
+      transform: translateY(-2px);
     }
     .agent-meta {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .agent-avatar {
-      font-size: 1.3rem;
-      background: rgba(255,255,255,0.05);
-      width: 34px;
-      height: 34px;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(99, 102, 241, 0.15));
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.18);
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .agent-card:hover .agent-avatar {
+      transform: scale(1.08) rotate(3deg);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.4);
     }
     .agent-name {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
     }
     .agent-role {
       font-size: 0.72rem;
       color: var(--text-muted);
       font-family: var(--font-mono);
+      margin-top: 1px;
     }
     .agent-status {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-family: var(--font-mono);
-      font-weight: 600;
-      color: var(--emerald);
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 3px 8px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      white-space: nowrap;
+      text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+    }
+    .agent-status.active {
+      color: var(--emerald);
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+      text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+    .agent-status.synthesis {
+      color: var(--indigo);
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
+      text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
     }
 
     /* Interactive Terminal Section */
@@ -471,65 +540,184 @@
         <span class="badge-tag">15 ACTIVE WORKERS</span>
       </div>
       <div class="agent-swarm-container">
+        <!-- 1. Lead AI Software Engineer -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">👑</div>
             <div>
               <div class="agent-name">Lead AI Software Engineer</div>
-              <div class="agent-role">Orchestrator & Decomposition</div>
+              <div class="agent-role">Orchestrator & Architecture Decomposition</div>
             </div>
           </div>
-          <div class="agent-status">⚡ READY</div>
+          <div class="agent-status active">⚡ READY</div>
         </div>
+
+        <!-- 2. Game Engine & 3D Specialist -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">🎮</div>
             <div>
               <div class="agent-name">Game Engine & 3D Specialist</div>
-              <div class="agent-role">UE5.4 & Unity 6 C++ Blueprints</div>
+              <div class="agent-role">UE5.4 & Unity 6 C++ Blueprints & PhysX</div>
             </div>
           </div>
-          <div class="agent-status">⚡ SYNTHESIZING</div>
+          <div class="agent-status synthesis">⚡ SYNTHESIZING</div>
         </div>
+
+        <!-- 3. Mobile Ecosystem Specialist -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">📱</div>
             <div>
               <div class="agent-name">Mobile Ecosystem Specialist</div>
-              <div class="agent-role">Jetpack Compose & SwiftUI</div>
+              <div class="agent-role">Jetpack Compose & SwiftUI Core</div>
             </div>
           </div>
-          <div class="agent-status">⚡ READY</div>
+          <div class="agent-status active">⚡ READY</div>
         </div>
+
+        <!-- 4. Frontend & Web Specialist -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🌐</div>
+            <div>
+              <div class="agent-name">Frontend & Web Specialist</div>
+              <div class="agent-role">Three.js WebGL & React 19 Engine</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ LIVE</div>
+        </div>
+
+        <!-- 5. Backend & Cloud Architect -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">⚡</div>
+            <div>
+              <div class="agent-name">Backend & Cloud Architect</div>
+              <div class="agent-role">Ktor, Go & Distributed Microservices</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ ONLINE</div>
+        </div>
+
+        <!-- 6. Database AI Specialist -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">🗄️</div>
             <div>
               <div class="agent-name">Database AI Specialist</div>
-              <div class="agent-role">PostgreSQL, Redis & EXPLAIN Indexer</div>
+              <div class="agent-role">PostgreSQL, Redis & Vector Indexing</div>
             </div>
           </div>
-          <div class="agent-status">⚡ OPTIMIZED</div>
+          <div class="agent-status active">⚡ OPTIMIZED</div>
         </div>
+
+        <!-- 7. Cybersecurity & Audit Agent -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">🛡️</div>
             <div>
               <div class="agent-name">Cybersecurity & Audit Agent</div>
-              <div class="agent-role">OWASP Zero-Trust & SAST Scanner</div>
+              <div class="agent-role">OWASP Zero-Trust & SAST Secret Guard</div>
             </div>
           </div>
           <div class="agent-status">🛡️ SECURED</div>
         </div>
+
+        <!-- 8. DevOps & Cloud CI/CD Agent -->
         <div class="agent-card">
           <div class="agent-meta">
             <div class="agent-avatar">🚀</div>
             <div>
               <div class="agent-name">DevOps & Cloud CI/CD Agent</div>
-              <div class="agent-role">GitHub Actions & Docker Builds</div>
+              <div class="agent-role">GitHub Actions & Release Packaging</div>
             </div>
           </div>
-          <div class="agent-status">⚡ PIPELINE ACTIVE</div>
+          <div class="agent-status active">⚡ PIPELINE ACTIVE</div>
+        </div>
+
+        <!-- 9. QA Automation & Test Engineer -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🧪</div>
+            <div>
+              <div class="agent-name">QA Automation & Test Engineer</div>
+              <div class="agent-role">Robolectric & Roborazzi Visual Regression</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ PASSED</div>
+        </div>
+
+        <!-- 10. Vector RAG & Memory Specialist -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🧠</div>
+            <div>
+              <div class="agent-name">Vector RAG & Memory Specialist</div>
+              <div class="agent-role">1536D Cosine Similarity & AST Tree</div>
+            </div>
+          </div>
+          <div class="agent-status synthesis">⚡ 1.8ms SEARCH</div>
+        </div>
+
+        <!-- 11. Research & Tech Intelligence -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🔍</div>
+            <div>
+              <div class="agent-name">Research & Tech Intelligence</div>
+              <div class="agent-role">Live Doc Scraper & API Spec Synthesizer</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ SYNCED</div>
+        </div>
+
+        <!-- 12. Project Manager & Goal Tracker -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">📊</div>
+            <div>
+              <div class="agent-name">Project Manager & Goal Tracker</div>
+              <div class="agent-role">Task Breakdown & Critical Path Router</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ TRACKING</div>
+        </div>
+
+        <!-- 13. UI/UX & Design Systems -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🎨</div>
+            <div>
+              <div class="agent-name">UI/UX & Design Systems</div>
+              <div class="agent-role">M3 Glassmorphism & Token Designer</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ STYLED</div>
+        </div>
+
+        <!-- 14. AI Model Router & Evaluator -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🤖</div>
+            <div>
+              <div class="agent-name">AI Model Router & Evaluator</div>
+              <div class="agent-role">Multi-Model Latency & Reasoning Dispatch</div>
+            </div>
+          </div>
+          <div class="agent-status active">⚡ ROUTED</div>
+        </div>
+
+        <!-- 15. Geospatial & 3D Terrain Agent -->
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🌍</div>
+            <div>
+              <div class="agent-name">Geospatial & 3D Terrain Agent</div>
+              <div class="agent-role">Google Earth LiDAR & 4K DEM Importer</div>
+            </div>
+          </div>
+          <div class="agent-status synthesis">⚡ 4K HEIGHTMAP</div>
         </div>
       </div>
     </div>
