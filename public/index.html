@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VirgoYT AI - Autonomous AI Software Engineer Platform & 3D Studio</title>
+  <meta name="description" content="VirgoYT AI is an autonomous AI software engineering ecosystem with 15 specialized sub-agents, Unreal Engine 5.4 3D studio, and 1536D vector RAG memory.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Three.js for 3D Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --bg-card: #0b1329;
+      --bg-card-hover: #132247;
+      --border-color: #1e293b;
+      --border-accent: rgba(6, 182, 212, 0.4);
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.3);
+      --indigo: #6366f1;
+      --indigo-bg: rgba(99, 102, 241, 0.15);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --purple: #a855f7;
+      --rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.18), transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1), transparent 40%);
+    }
+
+    /* Top Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(3, 7, 18, 0.85);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan), var(--indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+    .brand-badge {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      background: var(--indigo-bg);
+      color: var(--cyan);
+      border: 1px solid var(--border-accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-cyan {
+      background: linear-gradient(135deg, var(--cyan), var(--indigo));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+    }
+    .btn-cyan:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4);
+    }
+    .btn-outline {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    .btn-outline:hover {
+      border-color: var(--cyan);
+      background: var(--bg-card-hover);
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 32px;
+      text-align: center;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid var(--border-accent);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+      100% { opacity: 0.4; transform: scale(0.9); }
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #ffffff 10%, #67e8f9 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 780px;
+      margin: 0 auto 32px;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    /* App Workspace & 3D Canvas Grid */
+    .workspace-grid {
+      max-width: 1280px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 960px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .studio-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .panel-header {
+      padding: 12px 18px;
+      background: #060b18;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+    }
+    .badge-tag {
+      font-size: 0.65rem;
+      background: var(--indigo-bg);
+      color: var(--cyan);
+      border: 1px solid var(--border-accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* 3D Canvas Viewport */
+    #viewport3d {
+      width: 100%;
+      height: 380px;
+      background: #020617;
+      position: relative;
+      cursor: grab;
+    }
+    #viewport3d:active { cursor: grabbing; }
+    .viewport-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .viewport-overlay .stats {
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid var(--border-color);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--emerald);
+    }
+
+    /* Agent Swarm List */
+    .agent-swarm-container {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 380px;
+      overflow-y: auto;
+    }
+    .agent-card {
+      background: #070e20;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+    .agent-card:hover {
+      border-color: var(--cyan);
+      background: var(--bg-card-hover);
+    }
+    .agent-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .agent-avatar {
+      font-size: 1.3rem;
+      background: rgba(255,255,255,0.05);
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .agent-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .agent-role {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .agent-status {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Interactive Terminal Section */
+    .terminal-box {
+      max-width: 1280px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+    .console {
+      background: #020617;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      height: 220px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    .console .cmd { color: var(--cyan); }
+    .console .success { color: var(--emerald); }
+    .console .accent { color: var(--amber); }
+
+    /* Feature Grid */
+    .features-section {
+      max-width: 1280px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+    .features-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 22px;
+      transition: all 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--indigo-bg);
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 32px 24px;
+      background: #020617;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--cyan); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-logo">V</div>
+      <div>
+        <div class="brand-title">VirgoYT AI</div>
+      </div>
+      <span class="brand-badge">v1.0.0</span>
+    </a>
+    <div class="nav-links">
+      <a href="https://github.com/darkvirgoyt/VirgoYT-AI" target="_blank" class="btn btn-outline">
+        <i data-lucide="github"></i>
+        <span>GitHub Repo</span>
+      </a>
+      <a href="https://github.com/darkvirgoyt/VirgoYT-AI/releases" target="_blank" class="btn btn-cyan">
+        <i data-lucide="download"></i>
+        <span>Download APK</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-pill">
+      <div class="pulse-dot"></div>
+      <span>AUTONOMOUS MULTI-AGENT SWARM & 3D STUDIO</span>
+    </div>
+    <h1>Build Software & 3D Worlds at Superhuman Speed</h1>
+    <p>VirgoYT AI coordinates 15 specialized sub-agents, Unreal Engine 5.4 / Unity 6 game pipelines, and 1536-dimensional vector RAG memory in one unified ecosystem.</p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <a href="https://github.com/darkvirgoyt/VirgoYT-AI/releases/latest" class="btn btn-cyan" style="padding: 12px 24px; font-size: 1rem;">
+        <i data-lucide="smartphone"></i>
+        <span>Download Android APK</span>
+      </a>
+      <a href="https://github.com/darkvirgoyt/VirgoYT-AI" class="btn btn-outline" style="padding: 12px 24px; font-size: 1rem;">
+        <i data-lucide="code-2"></i>
+        <span>Explore Source Code</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Workspace Grid: 3D Engine & Agent Swarm -->
+  <section class="workspace-grid">
+    <!-- 3D Engine Viewport -->
+    <div class="studio-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i data-lucide="box" style="width: 16px; color: var(--cyan);"></i>
+          <span>3D Engine Sandbox (UE5.4 & WebGL)</span>
+        </div>
+        <span class="badge-tag">LUMEN GI &bull; 60 FPS</span>
+      </div>
+      <div id="viewport3d">
+        <div class="viewport-overlay">
+          <div class="stats">ROTATION: ACTIVE | SHADER: PBR WIREFRAME</div>
+          <div class="stats" id="fpsCounter">FPS: 60</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15 Agent Swarm -->
+    <div class="studio-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i data-lucide="bot" style="width: 16px; color: var(--indigo);"></i>
+          <span>15 Specialized Autonomous Sub-Agents</span>
+        </div>
+        <span class="badge-tag">15 ACTIVE WORKERS</span>
+      </div>
+      <div class="agent-swarm-container">
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">👑</div>
+            <div>
+              <div class="agent-name">Lead AI Software Engineer</div>
+              <div class="agent-role">Orchestrator & Decomposition</div>
+            </div>
+          </div>
+          <div class="agent-status">⚡ READY</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🎮</div>
+            <div>
+              <div class="agent-name">Game Engine & 3D Specialist</div>
+              <div class="agent-role">UE5.4 & Unity 6 C++ Blueprints</div>
+            </div>
+          </div>
+          <div class="agent-status">⚡ SYNTHESIZING</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">📱</div>
+            <div>
+              <div class="agent-name">Mobile Ecosystem Specialist</div>
+              <div class="agent-role">Jetpack Compose & SwiftUI</div>
+            </div>
+          </div>
+          <div class="agent-status">⚡ READY</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🗄️</div>
+            <div>
+              <div class="agent-name">Database AI Specialist</div>
+              <div class="agent-role">PostgreSQL, Redis & EXPLAIN Indexer</div>
+            </div>
+          </div>
+          <div class="agent-status">⚡ OPTIMIZED</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🛡️</div>
+            <div>
+              <div class="agent-name">Cybersecurity & Audit Agent</div>
+              <div class="agent-role">OWASP Zero-Trust & SAST Scanner</div>
+            </div>
+          </div>
+          <div class="agent-status">🛡️ SECURED</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-meta">
+            <div class="agent-avatar">🚀</div>
+            <div>
+              <div class="agent-name">DevOps & Cloud CI/CD Agent</div>
+              <div class="agent-role">GitHub Actions & Docker Builds</div>
+            </div>
+          </div>
+          <div class="agent-status">⚡ PIPELINE ACTIVE</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Terminal Logs -->
+  <section class="terminal-box">
+    <div class="studio-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i data-lucide="terminal" style="width: 16px; color: var(--emerald);"></i>
+          <span>VirgoYT Autonomous CI/CD & Build Log</span>
+        </div>
+        <span class="badge-tag" style="color: var(--emerald);">BUILD: SUCCESS</span>
+      </div>
+      <div class="console" id="terminalOutput">
+        <div><span class="cmd">[VirgoYT-Core]</span> Initializing 15-Agent Swarm Memory Bridge...</div>
+        <div><span class="cmd">[Vector-RAG]</span> 1536-Dimensional Embedding Index loaded (Cosine Similarity < 1.8ms)</div>
+        <div><span class="cmd">[Game-Engine]</span> Unreal Engine 5.4 Nanite & Lumen Shader Graph Pipeline ready</div>
+        <div><span class="success">[CI/CD]</span> Android APK Build: assembleDebug & assembleRelease generated</div>
+        <div><span class="accent">[GitHub-Host]</span> GitHub Pages Live Web Distribution Active @ darkvirgoyt</div>
+        <div><span class="cmd">[Status]</span> VirgoYT AI Online & Listening for Autonomous Engineering Goals...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features-section">
+    <div class="features-header">
+      <h2>Engineered for Deep Autonomous Coding</h2>
+      <p style="color: var(--text-muted); margin-top: 8px;">From full-stack web applications to AAA game mechanics.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="cpu"></i></div>
+        <h3>15-Agent Swarm Intelligence</h3>
+        <p>Parallelized task breakdown with dedicated sub-agents communicating through high-speed vector embeddings.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="gamepad-2"></i></div>
+        <h3>Unreal Engine 5.4 & 3D Studio</h3>
+        <p>Real-time Blueprint code synthesis, C++ actor classes, PhysX simulation, and Google Earth 3D terrain import.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="database"></i></div>
+        <h3>Database AI & SQL Optimizer</h3>
+        <p>PostgreSQL, MySQL, SQLite, MongoDB, Redis, and Supabase integration with automatic schema migration.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="git-branch"></i></div>
+        <h3>GitHub Host & CI/CD Pipeline</h3>
+        <p>Automated APK generation, unit testing, and GitHub Pages web frontend deployment on every git push.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>VirgoYT AI &bull; Created by <a href="https://github.com/darkvirgoyt" target="_blank">@darkvirgoyt</a> &bull; Hosted on GitHub Pages &bull; Public Release</p>
+  </footer>
+
+  <!-- Three.js 3D Sandbox Script -->
+  <script>
+    lucide.createIcons();
+
+    // 3D Canvas Init
+    const container = document.getElementById('viewport3d');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020617);
+
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 4, 8);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0x06b6d4, 1.2);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+
+    const purpleLight = new THREE.PointLight(0x6366f1, 2, 20);
+    purpleLight.position.set(-5, 3, -2);
+    scene.add(purpleLight);
+
+    // 3D Wireframe Grid Floor
+    const gridHelper = new THREE.GridHelper(12, 24, 0x06b6d4, 0x1e293b);
+    gridHelper.position.y = -1;
+    scene.add(gridHelper);
+
+    // 3D Central Icosahedron & Core Ring
+    const geo = new THREE.IcosahedronGeometry(1.6, 1);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x06b6d4,
+      wireframe: true,
+      emissive: 0x06b6d4,
+      emissiveIntensity: 0.2
+    });
+    const coreMesh = new THREE.Mesh(geo, mat);
+    scene.add(coreMesh);
+
+    // Orbiting Ring
+    const ringGeo = new THREE.TorusGeometry(2.6, 0.04, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 3;
+    scene.add(ringMesh);
+
+    // Orbit Interaction
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+
+    container.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    container.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - prevMouse.x;
+      const deltaY = e.clientY - prevMouse.y;
+      coreMesh.rotation.y += deltaX * 0.01;
+      coreMesh.rotation.x += deltaY * 0.01;
+      ringMesh.rotation.y += deltaX * 0.008;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    // Touch Support
+    container.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    });
+    window.addEventListener('touchend', () => { isDragging = false; });
+    container.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const deltaX = e.touches[0].clientX - prevMouse.x;
+      const deltaY = e.touches[0].clientY - prevMouse.y;
+      coreMesh.rotation.y += deltaX * 0.01;
+      coreMesh.rotation.x += deltaY * 0.01;
+      prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    });
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      if (!isDragging) {
+        coreMesh.rotation.y += 0.008;
+        coreMesh.rotation.x += 0.004;
+        ringMesh.rotation.z += 0.006;
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  </script>
+</body>
+</html>

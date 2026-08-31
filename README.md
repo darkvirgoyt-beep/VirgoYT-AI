@@ -77,6 +77,7 @@ The compiled APK will be located at:
 
 ## 🔗 Live URLs & Access
 
-- **Public Applet**: [https://ais-pre-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app](https://ais-pre-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app)
+- **Official Web App (GitHub Pages Hosted)**: [https://darkvirgoyt.github.io/VirgoYT-AI/](https://darkvirgoyt.github.io/VirgoYT-AI/)
+- **GitHub Repository**: [https://github.com/darkvirgoyt/VirgoYT-AI](https://github.com/darkvirgoyt/VirgoYT-AI)
+- **APK Releases**: [https://github.com/darkvirgoyt/VirgoYT-AI/releases](https://github.com/darkvirgoyt/VirgoYT-AI/releases)
 - **Developer Live Preview**: [https://ais-dev-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app](https://ais-dev-qeki52yslj4ugacyazvn2e-854216720694.asia-east1.run.app)
-- **GitHub Profile**: [@darkvirgoyt](https://github.com/darkvirgoyt)
