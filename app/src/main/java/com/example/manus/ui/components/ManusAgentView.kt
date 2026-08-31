@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.Button
@@ -51,6 +53,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import com.example.manus.data.model.ActiveWorkspaceTab
 import com.example.manus.data.model.AgentSubtask
 import com.example.manus.data.model.AgentTask
+import com.example.manus.data.model.ChatMessage
 import com.example.manus.data.model.TaskStatus
 import com.example.manus.ui.ManusCloudViewModel
 import com.example.ui.theme.ManusAmber
@@ -106,23 +110,65 @@ fun ManusAgentView(
     val statusText by viewModel.agentService.agentStatusText.collectAsState()
     val reasoningLogs by viewModel.agentService.agentReasoningLogs.collectAsState()
     val agentInputGoal by viewModel.agentInputGoal.collectAsState()
+    val activeChatSessions by viewModel.modelRouterEngine.activeChatSessions.collectAsState()
+    val currentSessionId by viewModel.modelRouterEngine.currentSessionId.collectAsState()
+    val currentSession = activeChatSessions.find { it.id == currentSessionId } ?: activeChatSessions.firstOrNull()
 
     var showReasoningLogs by remember { mutableStateOf(true) }
-    var activeMode by remember { mutableStateOf("SWARM") } // SWARM, GOAL_RUNNER
+    var activeMode by remember { mutableStateOf("CHAT") } // CHAT, SWARM, GOAL_RUNNER
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(ManusSlate950)
-            .padding(12.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        // Mode Selector Bar (Swarm vs Goal Runner)
+        // Mode Selector Bar (Chat & AI Responses vs Swarm vs Task Runner)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .weight(1.2f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (activeMode == "CHAT") ManusIndigoBg else ManusSlate900)
+                    .border(1.dp, if (activeMode == "CHAT") ManusCyan.copy(alpha = 0.6f) else SleekBorder, RoundedCornerShape(8.dp))
+                    .clickable { activeMode = "CHAT" }
+                    .padding(vertical = 7.dp)
+                    .testTag("chat_mode_tab"),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "💬 Live Chat & AI",
+                        color = if (activeMode == "CHAT") ManusCyan else ManusSlate400,
+                        fontSize = 11.5.sp,
+                        fontWeight = if (activeMode == "CHAT") FontWeight.Bold else FontWeight.Medium
+                    )
+                    if (currentSession != null && currentSession.messages.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(if (activeMode == "CHAT") ManusCyan else ManusSlate700)
+                                .padding(horizontal = 5.dp, vertical = 1.dp)
+                        ) {
+                            Text(
+                                text = "${currentSession.messages.size}",
+                                color = if (activeMode == "CHAT") ManusSlate950 else ManusWhite,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -130,11 +176,12 @@ fun ManusAgentView(
                     .background(if (activeMode == "SWARM") ManusIndigoBg else ManusSlate900)
                     .border(1.dp, if (activeMode == "SWARM") ManusCyan.copy(alpha = 0.5f) else SleekBorder, RoundedCornerShape(8.dp))
                     .clickable { activeMode = "SWARM" }
-                    .padding(vertical = 7.dp),
+                    .padding(vertical = 7.dp)
+                    .testTag("swarm_mode_tab"),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "🐝 15-Agent Autonomous Hive",
+                    text = "🐝 15-Agent Hive",
                     color = if (activeMode == "SWARM") ManusCyan else ManusSlate400,
                     fontSize = 11.5.sp,
                     fontWeight = if (activeMode == "SWARM") FontWeight.Bold else FontWeight.Medium
@@ -148,11 +195,12 @@ fun ManusAgentView(
                     .background(if (activeMode == "GOAL_RUNNER") ManusIndigoBg else ManusSlate900)
                     .border(1.dp, if (activeMode == "GOAL_RUNNER") ManusCyan.copy(alpha = 0.5f) else SleekBorder, RoundedCornerShape(8.dp))
                     .clickable { activeMode = "GOAL_RUNNER" }
-                    .padding(vertical = 7.dp),
+                    .padding(vertical = 7.dp)
+                    .testTag("goal_runner_mode_tab"),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "⚡ Lead AI Goal Execution",
+                    text = "⚡ Plan & Tasks",
                     color = if (activeMode == "GOAL_RUNNER") ManusCyan else ManusSlate400,
                     fontSize = 11.5.sp,
                     fontWeight = if (activeMode == "GOAL_RUNNER") FontWeight.Bold else FontWeight.Medium
@@ -160,303 +208,517 @@ fun ManusAgentView(
             }
         }
 
-        if (activeMode == "SWARM") {
+        // Live Chat Messages Stream
+        if (activeMode == "CHAT") {
+            ChatConversationView(
+                messages = currentSession?.messages ?: emptyList(),
+                isBusy = isBusy,
+                statusText = statusText,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+        } else if (activeMode == "SWARM") {
             MultiAgentTeamSection(viewModel = viewModel)
         }
 
-        // Sleek Interface Goal Input Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(ManusSlate900)
-                .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
-                .padding(14.dp)
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(ManusIndigoBg),
-                        contentAlignment = Alignment.Center
+        // Goal Runner & Plan Section
+        if (activeMode == "GOAL_RUNNER") {
+            // Sleek Interface Goal Input Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(ManusSlate900)
+                    .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+                    .padding(14.dp)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Psychology,
-                            contentDescription = null,
-                            tint = ManusIndigoLight,
-                            modifier = Modifier.size(15.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(ManusIndigoBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Psychology,
+                                contentDescription = null,
+                                tint = ManusIndigoLight,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                        Text(
+                            text = "MANUS AUTONOMOUS REASONING CORE",
+                            color = ManusWhite,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.5.sp
                         )
                     }
-                    Text(
-                        text = "MANUS AUTONOMOUS REASONING CORE",
-                        color = ManusWhite,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp
-                    )
-                }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = agentInputGoal,
-                        onValueChange = { viewModel.setAgentInputGoal(it) },
-                        placeholder = {
-                            Text(
-                                "Instruct agent to build an app, compile code, or solve tasks...",
-                                color = ManusSlate500,
-                                fontSize = 12.sp
-                            )
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("agent_goal_input"),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ManusIndigo,
-                            unfocusedBorderColor = SleekBorder,
-                            focusedTextColor = ManusWhite,
-                            unfocusedTextColor = ManusWhite,
-                            focusedContainerColor = ManusSlate850,
-                            unfocusedContainerColor = ManusSlate850
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        singleLine = false,
-                        maxLines = 3,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                        keyboardActions = KeyboardActions(onSend = {
-                            if (!isBusy && agentInputGoal.isNotBlank()) {
-                                viewModel.runAgentGoal()
-                            }
-                        })
-                    )
-
-                    Button(
-                        onClick = { viewModel.runAgentGoal() },
-                        enabled = !isBusy && agentInputGoal.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = ManusIndigo,
-                            disabledContainerColor = SleekSurface
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
-                        modifier = Modifier.testTag("agent_run_button")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (isBusy) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = ManusWhite,
-                                strokeWidth = 2.dp
+                        OutlinedTextField(
+                            value = agentInputGoal,
+                            onValueChange = { viewModel.setAgentInputGoal(it) },
+                            placeholder = {
+                                Text(
+                                    "Instruct agent to build an app, compile code, or solve tasks...",
+                                    color = ManusSlate500,
+                                    fontSize = 12.sp
+                                )
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("agent_goal_input"),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = ManusIndigo,
+                                unfocusedBorderColor = SleekBorder,
+                                focusedTextColor = ManusWhite,
+                                unfocusedTextColor = ManusWhite,
+                                focusedContainerColor = ManusSlate850,
+                                unfocusedContainerColor = ManusSlate850
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            singleLine = false,
+                            maxLines = 3,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                            keyboardActions = KeyboardActions(onSend = {
+                                if (!isBusy && agentInputGoal.isNotBlank()) {
+                                    viewModel.runAgentGoal()
+                                }
+                            })
+                        )
+
+                        Button(
+                            onClick = { viewModel.runAgentGoal() },
+                            enabled = !isBusy && agentInputGoal.isNotBlank(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ManusIndigo,
+                                disabledContainerColor = SleekSurface
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
+                            modifier = Modifier.testTag("agent_run_button")
+                        ) {
+                            if (isBusy) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = ManusWhite,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = "Run Goal",
+                                    tint = ManusWhite,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // Preset Goals chips in Sleek styling
+                    Text(
+                        text = "Suggested Goals:",
+                        color = ManusSlate500,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        item {
+                            PresetChip(
+                                icon = Icons.Default.SportsEsports,
+                                label = "Cyber Snake Game",
+                                onClick = { viewModel.runAgentGoal("Build an interactive 2D Cyberpunk Snake game with HTML5 canvas, scoreboard, and touch controls.") }
                             )
-                        } else {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Run Goal",
-                                tint = ManusWhite,
-                                modifier = Modifier.size(16.dp)
+                        }
+                        item {
+                            PresetChip(
+                                icon = Icons.AutoMirrored.Filled.TrendingUp,
+                                label = "Crypto Quant Dashboard",
+                                onClick = { viewModel.runAgentGoal("Build a Crypto market quant tracker with live tickers, order flow simulation, and Chart.js charts.") }
+                            )
+                        }
+                        item {
+                            PresetChip(
+                                icon = Icons.Default.DataObject,
+                                label = "Python Data Science",
+                                onClick = { viewModel.runAgentGoal("Run Python regression analysis on server metrics CSV, generate report, and output statistics.") }
+                            )
+                        }
+                        item {
+                            PresetChip(
+                                icon = Icons.Default.Code,
+                                label = "Multi-Runtime Benchmark",
+                                onClick = { viewModel.runAgentGoal("Compile C sorting algorithms with GCC, run Node prime benchmark, and test system uptime.") }
                             )
                         }
                     }
                 }
+            }
 
-                // Preset Goals chips in Sleek styling
-                Text(
-                    text = "Suggested Goals:",
-                    color = ManusSlate500,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                LazyRow(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Status bar & Toggle Reasoning
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    item {
-                        PresetChip(
-                            icon = Icons.Default.SportsEsports,
-                            label = "Cyber Snake Game",
-                            onClick = { viewModel.runAgentGoal("Build an interactive 2D Cyberpunk Snake game with HTML5 canvas, scoreboard, and touch controls.") }
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (isBusy) ManusAmber else ManusEmerald)
+                    )
+                    Text(
+                        text = statusText,
+                        color = if (isBusy) ManusAmber else ManusEmerald,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+
+                if (reasoningLogs.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(SleekSurface)
+                            .border(1.dp, SleekBorder, RoundedCornerShape(6.dp))
+                            .clickable { showReasoningLogs = !showReasoningLogs }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Reasoning Logs (${reasoningLogs.size})",
+                            color = ManusSlate400,
+                            fontSize = 10.sp,
+                            fontFamily = FontFamily.Monospace
                         )
-                    }
-                    item {
-                        PresetChip(
-                            icon = Icons.AutoMirrored.Filled.TrendingUp,
-                            label = "Crypto Quant Dashboard",
-                            onClick = { viewModel.runAgentGoal("Build a Crypto market quant tracker with live tickers, order flow simulation, and Chart.js charts.") }
-                        )
-                    }
-                    item {
-                        PresetChip(
-                            icon = Icons.Default.DataObject,
-                            label = "Python Data Science",
-                            onClick = { viewModel.runAgentGoal("Run Python regression analysis on server metrics CSV, generate report, and output statistics.") }
-                        )
-                    }
-                    item {
-                        PresetChip(
-                            icon = Icons.Default.Code,
-                            label = "Multi-Runtime Benchmark",
-                            onClick = { viewModel.runAgentGoal("Compile C sorting algorithms with GCC, run Node prime benchmark, and test system uptime.") }
+                        Icon(
+                            imageVector = if (showReasoningLogs) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = null,
+                            tint = ManusSlate400,
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-        // Status bar & Toggle Reasoning
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            // Expandable Reasoning Log Block (Sleek Obsidian Card)
+            AnimatedVisibility(
+                visible = showReasoningLogs && reasoningLogs.isNotEmpty(),
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
             ) {
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (isBusy) ManusAmber else ManusEmerald)
-                )
-                Text(
-                    text = statusText,
-                    color = if (isBusy) ManusAmber else ManusEmerald,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Monospace
-                )
-            }
-
-            if (reasoningLogs.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(SleekSurface)
-                        .border(1.dp, SleekBorder, RoundedCornerShape(6.dp))
-                        .clickable { showReasoningLogs = !showReasoningLogs }
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .fillMaxWidth()
+                        .height(115.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(ManusSlate900)
+                        .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
+                        .padding(10.dp)
                 ) {
-                    Text(
-                        text = "Reasoning Logs (${reasoningLogs.size})",
-                        color = ManusSlate400,
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Icon(
-                        imageVector = if (showReasoningLogs) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = null,
-                        tint = ManusSlate400,
-                        modifier = Modifier.size(14.dp)
-                    )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        items(reasoningLogs) { log ->
+                            Text(
+                                text = log,
+                                color = when {
+                                    log.startsWith("🧠") || log.startsWith("💭") -> ManusIndigoSoft
+                                    log.startsWith("⚡") -> ManusAmber
+                                    log.startsWith("✓") || log.startsWith("🎉") -> ManusGreen
+                                    log.startsWith("⚠️") -> ManusRed
+                                    else -> ManusSlate200
+                                },
+                                fontSize = 10.5.sp,
+                                fontFamily = FontFamily.Monospace,
+                                lineHeight = 14.5.sp
+                            )
+                        }
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Expandable Reasoning Log Block (Sleek Obsidian Card)
-        AnimatedVisibility(
-            visible = showReasoningLogs && reasoningLogs.isNotEmpty(),
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(115.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(ManusSlate900)
-                    .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
-                    .padding(10.dp)
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
+            // Structured Tasks List
+            if (currentTask != null) {
+                TaskPlanDisplay(
+                    task = currentTask!!,
+                    onOpenBrowser = { viewModel.selectTab(ActiveWorkspaceTab.BROWSER) },
+                    onOpenTerminal = { viewModel.selectTab(ActiveWorkspaceTab.TERMINAL) }
+                )
+            } else {
+                // Empty State Placeholder
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ManusSlate900)
+                        .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+                        .padding(20.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(reasoningLogs) { log ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(ManusIndigo.copy(alpha = 0.15f))
+                                .border(1.dp, ManusIndigo.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Psychology,
+                                contentDescription = null,
+                                tint = ManusIndigoLight,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                         Text(
-                            text = log,
-                            color = when {
-                                log.startsWith("🧠") || log.startsWith("💭") -> ManusIndigoSoft
-                                log.startsWith("⚡") -> ManusAmber
-                                log.startsWith("✓") || log.startsWith("🎉") -> ManusGreen
-                                log.startsWith("⚠️") -> ManusRed
-                                else -> ManusSlate200
-                            },
-                            fontSize = 10.5.sp,
-                            fontFamily = FontFamily.Monospace,
-                            lineHeight = 14.5.sp
+                            text = "Autonomous Virtual PC Ready",
+                            color = ManusWhite,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "Select a preset or describe any task. Manus will autonomously inspect workspace, compile code, execute scripts, and verify live preview.",
+                            color = ManusSlate400,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            lineHeight = 16.sp
                         )
                     }
                 }
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(8.dp))
+@Composable
+fun ChatConversationView(
+    messages: List<ChatMessage>,
+    isBusy: Boolean,
+    statusText: String,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyListState()
 
-        // Structured Tasks List
-        if (currentTask != null) {
-            TaskPlanDisplay(
-                task = currentTask!!,
-                onOpenBrowser = { viewModel.selectTab(ActiveWorkspaceTab.BROWSER) },
-                onOpenTerminal = { viewModel.selectTab(ActiveWorkspaceTab.TERMINAL) }
-            )
-        } else {
-            // Empty State Placeholder
+    // Auto-scroll to latest message
+    LaunchedEffect(messages.size, isBusy) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(ManusSlate900)
+            .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+            .padding(10.dp)
+    ) {
+        if (messages.isEmpty()) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ManusSlate900)
-                    .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
-                    .padding(20.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(ManusIndigo.copy(alpha = 0.15f))
-                            .border(1.dp, ManusIndigo.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Psychology,
-                            contentDescription = null,
-                            tint = ManusIndigoLight,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.SmartToy,
+                        contentDescription = null,
+                        tint = ManusCyan,
+                        modifier = Modifier.size(36.dp)
+                    )
                     Text(
-                        text = "Autonomous Virtual PC Ready",
+                        text = "Start a conversation with VirgoYT AI",
                         color = ManusWhite,
-                        fontSize = 15.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Select a preset or describe any task. Manus will autonomously inspect workspace, compile code, execute scripts, and verify live preview.",
+                        text = "Type below to request UE5 games, 3D GLB assets, Google Earth maps, or code solutions.",
                         color = ManusSlate400,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 20.dp),
+                        fontSize = 11.5.sp,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        lineHeight = 16.sp
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
                 }
+            }
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(messages) { message ->
+                    ChatMessageBubble(message = message)
+                }
+
+                if (isBusy) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = ManusCyan,
+                                strokeWidth = 2.dp
+                            )
+                            Text(
+                                text = statusText,
+                                color = ManusCyan,
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChatMessageBubble(message: ChatMessage) {
+    val isUser = message.role == "user"
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(if (isUser) 0.85f else 0.95f)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 12.dp,
+                        topEnd = 12.dp,
+                        bottomStart = if (isUser) 12.dp else 2.dp,
+                        bottomEnd = if (isUser) 2.dp else 12.dp
+                    )
+                )
+                .background(if (isUser) ManusIndigo.copy(alpha = 0.35f) else ManusSlate850)
+                .border(
+                    1.dp,
+                    if (isUser) ManusIndigo.copy(alpha = 0.7f) else SleekBorder,
+                    RoundedCornerShape(
+                        topStart = 12.dp,
+                        topEnd = 12.dp,
+                        bottomStart = if (isUser) 12.dp else 2.dp,
+                        bottomEnd = if (isUser) 2.dp else 12.dp
+                    )
+                )
+                .padding(12.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // Header: Author & Model badge
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = if (isUser) "👤 You" else "🤖 ${message.modelUsed.displayName}",
+                            color = if (isUser) ManusCyan else ManusIndigoLight,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(ManusSlate950)
+                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = message.modelUsed.provider,
+                            color = ManusSlate400,
+                            fontSize = 8.5.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                }
+
+                // Attachments chips if any
+                if (message.attachments.isNotEmpty()) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(message.attachments) { att ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(ManusSlate900)
+                                    .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                ) {
+                                    Text(text = att.type.icon, fontSize = 10.sp)
+                                    Text(
+                                        text = att.name,
+                                        color = ManusWhite,
+                                        fontSize = 9.5.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Message Text Content
+                Text(
+                    text = message.content,
+                    color = ManusWhite,
+                    fontSize = 12.5.sp,
+                    lineHeight = 17.sp,
+                    fontFamily = if (!isUser && (message.content.contains("`") || message.content.contains("- "))) FontFamily.SansSerif else FontFamily.Default
+                )
             }
         }
     }

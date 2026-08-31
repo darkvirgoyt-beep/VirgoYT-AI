@@ -56,6 +56,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.manus.data.model.AiModelTier
@@ -98,6 +103,8 @@ fun UniversalPromptBar(
         modifier = modifier
             .fillMaxWidth()
             .background(ManusSlate950)
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -409,7 +416,15 @@ fun UniversalPromptBar(
                 shape = RoundedCornerShape(22.dp),
                 modifier = Modifier
                     .weight(1f)
-                    .testTag("universal_prompt_input")
+                    .testTag("universal_prompt_input"),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = {
+                    if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) {
+                        viewModel.dispatchUniversalAutonomousPrompt(promptText, pendingAttachments)
+                        promptText = ""
+                        modelRouter.clearPendingAttachments()
+                    }
+                })
             )
 
             // Send Button
