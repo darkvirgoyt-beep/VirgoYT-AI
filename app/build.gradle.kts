@@ -56,7 +56,15 @@ android {
     compose = true
     buildConfig = true
   }
-  testOptions { unitTests { isIncludeAndroidResources = true } }
+  testOptions {
+    unitTests {
+      isIncludeAndroidResources = true
+      isReturnDefaultValues = true
+      all {
+        it.jvmArgs("-Djava.awt.headless=true", "-XX:+EnableDynamicAgentLoading")
+      }
+    }
+  }
   dependenciesInfo {
     includeInApk = false
     includeInBundle = true
