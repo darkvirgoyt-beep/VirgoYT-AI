@@ -46,10 +46,10 @@ class GitHubAuthManager {
 
     private val _userRepos = MutableStateFlow<List<GitHubRepo>>(
         listOf(
-            GitHubRepo("virgoyt-ai-platform", "darkvirgoyt/virgoyt-ai-platform", "Autonomous AI Software Engineer Platform & Multi-Agent Hive", "Kotlin", 312),
-            GitHubRepo("autonomous-agent-hive", "darkvirgoyt/autonomous-agent-hive", "15 Specialized Sub-Agents with Vector Communication", "TypeScript", 185),
-            GitHubRepo("unreal-engine-ai-bridge", "darkvirgoyt/unreal-engine-ai-bridge", "Realtime AI code generation bridge for UE5 and Unity", "C++", 142),
-            GitHubRepo("vector-rag-engine", "darkvirgoyt/vector-rag-engine", "1536-Dimensional embedding memory lookup system", "Rust", 97)
+            GitHubRepo("VirgoYT-AI", "darkvirgoyt-beep/VirgoYT-AI", "Autonomous AI Software Engineer Platform & Multi-Agent Swarm", "Kotlin", 420),
+            GitHubRepo("autonomous-agent-hive", "darkvirgoyt-beep/autonomous-agent-hive", "15 Specialized Sub-Agents with Vector Communication", "TypeScript", 185),
+            GitHubRepo("unreal-engine-ai-bridge", "darkvirgoyt-beep/unreal-engine-ai-bridge", "Realtime AI code generation bridge for UE5 and Unity", "C++", 142),
+            GitHubRepo("vector-rag-engine", "darkvirgoyt-beep/vector-rag-engine", "1536-Dimensional embedding memory lookup system", "Rust", 97)
         )
     )
     val userRepos: StateFlow<List<GitHubRepo>> = _userRepos.asStateFlow()
@@ -72,7 +72,7 @@ class GitHubAuthManager {
         return auth
     }
 
-    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "darkvirgoyt"): Boolean {
+    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "darkvirgoyt-beep"): Boolean {
         val trimmed = codeOrToken.trim()
         val pending = _pendingDeviceAuth.value
 
