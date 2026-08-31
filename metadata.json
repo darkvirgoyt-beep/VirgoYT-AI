@@ -1,0 +1,6 @@
+{
+  "name": "VirgoYT AI",
+  "description": "VirgoYT AI Autonomous Cloud Supercomputer with Unreal Engine 5 Game Studio, 3D GLB Model Maker, Google Earth 3D Maps, Multi-Model OpenRouter/NVIDIA Router, and Live Remote Control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

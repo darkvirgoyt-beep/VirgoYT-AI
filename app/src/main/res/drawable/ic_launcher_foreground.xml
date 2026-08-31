@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Virtual Terminal Window Frame -->
+    <path
+        android:pathData="M26,24 h56 a6,6 0 0 1 6,6 v48 a6,6 0 0 1 -6,6 h-56 a6,6 0 0 1 -6,-6 v-48 a6,6 0 0 1 6,-6 z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#38BDF8">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="20"
+                android:startY="20"
+                android:endX="88"
+                android:endY="88"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#330EA5E9" />
+                <item android:offset="1.0" android:color="#446366F1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Terminal Top Header Bar -->
+    <path
+        android:pathData="M20,34 h68"
+        android:strokeWidth="1.5"
+        android:strokeColor="#38BDF8" />
+
+    <!-- Terminal Window Action Dots -->
+    <path
+        android:pathData="M27,29 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:fillColor="#EF4444" />
+    <path
+        android:pathData="M34,29 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:fillColor="#F59E0B" />
+    <path
+        android:pathData="M41,29 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:fillColor="#10B981" />
+
+    <!-- Terminal Prompt '>_' Symbol -->
+    <path
+        android:pathData="M28,45 L37,53 L28,61"
+        android:strokeWidth="3"
+        android:strokeColor="#38BDF8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Blinking Cursor Bar -->
+    <path
+        android:pathData="M42,61 h12"
+        android:strokeWidth="3.5"
+        android:strokeColor="#00F0FF"
+        android:strokeLineCap="round" />
+
+    <!-- Cloud Compute Pulse Node -->
+    <path
+        android:pathData="M60,43 a8,8 0 0 1 14,-2 a6,6 0 0 1 5,6 a5,5 0 0 1 -2,8 h-18 a6,6 0 0 1 1,-12 z"
+        android:fillColor="#818CF8" />
+
+    <path
+        android:pathData="M32,71 h30"
+        android:strokeWidth="2"
+        android:strokeColor="#22D3EE"
+        android:strokeLineCap="round" />
+</vector>
