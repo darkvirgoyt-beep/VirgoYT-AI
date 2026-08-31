@@ -46,10 +46,10 @@ class GitHubAuthManager {
 
     private val _userRepos = MutableStateFlow<List<GitHubRepo>>(
         listOf(
-            GitHubRepo("manus-cloud-pc", "developer/manus-cloud-pc", "Full-stack Cloud Computer & Autonomous Agent Sandbox", "Kotlin", 142),
-            GitHubRepo("cursor-ai-assistant", "developer/cursor-ai-assistant", "Intelligent inline code editor and bash generator", "TypeScript", 89),
-            GitHubRepo("python-data-pipeline", "developer/python-data-pipeline", "High-performance streaming analytics engine", "Python", 34),
-            GitHubRepo("neural-network-from-scratch", "developer/neural-network-from-scratch", "Pure C/C++ neural network architecture", "C", 67)
+            GitHubRepo("virgoyt-ai-platform", "darkvirgoyt/virgoyt-ai-platform", "Autonomous AI Software Engineer Platform & Multi-Agent Hive", "Kotlin", 312),
+            GitHubRepo("autonomous-agent-hive", "darkvirgoyt/autonomous-agent-hive", "15 Specialized Sub-Agents with Vector Communication", "TypeScript", 185),
+            GitHubRepo("unreal-engine-ai-bridge", "darkvirgoyt/unreal-engine-ai-bridge", "Realtime AI code generation bridge for UE5 and Unity", "C++", 142),
+            GitHubRepo("vector-rag-engine", "darkvirgoyt/vector-rag-engine", "1536-Dimensional embedding memory lookup system", "Rust", 97)
         )
     )
     val userRepos: StateFlow<List<GitHubRepo>> = _userRepos.asStateFlow()
@@ -72,7 +72,7 @@ class GitHubAuthManager {
         return auth
     }
 
-    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "developer"): Boolean {
+    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "darkvirgoyt"): Boolean {
         val trimmed = codeOrToken.trim()
         val pending = _pendingDeviceAuth.value
 
@@ -91,11 +91,11 @@ class GitHubAuthManager {
 
             _currentUser.value = GitHubUser(
                 username = username,
-                name = username.replaceFirstChar { it.uppercase() } + " Cloud Dev",
-                email = "$username@users.noreply.github.com",
+                name = "VirgoYT AI",
+                email = "darkvirgoyt@gmail.com",
                 avatarUrl = "https://avatars.githubusercontent.com/u/849201?v=4",
                 publicRepos = _userRepos.value.size,
-                followers = 128,
+                followers = 256,
                 token = finalToken
             )
             _isConnected.value = true
@@ -105,15 +105,15 @@ class GitHubAuthManager {
         return false
     }
 
-    fun connectDirectWeb(username: String = "developer") {
+    fun connectDirectWeb(username: String = "darkvirgoyt") {
         val token = "gho_" + UUID.randomUUID().toString().replace("-", "").take(24)
         _currentUser.value = GitHubUser(
             username = username,
-            name = username.replaceFirstChar { it.uppercase() } + " Developer",
-            email = "$username@github.com",
+            name = "VirgoYT AI",
+            email = "darkvirgoyt@gmail.com",
             avatarUrl = "https://avatars.githubusercontent.com/u/849201?v=4",
             publicRepos = _userRepos.value.size,
-            followers = 142,
+            followers = 256,
             token = token
         )
         _isConnected.value = true
@@ -127,7 +127,7 @@ class GitHubAuthManager {
     }
 
     fun addRepo(name: String, description: String = "", language: String = "Kotlin"): GitHubRepo {
-        val user = _currentUser.value?.username ?: "developer"
+        val user = _currentUser.value?.username ?: "darkvirgoyt"
         val repo = GitHubRepo(
             name = name,
             fullName = "$user/$name",
