@@ -33,9 +33,9 @@ class ExampleRobolectricTest {
         assertTrue(indexFile!!.content.contains("<!DOCTYPE html>"))
 
         // Create and read a new file
-        vfs.writeFile("/workspace/test.txt", "Hello from Manus Cloud VFS")
+        vfs.writeFile("/workspace/test.txt", "Hello from VirgoYT Cloud VFS")
         val content = vfs.readFile("/workspace/test.txt")
-        assertEquals("Hello from Manus Cloud VFS", content)
+        assertEquals("Hello from VirgoYT Cloud VFS", content)
 
         // Delete file
         val deleted = vfs.deleteFile("/workspace/test.txt")
@@ -52,8 +52,8 @@ class ExampleRobolectricTest {
         assertEquals("/workspace", pwdOut)
 
         // Test echo
-        val echoOut = terminal.executeCommand("echo 'Manus Cloud PC'")
-        assertEquals("Manus Cloud PC", echoOut)
+        val echoOut = terminal.executeCommand("echo 'VirgoYT Cloud AI'")
+        assertEquals("VirgoYT Cloud AI", echoOut)
 
         // Test python execution
         val pyOut = terminal.executeCommand("python3 scripts/data_analyzer.py")

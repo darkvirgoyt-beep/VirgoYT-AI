@@ -31,7 +31,7 @@ val ManusDarkColorScheme = darkColorScheme(
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Use our sleek Manus aesthetic
+    dynamicColor: Boolean = false, // Use our sleek dark developer aesthetic
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

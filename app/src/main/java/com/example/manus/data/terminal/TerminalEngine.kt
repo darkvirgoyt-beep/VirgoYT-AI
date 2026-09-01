@@ -52,7 +52,7 @@ class TerminalEngine(
             OutputType.SYSTEM
         )
         appendEntry(
-            "║  MANUS CLOUD PC - VIRTUAL LINUX SANDBOX (Ubuntu 24.04 LTS)   ║",
+            "║  VIRGOYT CLOUD AI - VIRTUAL LINUX SANDBOX (Ubuntu 24.04 LTS) ║",
             OutputType.SYSTEM
         )
         appendEntry(
@@ -60,14 +60,14 @@ class TerminalEngine(
             OutputType.SYSTEM
         )
         appendEntry(
-            "║  Type 'help', 'gh auth login' or 'manus install' for CLI!     ║",
+            "║  Type 'help', 'gh auth login' or 'virgoyt install' for CLI!   ║",
             OutputType.SYSTEM
         )
         appendEntry(
             "╚═══════════════════════════════════════════════════════════════╝",
             OutputType.SYSTEM
         )
-        appendEntry("developer@manus-cloud-pc:~/workspace$ ready. [Mode: Cloud VM]", OutputType.SUCCESS)
+        appendEntry("developer@virgoyt-cloud-ai:~/workspace$ ready. [Mode: Cloud VM]", OutputType.SUCCESS)
     }
 
     fun getCurrentDir(): String = currentDir
@@ -224,7 +224,7 @@ Available Commands:
 
                 "signup", "useradd" -> {
                     val newUsername = args.firstOrNull()
-                    val newEmail = if (args.size > 1) args[1] else "$newUsername@manus.cloud"
+                    val newEmail = if (args.size > 1) args[1] else "$newUsername@virgoyt.cloud"
                     val newPass = if (args.size > 2) args[2] else "${newUsername}123"
                     if (newUsername == null) {
                         val err = "Usage: signup <username> [email] [password]"
@@ -470,9 +470,9 @@ MiB Mem :   8192.0 total,   5120.0 free,   1840.0 used,   1232.0 buff/cache
 MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6224.0 avail Mem 
 
   PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
- 1289 manus     20   0  380.2m  42.1m  18.4m S   8.2   0.5   0:03.14 node
- 1042 manus     20   0   18.5m   4.2m   3.1m S   1.8   0.1   0:01.02 bash
- 1350 manus     20   0   84.6m  24.8m  12.0m S   0.9   0.3   0:00.45 python3
+ 1289 virgoyt   20   0  380.2m  42.1m  18.4m S   8.2   0.5   0:03.14 node
+ 1042 virgoyt   20   0   18.5m   4.2m   3.1m S   1.8   0.1   0:01.02 bash
+ 1350 virgoyt   20   0   84.6m  24.8m  12.0m S   0.9   0.3   0:00.45 python3
 """.trimIndent()
                     appendEntry(topText, OutputType.STDOUT)
                     outputBuilder.append(topText)
@@ -502,7 +502,7 @@ MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6224.0 avail Mem
                     if (isLong) {
                         appendEntry("total ${files.size * 4}", OutputType.STDOUT)
                         files.forEach { f ->
-                            val perm = if (f.isDirectory) "drwxr-xr-x 2 manus dev" else "-rw-r--r-- 1 manus dev"
+                            val perm = if (f.isDirectory) "drwxr-xr-x 2 virgoyt dev" else "-rw-r--r-- 1 virgoyt dev"
                             val size = if (f.isDirectory) 4096 else f.sizeBytes
                             val line = String.format(
                                 Locale.US,
@@ -931,7 +931,7 @@ Console.WriteLine("✓ Microservice running with zero latency.");
                     when (sub) {
                         "run" -> {
                             val scriptKey = args.getOrNull(1) ?: "dev"
-                            appendEntry("> manus-cloud-workspace@1.0.0 $scriptKey", OutputType.SYSTEM)
+                            appendEntry("> virgoyt-cloud-workspace@1.0.0 $scriptKey", OutputType.SYSTEM)
                             appendEntry("> Compiling project assets and launching isolated runtime...", OutputType.STDOUT)
                             delay(300)
                             when (scriptKey) {
@@ -979,7 +979,7 @@ Console.WriteLine("✓ Microservice running with zero latency.");
                             val text = """
 On branch main
 Your branch is up to date with 'origin/main'.
-Remote: https://github.com/$ghUser/manus-cloud-pc.git (fetch & push)
+Remote: https://github.com/$ghUser/virgoyt-cloud-pc.git (fetch & push)
 Auth: ${if (isGh) "✓ Authenticated as @$ghUser" else "⚠️ Not connected (run 'gh auth login')"}
 
 Changes not staged for commit:
@@ -1159,7 +1159,7 @@ github.com
                                 }
                                 "create" -> {
                                     val repoName = args.getOrNull(2) ?: "new-repo"
-                                    val newRepo = githubManager.addRepo(repoName, "Created from Manus Cloud Terminal")
+                                    val newRepo = githubManager.addRepo(repoName, "Created from VirgoYT Cloud AI Terminal")
                                     val msg = "✓ Created repository ${newRepo.fullName} on GitHub (HTTPS: https://github.com/${newRepo.fullName}.git)"
                                     appendEntry(msg, OutputType.SUCCESS)
                                     outputBuilder.append(msg)

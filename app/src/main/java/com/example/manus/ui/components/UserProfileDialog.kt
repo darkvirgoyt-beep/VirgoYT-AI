@@ -130,7 +130,7 @@ fun UserProfileDialog(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "${currentSession?.user?.role ?: "Developer"} • ${currentSession?.user?.email ?: "dev@manus.cloud"}",
+                                text = "${currentSession?.user?.role ?: "Developer"} • ${currentSession?.user?.email ?: "dev@virgoyt.cloud"}",
                                 color = VirgoCyanGlow,
                                 fontSize = 10.sp
                             )

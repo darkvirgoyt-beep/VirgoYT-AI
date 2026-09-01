@@ -545,8 +545,8 @@ fun CloudTerminalView(
                 }
                 item { QuickCmdButton("gh auth login") { viewModel.executeTerminalCommand("gh auth login") } }
                 item { QuickCmdButton("gh repo list") { viewModel.executeTerminalCommand("gh repo list") } }
-                item { QuickCmdButton("manus install") { viewModel.executeTerminalCommand("manus install") } }
-                item { QuickCmdButton("manus mode local") { viewModel.executeTerminalCommand("manus mode local") } }
+                item { QuickCmdButton("virgoyt install") { viewModel.executeTerminalCommand("virgoyt install") } }
+                item { QuickCmdButton("virgoyt mode local") { viewModel.executeTerminalCommand("virgoyt mode local") } }
                 item { QuickCmdButton("git status") { viewModel.executeTerminalCommand("git status") } }
                 item { QuickCmdButton("ls -la") { viewModel.executeTerminalCommand("ls -la") } }
                 item { QuickCmdButton("whoami") { viewModel.executeTerminalCommand("whoami") } }

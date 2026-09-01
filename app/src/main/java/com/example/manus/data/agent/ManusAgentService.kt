@@ -142,7 +142,7 @@ Return STRICTLY a JSON object with this format:
             ?: throw RuntimeException("No text in candidate response")
 
         val parsedPlan = JSONObject(text)
-        val explanation = parsedPlan.optString("explanation", "Executing task on Manus Cloud PC")
+        val explanation = parsedPlan.optString("explanation", "Executing task on VirgoYT Cloud AI")
         val subtasksArray = parsedPlan.optJSONArray("subtasks") ?: JSONArray()
 
         val taskList = mutableListOf<AgentSubtask>()

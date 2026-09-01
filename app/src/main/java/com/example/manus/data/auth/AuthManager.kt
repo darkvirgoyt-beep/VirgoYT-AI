@@ -24,7 +24,7 @@ class AuthManager {
         val guestUser = User(
             username = "guest",
             displayName = "Guest Developer",
-            email = "guest@manus.cloud",
+            email = "guest@virgoyt.cloud",
             passwordHash = hashPassword("guest123"),
             role = "Guest Developer",
             avatarColorHex = 0xFF6366F1, // Indigo
@@ -59,7 +59,7 @@ class AuthManager {
         val newUser = User(
             username = cleanUsername,
             displayName = if (displayName.isNotBlank()) displayName.trim() else cleanUsername,
-            email = if (email.isBlank()) "$cleanUsername@manus.cloud" else email.trim(),
+            email = if (email.isBlank()) "$cleanUsername@virgoyt.cloud" else email.trim(),
             passwordHash = hashPassword(password),
             role = "Developer",
             avatarColorHex = assignedColor,
@@ -140,7 +140,7 @@ class AuthManager {
         // Fallback to guest user on logout to maintain session continuity in cloud terminal
         val guest = users["guest"] ?: User(
             username = "guest",
-            email = "guest@manus.cloud",
+            email = "guest@virgoyt.cloud",
             passwordHash = hashPassword("guest123"),
             role = "Guest",
             avatarColorHex = 0xFF00F0FF,

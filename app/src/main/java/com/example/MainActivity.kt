@@ -94,7 +94,7 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .testTag("manus_cloud_app_root"),
+            .testTag("virgoyt_cloud_app_root"),
         containerColor = ManusSlate950
     ) { innerPadding ->
         Box(

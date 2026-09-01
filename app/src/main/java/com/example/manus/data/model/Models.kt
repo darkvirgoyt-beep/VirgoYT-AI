@@ -133,7 +133,7 @@ enum class AiModelTier(
     GEMINI_2_5_PRO(
         id = "google/gemini-2.5-pro",
         displayName = "Gemini 2.5 Pro",
-        provider = "Google AI Studio",
+        provider = "Google AI / DeepMind",
         iconEmoji = "✨",
         specialty = "1M token context, Google Earth spatial GIS & 3D world synthesis"
     )
