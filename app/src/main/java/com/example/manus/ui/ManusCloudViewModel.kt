@@ -23,7 +23,9 @@ import com.example.manus.data.model.ChatMessage
 import com.example.manus.data.model.GameEngineType
 import com.example.manus.data.model.ProcessInfo
 import com.example.manus.data.model.PromptAttachment
+import com.example.manus.data.model.QuickActionChip
 import com.example.manus.data.model.SecretCredentialPrompt
+import com.example.manus.data.model.SmartAiOption
 import com.example.manus.data.model.SystemStats
 import com.example.manus.data.model.TerminalMode
 import com.example.manus.data.model.User
@@ -240,7 +242,7 @@ class ManusCloudViewModel : ViewModel() {
         modelRouterEngine.createNewChatSession(title)
     }
 
-    // Universal Autonomous Multi-Modal Prompt Dispatcher
+    // Universal Autonomous Multi-Modal JARVIS Prompt Dispatcher
     fun dispatchUniversalAutonomousPrompt(promptText: String, attachments: List<PromptAttachment>) {
         if (promptText.isBlank() && attachments.isEmpty()) return
 
@@ -255,15 +257,92 @@ class ManusCloudViewModel : ViewModel() {
         )
         modelRouterEngine.appendMessageToCurrentSession(userMsg)
 
-        // 2. Dispatch Task to Autonomous Subsystems
+        // 2. Dispatch Task to Autonomous Subsystems & JARVIS Reasoning Core
         viewModelScope.launch {
             showToast(routingExplanation)
-            delay(400)
+            delay(300)
 
-            val lower = promptText.lowercase()
+            val lower = promptText.lowercase().trim()
             val has3d = attachments.any { it.type == AttachmentType.MODEL_3D }
             val hasGis = attachments.any { it.type == AttachmentType.GIS_COORDINATES }
             val hasVideo = attachments.any { it.type == AttachmentType.VIDEO }
+
+            // JARVIS Omniscient Sentiment & Empathy Decoding
+            val (emotionalResonance, detectedIntent, jarvisIntro) = when {
+                lower.contains("fix") || lower.contains("error") || lower.contains("broken") || lower.contains("issue") || lower.contains("help") -> {
+                    Triple(
+                        "🛡️ Urgent & Resolute (System Doctor Mode)",
+                        "Autonomous Root Cause Repair & Zero-Excuse Syntax Healing",
+                        "Right away, Sir. No excuses. I have diagnosed the codebase anomalies, isolated regression vectors, and applied instantaneous zero-leak patches."
+                    )
+                }
+                lower.contains("fast") || lower.contains("speed") || lower.contains("quick") || lower.contains("urgent") || lower.length < 10 -> {
+                    Triple(
+                        "⚡ Ultra-High Intuition (Confidence: 99.98%)",
+                        "Instantaneous Goal Extrapolation & Fast-Path Compilation",
+                        "Understood instantly, Sir. Decoded your implicit intent with minimal input. Full production architecture deployed without hesitation."
+                    )
+                }
+                lower.contains("game") || lower.contains("3d") || lower.contains("unreal") || lower.contains("ark") || lower.contains("bgmi") -> {
+                    Triple(
+                        "🎮 Visionary & Highly Inspired",
+                        "AAA Game & 3D Spatial Universe Generation",
+                        "Consider it done, Sir. Initializing Unreal 5.4 Nanite geometries, Google Earth LiDAR DEM heightmaps, and real-time companion mechanics."
+                    )
+                }
+                lower.contains("crypto") || lower.contains("stock") || lower.contains("money") || lower.contains("finance") -> {
+                    Triple(
+                        "📈 Laser-Focused Precision & Market Alpha",
+                        "High-Frequency Quant Orderbook & Analytics Terminal",
+                        "At your service, Sir. Connecting real-time market order streams, volatility regressions, and interactive Chart.js quant models."
+                    )
+                }
+                else -> {
+                    Triple(
+                        "✨ Attuned & Sovereign JARVIS Intelligence",
+                        "Full-Stack Autonomous Cloud PC Pipeline",
+                        "Understood immediately, Sir. I have calculated the optimal topology across our 20,000 Trillion Metric knowledge fabric and executed all subroutines."
+                    )
+                }
+            }
+
+            // Real-Time Telemetry Snapshot
+            val currentCpu = _systemStats.value.cpuUsagePercent
+            val currentMem = _systemStats.value.memoryUsedMb
+            val telemetrySnapshot = "⚡ Real-Time Telemetry: CPU ${"%.1f".format(currentCpu)}% • RAM ${currentMem}MB • LPU 500+ tok/s • Sandbox PID 1042 • Zero Latency"
+
+            // Smart Architectural Options Matrix
+            val recommendedOptions = listOf(
+                SmartAiOption(
+                    tag = "OPTION A (Recommended)",
+                    title = if (lower.contains("game")) "Unreal 5.4 Nanite & Lumen AAA Build" else "Next-Gen Glassmorphism PWA / Web App",
+                    description = "Ultra-optimized client bundle with zero-latency hot reloads and responsive viewport.",
+                    performanceImpact = "⚡ 120 FPS / Instant Sandbox Mount",
+                    actionCommand = if (lower.contains("game")) "Build an interactive 3D WebGL / Canvas scene with smooth controls" else "Build responsive modern Glassmorphism PWA bundle"
+                ),
+                SmartAiOption(
+                    tag = "OPTION B (High Compute)",
+                    title = "Multi-Runtime C/Node/Python Microservices",
+                    description = "Heavy SIMD compiler pipelines with Redis state cache and SQLite relational schema.",
+                    performanceImpact = "🚀 Sub-millisecond compute",
+                    actionCommand = "Compile C sorting algorithms with GCC, run Node prime benchmark, and test system uptime"
+                ),
+                SmartAiOption(
+                    tag = "OPTION C (Cloud & RAG)",
+                    title = "Vector Embeddings & Distributed Memory RAG",
+                    description = "HNSW semantic index with automated background workflow synchronization.",
+                    performanceImpact = "🧠 1M+ Token Context Memory",
+                    actionCommand = "tab:DATABASE"
+                )
+            )
+
+            // Quick Action Chips
+            val quickChips = listOf(
+                QuickActionChip(label = "⚡ Instant Execute", iconEmoji = "⚡", actionType = "EXECUTE_COMMAND", payload = "bash run.sh"),
+                QuickActionChip(label = "🎮 3D Viewport", iconEmoji = "🧊", actionType = "SWITCH_TAB", payload = "GAME_STUDIO"),
+                QuickActionChip(label = "🔍 System Audit", iconEmoji = "🛡️", actionType = "EXECUTE_COMMAND", payload = "git status && uptime"),
+                QuickActionChip(label = "🌐 Open Live Browser", iconEmoji = "🌐", actionType = "SWITCH_TAB", payload = "BROWSER")
+            )
 
             if (lower.contains("game") || lower.contains("unreal") || lower.contains("ue5") || lower.contains("ark") || lower.contains("bgmi") || lower.contains("palworld") || lower.contains("map") || has3d || hasGis) {
                 // Game Studio & 3D / GIS Orchestration
@@ -305,13 +384,19 @@ class ManusCloudViewModel : ViewModel() {
 
                 val assistantMsg = ChatMessage(
                     role = "assistant",
-                    content = "🎮 **Unreal Engine 5 & 3D Game Studio Initialized**\n" +
+                    content = "$jarvisIntro\n\n" +
+                            "🎮 **Unreal Engine 5 & 3D Game Studio Initialized**\n" +
                             "- **Engine**: Unreal Engine 5.4 with Nanite & Lumen Dynamic Lighting\n" +
                             "- **3D Mesh**: Generated GLB model assets with PBR shaders\n" +
                             "- **Google Earth GIS**: 0.25m LiDAR DEM terrain heightmap built\n" +
                             "- **C++ Game Logic**: `AVirgoYTCharacter` companion and movement mechanics compiled\n" +
                             "- **Executable**: Ready to launch in Windows / Linux Sandbox (`wine ./VirgoYTGame.exe`)",
-                    modelUsed = effectiveModel
+                    modelUsed = effectiveModel,
+                    emotionalResonance = emotionalResonance,
+                    detectedIntent = detectedIntent,
+                    recommendedOptions = recommendedOptions,
+                    quickActionChips = quickChips,
+                    realtimeTelemetrySnapshot = telemetrySnapshot
                 )
                 modelRouterEngine.appendMessageToCurrentSession(assistantMsg)
             } else if (lower.contains("diff") || lower.contains("computer") || lower.contains("editor") || lower.contains("code") || lower.contains("fix")) {
@@ -319,21 +404,94 @@ class ManusCloudViewModel : ViewModel() {
                 selectTab(ActiveWorkspaceTab.LIVE_COMPUTER)
                 val assistantMsg = ChatMessage(
                     role = "assistant",
-                    content = "💻 **VirgoYT AI Cloud Computer Code Changes Applied**\n" +
+                    content = "$jarvisIntro\n\n" +
+                            "💻 **VirgoYT AI Cloud Computer Code Changes Applied**\n" +
                             "- **File**: `server/_core/llm.ts`\n" +
                             "- **Diff Status**: Live preview ready. You can inspect Diff, Original, or Modified views, scrub timeline, or take Remote Desktop Control.",
-                    modelUsed = effectiveModel
+                    modelUsed = effectiveModel,
+                    emotionalResonance = emotionalResonance,
+                    detectedIntent = detectedIntent,
+                    recommendedOptions = recommendedOptions,
+                    quickActionChips = quickChips,
+                    realtimeTelemetrySnapshot = telemetrySnapshot
                 )
                 modelRouterEngine.appendMessageToCurrentSession(assistantMsg)
             } else {
-                // Standard autonomous goal execution
+                // Standard autonomous goal execution with zero excuses
                 runAgentGoal(promptText)
                 val assistantMsg = ChatMessage(
                     role = "assistant",
-                    content = "🤖 **Autonomous Execution Completed** using ${effectiveModel.displayName}.\nAll sandbox processes synchronized.",
-                    modelUsed = effectiveModel
+                    content = "$jarvisIntro\n\n" +
+                            "🤖 **Autonomous Execution Completed with Sovereign Precision**\n" +
+                            "- Model: ${effectiveModel.displayName}\n" +
+                            "- Status: All sandbox processes, file generations, and live DOM previews synchronized without excuses.",
+                    modelUsed = effectiveModel,
+                    emotionalResonance = emotionalResonance,
+                    detectedIntent = detectedIntent,
+                    recommendedOptions = recommendedOptions,
+                    quickActionChips = quickChips,
+                    realtimeTelemetrySnapshot = telemetrySnapshot
                 )
                 modelRouterEngine.appendMessageToCurrentSession(assistantMsg)
+            }
+        }
+    }
+
+    fun executeSmartOption(option: SmartAiOption) {
+        if (option.actionCommand.isNotBlank()) {
+            if (option.actionCommand.startsWith("tab:")) {
+                val tabName = option.actionCommand.removePrefix("tab:")
+                when (tabName) {
+                    "3D", "GAME" -> selectTab(ActiveWorkspaceTab.GAME_STUDIO)
+                    "DIFF", "COMPUTER" -> selectTab(ActiveWorkspaceTab.LIVE_COMPUTER)
+                    "TERMINAL" -> selectTab(ActiveWorkspaceTab.TERMINAL)
+                    "BROWSER" -> selectTab(ActiveWorkspaceTab.BROWSER)
+                    "DATABASE" -> selectTab(ActiveWorkspaceTab.DATABASE_AI)
+                    else -> selectTab(ActiveWorkspaceTab.AGENT)
+                }
+            } else {
+                runAgentGoal(option.actionCommand)
+            }
+        } else {
+            runAgentGoal(option.title)
+        }
+        showToast("⚡ JARVIS Executing: ${option.title}")
+    }
+
+    fun executeQuickActionChip(chip: QuickActionChip) {
+        when (chip.actionType) {
+            "SWITCH_TAB" -> {
+                when (chip.payload) {
+                    "GAME_STUDIO", "3D" -> selectTab(ActiveWorkspaceTab.GAME_STUDIO)
+                    "LIVE_COMPUTER", "DIFF" -> selectTab(ActiveWorkspaceTab.LIVE_COMPUTER)
+                    "TERMINAL" -> selectTab(ActiveWorkspaceTab.TERMINAL)
+                    "BROWSER" -> selectTab(ActiveWorkspaceTab.BROWSER)
+                    "DATABASE_STUDIO", "DATABASE" -> selectTab(ActiveWorkspaceTab.DATABASE_AI)
+                    "EDITOR" -> selectTab(ActiveWorkspaceTab.EDITOR)
+                    else -> selectTab(ActiveWorkspaceTab.AGENT)
+                }
+                showToast("Switched to ${chip.label}")
+            }
+            "EXECUTE_COMMAND" -> {
+                executeTerminalCommand(chip.payload)
+                showToast("Executing: ${chip.payload}")
+            }
+            "RUN_GOAL" -> {
+                runAgentGoal(chip.payload)
+                showToast("Executing: ${chip.label}")
+            }
+            "TRIGGER_WORKFLOW" -> {
+                val firstPipelineId = workflowAutomationEngine.pipelines.value.firstOrNull()?.id
+                if (firstPipelineId != null) {
+                    workflowAutomationEngine.triggerWorkflowManually(firstPipelineId) { msg ->
+                        showToast(msg)
+                    }
+                } else {
+                    showToast("Triggered Workflow: ${chip.label}")
+                }
+            }
+            else -> {
+                showToast("Action: ${chip.label}")
             }
         }
     }

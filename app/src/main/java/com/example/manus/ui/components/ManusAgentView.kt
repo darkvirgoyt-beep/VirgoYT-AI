@@ -214,6 +214,8 @@ fun ManusAgentView(
                 messages = currentSession?.messages ?: emptyList(),
                 isBusy = isBusy,
                 statusText = statusText,
+                onOptionClick = { viewModel.executeSmartOption(it) },
+                onChipClick = { viewModel.executeQuickActionChip(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -528,6 +530,8 @@ fun ChatConversationView(
     messages: List<ChatMessage>,
     isBusy: Boolean,
     statusText: String,
+    onOptionClick: (com.example.manus.data.model.SmartAiOption) -> Unit = {},
+    onChipClick: (com.example.manus.data.model.QuickActionChip) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -562,13 +566,13 @@ fun ChatConversationView(
                         modifier = Modifier.size(36.dp)
                     )
                     Text(
-                        text = "Start a conversation with VirgoYT AI",
+                        text = "Start a conversation with VirgoYT JARVIS AI",
                         color = ManusWhite,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Type below to request UE5 games, 3D GLB assets, Google Earth maps, or code solutions.",
+                        text = "Type below to request UE5 games, 3D GLB assets, Google Earth maps, or code solutions with zero excuses.",
                         color = ManusSlate400,
                         fontSize = 11.5.sp,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -583,7 +587,11 @@ fun ChatConversationView(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(messages) { message ->
-                    ChatMessageBubble(message = message)
+                    ChatMessageBubble(
+                        message = message,
+                        onOptionClick = onOptionClick,
+                        onChipClick = onChipClick
+                    )
                 }
 
                 if (isBusy) {
@@ -615,7 +623,11 @@ fun ChatConversationView(
 }
 
 @Composable
-fun ChatMessageBubble(message: ChatMessage) {
+fun ChatMessageBubble(
+    message: ChatMessage,
+    onOptionClick: (com.example.manus.data.model.SmartAiOption) -> Unit = {},
+    onChipClick: (com.example.manus.data.model.QuickActionChip) -> Unit = {}
+) {
     val isUser = message.role == "user"
 
     Row(
@@ -624,7 +636,7 @@ fun ChatMessageBubble(message: ChatMessage) {
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(if (isUser) 0.85f else 0.95f)
+                .fillMaxWidth(if (isUser) 0.85f else 0.98f)
                 .clip(
                     RoundedCornerShape(
                         topStart = 12.dp,
@@ -646,7 +658,7 @@ fun ChatMessageBubble(message: ChatMessage) {
                 )
                 .padding(12.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Header: Author & Model badge
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -677,6 +689,49 @@ fun ChatMessageBubble(message: ChatMessage) {
                             fontSize = 8.5.sp,
                             fontFamily = FontFamily.Monospace
                         )
+                    }
+                }
+
+                // JARVIS Emotional Resonance & Intent Badges (if present)
+                if (!isUser && (message.emotionalResonance != null || message.detectedIntent != null)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (message.emotionalResonance != null) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(ManusIndigoBg)
+                                    .border(1.dp, ManusIndigo.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 7.dp, vertical = 3.dp)
+                            ) {
+                                Text(
+                                    text = message.emotionalResonance,
+                                    color = ManusCyan,
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
+                        if (message.detectedIntent != null) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(ManusSlate950)
+                                    .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 7.dp, vertical = 3.dp)
+                            ) {
+                                Text(
+                                    text = "🎯 ${message.detectedIntent}",
+                                    color = ManusEmerald,
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -719,6 +774,132 @@ fun ChatMessageBubble(message: ChatMessage) {
                     lineHeight = 17.sp,
                     fontFamily = if (!isUser && (message.content.contains("`") || message.content.contains("- "))) FontFamily.SansSerif else FontFamily.Default
                 )
+
+                // Recommended Smart Options Matrix (Options A, B, C)
+                if (!isUser && message.recommendedOptions.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "⚡ JARVIS SUITABLE ARCHITECTURAL PATHS:",
+                            color = ManusSlate400,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        message.recommendedOptions.forEach { opt ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(ManusSlate900)
+                                    .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
+                                    .clickable { onOptionClick(opt) }
+                                    .padding(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Text(
+                                                text = opt.tag,
+                                                color = ManusCyan,
+                                                fontSize = 9.5.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = opt.performanceImpact,
+                                                color = ManusEmerald,
+                                                fontSize = 8.5.sp,
+                                                fontFamily = FontFamily.Monospace
+                                            )
+                                        }
+                                        Text(
+                                            text = opt.title,
+                                            color = ManusWhite,
+                                            fontSize = 11.5.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            text = opt.description,
+                                            color = ManusSlate400,
+                                            fontSize = 10.sp,
+                                            lineHeight = 13.sp
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(ManusIndigo)
+                                            .padding(horizontal = 8.dp, vertical = 5.dp)
+                                    ) {
+                                        Text(
+                                            text = "⚡ Run",
+                                            color = ManusWhite,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Quick Action Chips Row
+                if (!isUser && message.quickActionChips.isNotEmpty()) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(message.quickActionChips) { chip ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(ManusSlate950)
+                                    .border(1.dp, SleekBorder, RoundedCornerShape(16.dp))
+                                    .clickable { onChipClick(chip) }
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(text = chip.iconEmoji, fontSize = 11.sp)
+                                    Text(
+                                        text = chip.label,
+                                        color = ManusSlate200,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Live Real-Time Telemetry Bar (if present)
+                if (!isUser && message.realtimeTelemetrySnapshot != null) {
+                    Text(
+                        text = message.realtimeTelemetrySnapshot,
+                        color = ManusSlate500,
+                        fontSize = 9.sp,
+                        fontFamily = FontFamily.Monospace,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
             }
         }
     }

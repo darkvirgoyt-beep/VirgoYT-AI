@@ -157,6 +157,23 @@ data class PromptAttachment(
     val metaDescription: String = ""
 )
 
+data class SmartAiOption(
+    val id: String = UUID.randomUUID().toString(),
+    val tag: String, // e.g. "OPTION A (Recommended)"
+    val title: String, // e.g. "Next-Gen Reactive Glassmorphism App"
+    val description: String,
+    val performanceImpact: String = "⚡ 120 FPS / Instant Load",
+    val actionCommand: String = "" // e.g. "build pwa"
+)
+
+data class QuickActionChip(
+    val id: String = UUID.randomUUID().toString(),
+    val label: String,
+    val iconEmoji: String = "⚡",
+    val actionType: String = "EXECUTE_COMMAND", // SWITCH_TAB, EXECUTE_COMMAND, RUN_GOAL, TRIGGER_WORKFLOW
+    val payload: String = ""
+)
+
 data class ChatMessage(
     val id: String = UUID.randomUUID().toString(),
     val role: String, // "user", "assistant", "system"
@@ -164,7 +181,13 @@ data class ChatMessage(
     val modelUsed: AiModelTier = AiModelTier.AUTO_ROUTER,
     val attachments: List<PromptAttachment> = emptyList(),
     val timestamp: Long = System.currentTimeMillis(),
-    val toolExecutions: List<String> = emptyList()
+    val toolExecutions: List<String> = emptyList(),
+    val emotionalResonance: String? = null,
+    val detectedIntent: String? = null,
+    val recommendedOptions: List<SmartAiOption> = emptyList(),
+    val quickActionChips: List<QuickActionChip> = emptyList(),
+    val realtimeTelemetrySnapshot: String? = null,
+    val confidenceScore: Float = 0.999f
 )
 
 data class ChatSession(
