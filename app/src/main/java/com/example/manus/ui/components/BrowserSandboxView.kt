@@ -291,7 +291,6 @@ fun BrowserSandboxView(
                         WebView(ctx).apply {
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
-                            settings.databaseEnabled = true
                             settings.allowFileAccess = true
                             settings.loadWithOverviewMode = true
                             settings.useWideViewPort = true

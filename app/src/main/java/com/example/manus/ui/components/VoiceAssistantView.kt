@@ -28,12 +28,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RecordVoiceOver
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -265,7 +265,7 @@ fun VoiceAssistantView(
                         Icon(
                             imageVector = when (voiceState) {
                                 VoiceState.LISTENING -> Icons.Default.Mic
-                                VoiceState.SPEAKING -> Icons.Default.VolumeUp
+                                VoiceState.SPEAKING -> Icons.AutoMirrored.Filled.VolumeUp
                                 VoiceState.PROCESSING -> Icons.Default.GraphicEq
                                 VoiceState.IDLE -> Icons.Default.Mic
                             },

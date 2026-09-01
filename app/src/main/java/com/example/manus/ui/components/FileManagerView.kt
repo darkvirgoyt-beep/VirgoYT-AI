@@ -23,17 +23,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DriveFileMove
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -372,7 +372,7 @@ fun FileManagerView(viewModel: ManusCloudViewModel) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(
-                                    imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.Default.InsertDriveFile,
+                                    imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
                                     contentDescription = if (file.isDirectory) "Dir" else "File",
                                     tint = if (file.isDirectory) ManusCyanAccent else ManusIndigoLight,
                                     modifier = Modifier.size(18.dp)
@@ -505,7 +505,7 @@ fun FileManagerView(viewModel: ManusCloudViewModel) {
                                     modifier = Modifier.size(26.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.DriveFileMove,
+                                        imageVector = Icons.AutoMirrored.Filled.DriveFileMove,
                                         contentDescription = "Move",
                                         tint = ManusSlate400,
                                         modifier = Modifier.size(14.dp)
