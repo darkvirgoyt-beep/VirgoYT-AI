@@ -142,9 +142,9 @@ Available Commands:
       gh gist create <file>     - Create public GitHub Gist
       git <status|log|commit|push|pull|clone|remote> - Standard Git operations
   • Multi-Platform Terminal CLI:
-      manus install             - Show CLI install commands for Linux, macOS, Windows, Termux
-      manus mode <cloud|local>  - Switch terminal between Cloud VM and Localhost daemon
-      manus status              - Show active system specs, GitHub link & network mode
+      virgoyt install           - Show CLI install commands for Linux, macOS, Windows, Termux
+      virgoyt mode <cloud|local>- Switch terminal between Cloud VM and Localhost daemon
+      virgoyt status            - Show active system specs, GitHub link & network mode
   • Navigation & Files:
       ls [-la], cd <dir>, pwd, cat <file>, touch <file>, mkdir [-p] <dir>,
       rm [-rf] <path>, cp <src> <dest>, mv <src> <dest>, rename <file> <newName>,
@@ -152,11 +152,17 @@ Available Commands:
   • User & Session Management:
       whoami, users, login <user> [pass], signup <user> [email] [pass],
       logout, su <user>, session, auth
-  • Code Compiling & Script Execution:
-      python3 <script.py>       - Run Python script in isolated interpreter
-      node <script.js>          - Execute JavaScript runtime script
-      gcc <file.c> -o <bin>     - Compile C code and generate binary
-      bash <script.sh> / ./<sh> - Run shell automation script
+  • High-End Compilers & Runtimes:
+      dotnet run / build / test - .NET 9.0 SDK & C# 13 Runtime
+      csc <Program.cs>          - Microsoft Roslyn C# Compiler
+      g++ / clang++ <file.cpp>  - Modern C++23 Compiler (-O3, AST optimization)
+      gcc / clang <file.c>      - High-Performance C Compiler & Linker
+      rustc <file.rs> / cargo   - Rust 1.80 Compiler & Package Engine
+      go run / build <file.go>  - Go 1.23 Fast Concurrency Runtime
+      javac / java <File.java>  - Java 21 LTS OpenJDK Platform
+      python3 <script.py>       - Python 3.12 Data Science & ML Engine
+      node <script.js>          - Node.js v22 JavaScript/TypeScript Engine
+      bash <script.sh> / ./<bin>- Shell automation & native ELF execution
   • Package & Network:
       npm run <dev|start|test>, pip install <pkg>, curl <url>, ping <host>, top, ps, df, free
 """.trimIndent()
@@ -406,7 +412,7 @@ User Session Details:
                 }
 
                 "uname" -> {
-                    val unameStr = "Linux manus-cloud-pc 6.8.0-31-generic #31-Ubuntu SMP PREEMPT_DYNAMIC x86_64 GNU/Linux"
+                    val unameStr = "Linux virgoyt-cloud-ai 6.8.0-31-generic #31-Ubuntu SMP PREEMPT_DYNAMIC x86_64 GNU/Linux"
                     appendEntry(unameStr, OutputType.STDOUT)
                     outputBuilder.append(unameStr)
                 }
@@ -691,28 +697,205 @@ MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6224.0 avail Mem
                     }
                 }
 
-                "gcc", "g++" -> {
-                    val srcName = args.firstOrNull()
+                "gcc", "g++", "clang", "clang++" -> {
+                    val isCpp = cmd == "g++" || cmd == "clang++" || args.any { it.endsWith(".cpp") || it.endsWith(".cxx") || it.endsWith(".cc") }
+                    val compilerName = if (cmd.startsWith("clang")) "LLVM Clang 18.1" else "GCC 14.2"
+                    val langStandard = if (isCpp) "C++23 (ISO/IEC 14882:2024)" else "C23 (ISO/IEC 9899:2024)"
+                    val srcName = args.firstOrNull { !it.startsWith("-") }
                     if (srcName == null) {
-                        val err = "gcc: fatal error: no input files"
+                        val err = "$cmd: fatal error: no input files"
                         appendEntry(err, OutputType.STDERR)
                         outputBuilder.append(err)
                     } else {
                         val path = resolvePath(srcName)
                         val code = vfs.readFile(path)
                         if (code != null) {
-                            appendEntry("[*] Compiling C source $srcName with GCC 14.2 optimization (-O3)...", OutputType.SYSTEM)
-                            delay(350)
-                            val binName = if (args.contains("-o")) args[args.indexOf("-o") + 1] else "a.out"
-                            appendEntry("[+] Linking objects -> binary: $binName", OutputType.SUCCESS)
-                            // Register binary in VFS
-                            vfs.writeFile("$currentDir/$binName", "[COMPILED_ELF_BINARY_X86_64]")
+                            appendEntry("[*] Invoking $compilerName [$langStandard] -O3 -flto -march=native...", OutputType.SYSTEM)
+                            delay(250)
+                            appendEntry("[1/3] Parsing syntax AST and checking static type contracts...", OutputType.STDOUT)
+                            delay(150)
+                            val binName = if (args.contains("-o")) args[args.indexOf("-o") + 1] else srcName.substringBeforeLast('.')
+                            appendEntry("[2/3] Emitting optimized LLVM machine code and linking runtime...", OutputType.STDOUT)
+                            vfs.writeFile("$currentDir/$binName", "[COMPILED_ELF_BINARY_X86_64]\n$code")
+                            appendEntry("[3/3] Binary successfully generated: $binName", OutputType.SUCCESS)
                             appendEntry("[✓] Compilation successful: 0 errors, 0 warnings.", OutputType.SUCCESS)
+
+                            // If flags or command included immediate execution
+                            if (args.contains("-run") || args.contains("--run")) {
+                                appendEntry("\n--- Running Binary: ./$binName ---", OutputType.SYSTEM)
+                                val executionLog = if (isCpp) executeCppCode(code) else executePythonCode(code)
+                                appendEntry(executionLog, OutputType.STDOUT)
+                                appendEntry("[✓] Process returned 0", OutputType.SUCCESS)
+                            }
                             outputBuilder.append("Compilation successful")
                         } else {
-                            val err = "gcc: error: $srcName: No such file or directory"
+                            val err = "$cmd: error: $srcName: No such file or directory"
                             appendEntry(err, OutputType.STDERR)
                             outputBuilder.append(err)
+                        }
+                    }
+                }
+
+                "dotnet" -> {
+                    val sub = args.firstOrNull() ?: "help"
+                    when (sub) {
+                        "run" -> {
+                            val targetFile = args.getOrNull(1) ?: "Program.cs"
+                            val path = resolvePath(targetFile)
+                            var code = vfs.readFile(path)
+                            if (code == null) {
+                                // Search for any .cs file in current directory
+                                val csFile = vfs.getAllFiles().firstOrNull { it.path.startsWith(currentDir) && it.name.endsWith(".cs") }
+                                if (csFile != null) {
+                                    code = csFile.content
+                                }
+                            }
+                            if (code != null) {
+                                appendEntry("[*] Building .NET 9.0 SDK Project with Roslyn JIT/AOT...", OutputType.SYSTEM)
+                                delay(300)
+                                appendEntry("  Determining projects to restore...", OutputType.STDOUT)
+                                appendEntry("  Restored /workspace/VirgoApp.csproj (in 112 ms).", OutputType.STDOUT)
+                                appendEntry("  VirgoApp -> /workspace/bin/Release/net9.0/VirgoApp.dll", OutputType.SUCCESS)
+                                appendEntry("\n--- Output: .NET 9.0 CoreCLR ---", OutputType.SYSTEM)
+                                val result = executeCSharpCode(code)
+                                appendEntry(result, OutputType.STDOUT)
+                                appendEntry("[✓] .NET Application exited with code 0.", OutputType.SUCCESS)
+                                outputBuilder.append(result)
+                            } else {
+                                appendEntry("MSBUILD : error MSB1009: Project file does not exist or no .cs source found.", OutputType.STDERR)
+                            }
+                        }
+                        "build" -> {
+                            appendEntry(".NET SDK 9.0.100\nBuilding /workspace/VirgoApp.csproj for .NET 9.0 (x64 Release)...", OutputType.SYSTEM)
+                            delay(250)
+                            appendEntry("  Optimizing assembly: Native AOT compilation active.", OutputType.STDOUT)
+                            appendEntry("Build succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed: 00:00:00.84", OutputType.SUCCESS)
+                        }
+                        "test" -> {
+                            appendEntry("Starting test execution, please wait...", OutputType.SYSTEM)
+                            delay(250)
+                            appendEntry("A total of 18 test files matched the specified pattern.", OutputType.STDOUT)
+                            appendEntry("[xUnit.net 00:00:00.45] Total: 18, Passed: 18, Failed: 0, Skipped: 0", OutputType.SUCCESS)
+                        }
+                        "new" -> {
+                            val template = args.getOrNull(1) ?: "console"
+                            val csSample = """
+// Program.cs - .NET 9.0 C# 13 High-Performance Service
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+Console.WriteLine("🚀 VirgoYT Cloud AI - High-End .NET 9.0 C# Microservice");
+var numbers = Enumerable.Range(1, 10).Select(x => x * x).ToList();
+Console.WriteLine($"Computed squares: {string.Join(", ", numbers)}");
+Console.WriteLine("✓ Microservice running with zero latency.");
+""".trimIndent()
+                            vfs.writeFile("$currentDir/Program.cs", csSample)
+                            appendEntry("The template \"Console App\" was created successfully.\nCreated Program.cs in $currentDir", OutputType.SUCCESS)
+                        }
+                        else -> {
+                            appendEntry(".NET SDK (9.0.100)\nUsage: dotnet [run|build|test|new <console|web>]", OutputType.STDOUT)
+                        }
+                    }
+                }
+
+                "csc" -> {
+                    val srcName = args.firstOrNull() ?: "Program.cs"
+                    val path = resolvePath(srcName)
+                    val code = vfs.readFile(path)
+                    if (code != null) {
+                        appendEntry("Microsoft (R) Visual C# Compiler version 4.12.0-3.24574.8 (Roslyn)", OutputType.SYSTEM)
+                        appendEntry("Copyright (C) Microsoft Corporation. All rights reserved.", OutputType.STDOUT)
+                        delay(250)
+                        val outName = srcName.substringBeforeLast('.') + ".exe"
+                        vfs.writeFile("$currentDir/$outName", "[DOTNET_PE_BINARY]\n$code")
+                        appendEntry("[✓] Output generated: $outName (Target: net9.0-windows/linux)", OutputType.SUCCESS)
+                    } else {
+                        appendEntry("fatal error CS2001: Source file '$srcName' could not be found", OutputType.STDERR)
+                    }
+                }
+
+                "rustc", "cargo" -> {
+                    if (cmd == "cargo") {
+                        val sub = args.firstOrNull() ?: "build"
+                        when (sub) {
+                            "run", "build", "check" -> {
+                                val rsFile = vfs.getAllFiles().firstOrNull { it.name.endsWith(".rs") }
+                                val code = rsFile?.content ?: "fn main() { println!(\"VirgoYT Rust Microkernel\"); }"
+                                appendEntry("   Compiling virgoyt-core v0.1.0 (/workspace)", OutputType.SYSTEM)
+                                delay(300)
+                                appendEntry("    Finished release [optimized] target(s) in 0.72s", OutputType.SUCCESS)
+                                if (sub == "run") {
+                                    appendEntry("     Running `target/release/virgoyt-core`", OutputType.SYSTEM)
+                                    appendEntry(executeRustCode(code), OutputType.STDOUT)
+                                    appendEntry("[✓] Process finished with exit code 0", OutputType.SUCCESS)
+                                }
+                            }
+                            else -> appendEntry("cargo 1.80.0 (376290e 2024-07-16)\nUsage: cargo [run|build|check|test]", OutputType.STDOUT)
+                        }
+                    } else {
+                        val src = args.firstOrNull() ?: "main.rs"
+                        val path = resolvePath(src)
+                        val code = vfs.readFile(path)
+                        if (code != null) {
+                            appendEntry("[*] Compiling $src with rustc 1.80.0 (LLVM 18.1 backend)...", OutputType.SYSTEM)
+                            delay(250)
+                            val bin = src.substringBeforeLast('.')
+                            vfs.writeFile("$currentDir/$bin", "[RUST_NATIVE_ELF]\n$code")
+                            appendEntry("[✓] Compiled binary '$bin' created successfully.", OutputType.SUCCESS)
+                        } else {
+                            appendEntry("error[E0463]: can't find source file `$src`", OutputType.STDERR)
+                        }
+                    }
+                }
+
+                "go" -> {
+                    val sub = args.firstOrNull() ?: "version"
+                    when (sub) {
+                        "run" -> {
+                            val src = args.getOrNull(1) ?: "main.go"
+                            val path = resolvePath(src)
+                            val code = vfs.readFile(path)
+                            if (code != null) {
+                                appendEntry("[*] Building and executing Go routine: $src...", OutputType.SYSTEM)
+                                delay(200)
+                                appendEntry(executeGoCode(code), OutputType.STDOUT)
+                                appendEntry("[✓] Go process exited without panic (status: 0)", OutputType.SUCCESS)
+                            } else {
+                                appendEntry("go: cannot find '$src': No such file", OutputType.STDERR)
+                            }
+                        }
+                        "build" -> {
+                            val src = args.getOrNull(1) ?: "main.go"
+                            appendEntry("[*] go build: linking dynamic ELF with cgo enabled...", OutputType.SYSTEM)
+                            delay(250)
+                            appendEntry("[✓] Binary ${src.substringBeforeLast('.')} generated.", OutputType.SUCCESS)
+                        }
+                        else -> appendEntry("go version go1.23.0 linux/amd64", OutputType.STDOUT)
+                    }
+                }
+
+                "javac", "java" -> {
+                    val src = args.firstOrNull() ?: "Main.java"
+                    val path = resolvePath(src)
+                    val code = vfs.readFile(path)
+                    if (cmd == "javac") {
+                        if (code != null) {
+                            appendEntry("[*] Compiling $src with OpenJDK 21 javac...", OutputType.SYSTEM)
+                            delay(250)
+                            vfs.writeFile("$currentDir/${src.substringBeforeLast('.')}.class", "[JAVA_BYTECODE_21]")
+                            appendEntry("[✓] Bytecode generated: ${src.substringBeforeLast('.')}.class", OutputType.SUCCESS)
+                        } else {
+                            appendEntry("javac: file not found: $src", OutputType.STDERR)
+                        }
+                    } else {
+                        if (code != null) {
+                            appendEntry("[*] Launching OpenJDK 21 JVM runtime...", OutputType.SYSTEM)
+                            delay(200)
+                            appendEntry(executeJavaCode(code), OutputType.STDOUT)
+                            appendEntry("[✓] JVM terminated successfully.", OutputType.SUCCESS)
+                        } else {
+                            appendEntry("Error: Could not find or load main class $src", OutputType.STDERR)
                         }
                     }
                 }
@@ -812,13 +995,13 @@ no changes added to commit (use "git add")
                         "log" -> {
                             val text = """
 commit 7f3a8b29c18d (HEAD -> main, origin/main)
-Author: Manus Autonomous Agent <agent@manus.cloud>
+Author: VirgoYT Autonomous Agent <agent@virgoyt.cloud>
 Date:   Mon Aug 31 05:20:00 2026 -0700
 
     feat: integrate sandbox canvas simulator and cyber glassmorphism styles
 
 commit 1a2b3c4d5e6f
-Author: Manus System <system@manus.cloud>
+Author: VirgoYT System <system@virgoyt.cloud>
 Date:   Mon Aug 31 05:00:00 2026 -0700
 
     initial: initialize cloud computer virtual pc workspace
@@ -842,7 +1025,7 @@ Date:   Mon Aug 31 05:00:00 2026 -0700
                                 appendEntry("Compressing objects: 100% (8/8), done.", OutputType.STDOUT)
                                 appendEntry("Writing objects: 100% (12/12), 4.21 KiB | 4.21 MiB/s, done.", OutputType.STDOUT)
                                 appendEntry("Total 12 (delta 4), reused 0 (delta 0), pack-reused 0", OutputType.STDOUT)
-                                appendEntry("To https://github.com/$ghUser/manus-cloud-pc.git\n   7f3a8b2..9b8c7d6  main -> main", OutputType.SUCCESS)
+                                appendEntry("To https://github.com/$ghUser/virgoyt-cloud-ai.git\n   7f3a8b2..9b8c7d6  main -> main", OutputType.SUCCESS)
                             }
                         }
                         "pull" -> {
@@ -851,7 +1034,7 @@ Date:   Mon Aug 31 05:00:00 2026 -0700
                         }
                         "remote" -> {
                             val ghUser = githubManager.currentUser.value?.username ?: "developer"
-                            appendEntry("origin\thttps://github.com/$ghUser/manus-cloud-pc.git (fetch)\norigin\thttps://github.com/$ghUser/manus-cloud-pc.git (push)", OutputType.STDOUT)
+                            appendEntry("origin\thttps://github.com/$ghUser/virgoyt-cloud-ai.git (fetch)\norigin\thttps://github.com/$ghUser/virgoyt-cloud-ai.git (push)", OutputType.STDOUT)
                         }
                         "clone" -> {
                             val targetRepo = args.getOrNull(1) ?: "https://github.com/developer/sample-repo.git"
@@ -859,7 +1042,7 @@ Date:   Mon Aug 31 05:00:00 2026 -0700
                             appendEntry("Cloning into '$repoName'...", OutputType.STDOUT)
                             delay(250)
                             appendEntry("remote: Enumerating objects: 45, done.\nremote: Total 45 (delta 18), reused 45 (delta 18)\nReceiving objects: 100% (45/45), 18.23 KiB | 2.10 MiB/s, done.", OutputType.STDOUT)
-                            vfs.addFile("/workspace/$repoName/README.md", "# $repoName\n\nCloned via Manus Cloud Terminal Git Client.")
+                            vfs.addFile("/workspace/$repoName/README.md", "# $repoName\n\nCloned via VirgoYT Cloud Terminal Git Client.")
                             appendEntry("Resolving deltas: 100% (18/18), done.\n[✓] Repo '$repoName' cloned to /workspace/$repoName", OutputType.SUCCESS)
                         }
                         else -> appendEntry("git version 2.45.0", OutputType.STDOUT)
@@ -988,7 +1171,7 @@ github.com
                         "issue" -> {
                             val user = githubManager.currentUser.value?.username ?: "developer"
                             val issuesText = """
-Showing 3 open issues for $user/manus-cloud-pc:
+Showing 3 open issues for $user/virgoyt-cloud-ai:
 
 #42  [Feat] Add multi-platform terminal CLI installer (Linux/Mac/Win/Termux)  (opened 2h ago by @user)
 #41  [Auth] Implement GitHub Device Code web-to-terminal OAuth bridge         (opened 4h ago by @dev)
@@ -1028,39 +1211,39 @@ GitHub CLI (gh) 2.50.0:
                     }
                 }
 
-                "manus" -> {
+                "virgoyt", "manus" -> {
                     val sub = args.firstOrNull() ?: "help"
                     when (sub) {
                         "install", "cli" -> {
                             val installBanner = """
 ╔════════════════════════════════════════════════════════════════════════════╗
-║             MANUS CLOUD TERMINAL - MULTI-PLATFORM CLI INSTALLER            ║
+║             VIRGOYT CLOUD AI TERMINAL - MULTI-PLATFORM CLI INSTALLER       ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
 Select your platform or copy the 1-line installation command:
 
 🐧 LINUX (Ubuntu, Debian, Fedora, Arch):
-   curl -fsSL https://manus.cloud/install.sh | bash
-   manus login && manus start
+   curl -fsSL https://virgoyt.cloud/install.sh | bash
+   virgoyt login && virgoyt start
 
 🍎 MACOS (Apple Silicon & Intel / Homebrew):
-   brew install manus-ai/tap/manus-cli
+   brew install virgoyt-ai/tap/virgoyt-cli
    # or via direct installer:
-   curl -fsSL https://manus.cloud/install-mac.sh | bash
+   curl -fsSL https://virgoyt.cloud/install-mac.sh | bash
 
 🪟 WINDOWS (PowerShell 7+ / WSL2 / Command Prompt):
-   powershell -c "irm https://manus.cloud/install.ps1 | iex"
+   powershell -c "irm https://virgoyt.cloud/install.ps1 | iex"
    # or via winget:
-   winget install ManusAI.ManusCli
+   winget install VirgoYTAI.VirgoYTCli
 
 📱 ANDROID (Termux Terminal):
    pkg update && pkg install -y git python curl openssh nodejs
-   curl -fsSL https://manus.cloud/install-termux.sh | bash
-   manus-termux --host 127.0.0.1:8080
+   curl -fsSL https://virgoyt.cloud/install-termux.sh | bash
+   virgoyt-termux --host 127.0.0.1:8080
 
 ⚡ RUNNING IN LOCALHOST OR CLOUD MODE:
-   manus mode local   -> Run terminal connected to local machine (127.0.0.1:8080)
-   manus mode cloud   -> Run terminal connected to Cloud Sandbox VM
+   virgoyt mode local   -> Run terminal connected to local machine (127.0.0.1:8080)
+   virgoyt mode cloud   -> Run terminal connected to Cloud Sandbox VM
 """.trimIndent()
                             appendEntry(installBanner, OutputType.SYSTEM)
                             outputBuilder.append(installBanner)
@@ -1080,8 +1263,8 @@ Select your platform or copy the 1-line installation command:
 Current Execution Mode: [${_terminalMode.value.label}]
 Target Host: ${_terminalMode.value.host}
 Usage:
-  manus mode local   -> Switch to Localhost (127.0.0.1:8080)
-  manus mode cloud   -> Switch to Cloud VM (asia-east1 Ubuntu container)
+  virgoyt mode local   -> Switch to Localhost (127.0.0.1:8080)
+  virgoyt mode cloud   -> Switch to Cloud VM (asia-east1 Ubuntu container)
 """.trimIndent()
                                     appendEntry(modeInfo, OutputType.STDOUT)
                                     outputBuilder.append(modeInfo)
@@ -1093,7 +1276,7 @@ Usage:
                             val ghConnected = githubManager.isConnected.value
                             val ghUser = githubManager.currentUser.value?.username ?: "None"
                             val statusReport = """
-MANUS CLOUD PC INSTANCE STATUS:
+VIRGOYT CLOUD AI INSTANCE STATUS:
   • Execution Mode   : ${_terminalMode.value.label} (${_terminalMode.value.host})
   • Container OS     : Ubuntu 24.04.1 LTS (Linux 6.8.0-cloud)
   • Active User      : $activeUser (Lead Developer)
@@ -1108,20 +1291,20 @@ MANUS CLOUD PC INSTANCE STATUS:
                         }
 
                         else -> {
-                            val manusHelp = """
-Manus CLI Commands:
-  manus install             - Display one-click installation scripts (Linux, Mac, Windows, Termux)
-  manus mode <local|cloud>  - Toggle execution host between Localhost & Cloud VM
-  manus status              - Display system specs, daemon status & GitHub integration
+                            val virgoytHelp = """
+VirgoYT Cloud AI CLI Commands:
+  virgoyt install             - Display one-click installation scripts (Linux, Mac, Windows, Termux)
+  virgoyt mode <local|cloud>  - Toggle execution host between Localhost & Cloud VM
+  virgoyt status              - Display system specs, daemon status & GitHub integration
 """.trimIndent()
-                            appendEntry(manusHelp, OutputType.STDOUT)
-                            outputBuilder.append(manusHelp)
+                            appendEntry(virgoytHelp, OutputType.STDOUT)
+                            outputBuilder.append(virgoytHelp)
                         }
                     }
                 }
 
                 "curl" -> {
-                    val url = args.firstOrNull() ?: "https://api.manus.cloud/health"
+                    val url = args.firstOrNull() ?: "https://api.virgoyt.cloud/health"
                     appendEntry("[*] Requesting HTTP GET $url...", OutputType.SYSTEM)
                     delay(200)
                     val mockResponse = """
@@ -1134,7 +1317,7 @@ date: Mon, 31 Aug 2026 05:30:00 GMT
   "status": "healthy",
   "cluster": "asia-east1-cloud-node-4",
   "latency_ms": 14.8,
-  "sandbox_id": "sbx-manus-88912",
+  "sandbox_id": "sbx-virgoyt-88912",
   "auth": "bearer-verified"
 }
 """.trimIndent()
@@ -1231,7 +1414,6 @@ date: Mon, 31 Aug 2026 05:30:00 GMT
             if (t.startsWith("print(") && t.endsWith(")")) {
                 val inside = t.removePrefix("print(").removeSuffix(")")
                 val text = inside.trim('"', '\'').replace("\\n", "\n")
-                // Basic f-string mockup
                 val clean = if (text.startsWith("f\"") || text.startsWith("f'")) {
                     text.substring(2, text.length - 1)
                 } else text
@@ -1239,7 +1421,7 @@ date: Mon, 31 Aug 2026 05:30:00 GMT
             }
         }
         if (sb.isEmpty()) {
-            sb.appendLine("[Python 3.12 Engine] Code executed successfully with zero runtime exceptions.")
+            sb.appendLine("[Python 3.12 Engine] Process finished with exit code 0.")
         }
         return sb.toString().trimEnd()
     }
@@ -1258,7 +1440,114 @@ date: Mon, 31 Aug 2026 05:30:00 GMT
             }
         }
         if (sb.isEmpty()) {
-            sb.appendLine("[Node.js v22.1.0] Evaluated 1 script chunk: return 0")
+            sb.appendLine("[Node.js v22.1.0] Script executed successfully (exit code: 0).")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun executeCppCode(code: String): String {
+        val sb = StringBuilder()
+        val lines = code.lines()
+        for (line in lines) {
+            val t = line.trim()
+            if (t.contains("std::cout") || t.contains("cout")) {
+                val parts = t.substringAfter("cout").split("<<")
+                for (part in parts) {
+                    val p = part.trim().removeSuffix(";").trim()
+                    if (p == "std::endl" || p == "endl") {
+                        sb.appendLine()
+                    } else if (p.startsWith("\"") && p.endsWith("\"")) {
+                        sb.append(p.removeSurrounding("\"").replace("\\n", "\n"))
+                    } else if (p.isNotEmpty() && !p.startsWith("/*") && !p.startsWith("//")) {
+                        sb.append(p)
+                    }
+                }
+                if (!t.contains("endl") && !t.contains("\\n")) {
+                    sb.appendLine()
+                }
+            } else if (t.contains("printf(") || t.contains("std::println(")) {
+                val raw = if (t.contains("printf(")) t.substringAfter("printf(").substringBeforeLast(")")
+                else t.substringAfter("std::println(").substringBeforeLast(")")
+                val clean = raw.trim().removeSurrounding("\"").replace("\\n", "\n").replace("%d", "42").replace("%s", "OK")
+                sb.appendLine(clean)
+            }
+        }
+        if (sb.isEmpty()) {
+            sb.appendLine("[C++23 Native Binary] ELF 64-bit LSB executable, x86-64, dynamically linked.")
+            sb.appendLine("[+] Execution latency: 0.038ms | CPU Cycles: 1,420 | Status: SUCCESS")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun executeCSharpCode(code: String): String {
+        val sb = StringBuilder()
+        val lines = code.lines()
+        for (line in lines) {
+            val t = line.trim()
+            if (t.contains("Console.WriteLine(") || t.contains("Console.Write(")) {
+                val isLine = t.contains("WriteLine")
+                val inside = if (isLine) t.substringAfter("Console.WriteLine(").substringBeforeLast(");").substringBeforeLast(")")
+                else t.substringAfter("Console.Write(").substringBeforeLast(");").substringBeforeLast(")")
+                val clean = inside.trim().trim('$', '@', '"', '\'').replace("\\n", "\n")
+                if (isLine) sb.appendLine(clean) else sb.append(clean)
+            }
+        }
+        if (sb.isEmpty()) {
+            sb.appendLine("[.NET 9.0 CoreCLR / C# 13 Runtime] Ready to Run (R2R) Image Loaded.")
+            sb.appendLine("VirgoYT High-Performance C# Microservice initialized.")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun executeRustCode(code: String): String {
+        val sb = StringBuilder()
+        val lines = code.lines()
+        for (line in lines) {
+            val t = line.trim()
+            if (t.contains("println!(") || t.contains("print!(")) {
+                val inside = t.substringAfter("!(").substringBeforeLast(");").substringBeforeLast(")")
+                val clean = inside.trim().trim('"', '\'').replace("\\n", "\n")
+                sb.appendLine(clean)
+            }
+        }
+        if (sb.isEmpty()) {
+            sb.appendLine("[Rust 1.80 LLVM] Memory Safety Verified (0 borrow checker violations).")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun executeGoCode(code: String): String {
+        val sb = StringBuilder()
+        val lines = code.lines()
+        for (line in lines) {
+            val t = line.trim()
+            if (t.contains("fmt.Println(") || t.contains("fmt.Printf(")) {
+                val inside = t.substringAfter("fmt.Print").substringAfter("(").substringBeforeLast(")")
+                val clean = inside.trim().trim('"', '`', '\'').replace("\\n", "\n")
+                sb.appendLine(clean)
+            }
+        }
+        if (sb.isEmpty()) {
+            sb.appendLine("[Go 1.23.0 Engine] Compiled with gc go1.23 linux/amd64 (1 goroutine).")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun executeJavaCode(code: String): String {
+        val sb = StringBuilder()
+        val lines = code.lines()
+        for (line in lines) {
+            val t = line.trim()
+            if (t.contains("System.out.println(") || t.contains("System.out.print(")) {
+                val isLine = t.contains("println")
+                val inside = if (isLine) t.substringAfter("System.out.println(").substringBeforeLast(");").substringBeforeLast(")")
+                else t.substringAfter("System.out.print(").substringBeforeLast(");").substringBeforeLast(")")
+                val clean = inside.trim().trim('"', '\'').replace("\\n", "\n")
+                if (isLine) sb.appendLine(clean) else sb.append(clean)
+            }
+        }
+        if (sb.isEmpty()) {
+            sb.appendLine("[OpenJDK 21.0.2] HotSpot(TM) 64-Bit Server VM (build 21.0.2+13-LTS).")
         }
         return sb.toString().trimEnd()
     }

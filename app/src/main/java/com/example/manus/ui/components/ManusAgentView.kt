@@ -509,7 +509,7 @@ fun ManusAgentView(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text = "Select a preset or describe any task. Manus will autonomously inspect workspace, compile code, execute scripts, and verify live preview.",
+                            text = "Select a preset or describe any task. VirgoYT will autonomously inspect workspace, compile code, execute scripts, and verify live preview.",
                             color = ManusSlate400,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(horizontal = 20.dp),

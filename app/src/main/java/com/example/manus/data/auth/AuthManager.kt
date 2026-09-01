@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.security.MessageDigest
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class AuthManager {
@@ -19,58 +20,31 @@ class AuthManager {
         get() = _currentSession.value?.user
 
     init {
-        // Seed default accounts
-        val darkvirgo = User(
-            username = "darkvirgoyt-beep",
-            email = "darkvirgoyt@gmail.com",
-            passwordHash = hashPassword("virgo123"),
-            role = "Chief AI Architect",
-            avatarColorHex = 0xFF00F0FF, // Cyan
-            homeDir = "/home/darkvirgoyt-beep"
-        )
-        val defaultDev = User(
-            username = "developer",
-            email = "dev@virgoyt.ai",
-            passwordHash = hashPassword("developer123"),
-            role = "Lead Developer",
-            avatarColorHex = 0xFF6366F1, // Indigo
-            homeDir = "/workspace"
-        )
-        val defaultAdmin = User(
-            username = "admin",
-            email = "admin@virgoyt.ai",
-            passwordHash = hashPassword("admin123"),
-            role = "Root Administrator",
-            avatarColorHex = 0xFF10B981, // Emerald
-            homeDir = "/home/admin"
-        )
+        // Seed default guest account
         val guestUser = User(
             username = "guest",
-            email = "guest@virgoyt.ai",
+            displayName = "Guest Developer",
+            email = "guest@manus.cloud",
             passwordHash = hashPassword("guest123"),
-            role = "Sandbox Guest",
-            avatarColorHex = 0xFFF59E0B, // Amber
+            role = "Guest Developer",
+            avatarColorHex = 0xFF6366F1, // Indigo
             homeDir = "/home/guest"
         )
-
-        users[darkvirgo.username.lowercase()] = darkvirgo
-        users[defaultDev.username.lowercase()] = defaultDev
-        users[defaultAdmin.username.lowercase()] = defaultAdmin
         users[guestUser.username.lowercase()] = guestUser
 
-        // Default login as 'darkvirgoyt-beep'
-        _currentSession.value = AuthSession(user = darkvirgo)
+        // Default session starts as generic Guest (user has to sign up or log in)
+        _currentSession.value = AuthSession(user = guestUser)
     }
 
     fun getAllUsers(): List<User> = users.values.toList().sortedBy { it.username }
 
-    fun signup(username: String, email: String, password: String): Result<User> {
+    fun signup(username: String, email: String, password: String, displayName: String = ""): Result<User> {
         val cleanUsername = username.trim().lowercase()
         if (cleanUsername.length < 3) {
             return Result.failure(IllegalArgumentException("Username must be at least 3 characters long."))
         }
-        if (!cleanUsername.matches("^[a-z0-9_-]+$".toRegex())) {
-            return Result.failure(IllegalArgumentException("Username can only contain alphanumeric characters, underscores, and dashes."))
+        if (!cleanUsername.matches("^[a-z0-9_.-]+$".toRegex())) {
+            return Result.failure(IllegalArgumentException("Username can only contain alphanumeric characters, underscores, dots, and dashes."))
         }
         if (users.containsKey(cleanUsername)) {
             return Result.failure(IllegalArgumentException("Username '$cleanUsername' is already registered."))
@@ -84,6 +58,7 @@ class AuthManager {
 
         val newUser = User(
             username = cleanUsername,
+            displayName = if (displayName.isNotBlank()) displayName.trim() else cleanUsername,
             email = if (email.isBlank()) "$cleanUsername@manus.cloud" else email.trim(),
             passwordHash = hashPassword(password),
             role = "Developer",
@@ -92,6 +67,57 @@ class AuthManager {
         )
 
         users[cleanUsername] = newUser
+        _currentSession.value = AuthSession(user = newUser)
+        return Result.success(newUser)
+    }
+
+    fun signupWithGoogle(accountEmail: String, name: String): Result<User> {
+        val cleanEmail = accountEmail.trim().lowercase()
+        val baseUsername = cleanEmail.substringBefore("@").replace("[^a-z0-9_]".toRegex(), "")
+        val username = if (baseUsername.length < 3) "user_${cleanEmail.hashCode().toString().takeLast(4)}" else baseUsername
+        var uniqueUsername = username
+        var counter = 1
+        while (users.containsKey(uniqueUsername)) {
+            uniqueUsername = "${username}_$counter"
+            counter++
+        }
+
+        val colors = listOf(0xFF4285F4, 0xFF34A853, 0xFFFBBC05, 0xFFEA4335, 0xFF6366F1)
+        val assignedColor = colors[users.size % colors.size]
+
+        val newUser = User(
+            username = uniqueUsername,
+            displayName = if (name.isNotBlank()) name.trim() else uniqueUsername,
+            email = cleanEmail,
+            passwordHash = hashPassword("google_oauth_${UUID.randomUUID()}"),
+            role = "Google Verified Developer",
+            avatarColorHex = assignedColor,
+            homeDir = "/home/$uniqueUsername"
+        )
+        users[uniqueUsername] = newUser
+        _currentSession.value = AuthSession(user = newUser)
+        return Result.success(newUser)
+    }
+
+    fun signupWithGitHub(githubUsername: String, email: String, name: String): Result<User> {
+        val cleanUsername = githubUsername.trim().lowercase().replace("[^a-z0-9_-]".toRegex(), "")
+        var uniqueUsername = cleanUsername.ifBlank { "gh_user" }
+        var counter = 1
+        while (users.containsKey(uniqueUsername)) {
+            uniqueUsername = "${cleanUsername}_$counter"
+            counter++
+        }
+
+        val newUser = User(
+            username = uniqueUsername,
+            displayName = if (name.isNotBlank()) name.trim() else "@$uniqueUsername",
+            email = if (email.isNotBlank()) email.trim() else "$uniqueUsername@users.noreply.github.com",
+            passwordHash = hashPassword("github_oauth_${UUID.randomUUID()}"),
+            role = "GitHub Authenticated Developer",
+            avatarColorHex = 0xFF24292E,
+            homeDir = "/home/$uniqueUsername"
+        )
+        users[uniqueUsername] = newUser
         _currentSession.value = AuthSession(user = newUser)
         return Result.success(newUser)
     }

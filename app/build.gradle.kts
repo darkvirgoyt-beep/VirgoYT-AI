@@ -1,4 +1,5 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
+import java.io.File
 
 plugins {
   alias(libs.plugins.android.application)
@@ -14,13 +15,37 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.manuscloudpc.xpvz"
+    applicationId = "com.virgoyt.cloudai"
     minSdk = 24
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  val debugKeystore = file("${rootDir}/debug.keystore")
+  if (!debugKeystore.exists()) {
+    try {
+      val keytool = if (System.getProperty("os.name").lowercase().contains("windows")) "keytool.exe" else "keytool"
+      val javaHome = System.getProperty("java.home")
+      val keytoolPath = if (javaHome != null) File(javaHome, "bin/$keytool").absolutePath else keytool
+      val process = ProcessBuilder(
+        keytoolPath,
+        "-genkeypair",
+        "-alias", "androiddebugkey",
+        "-keyalg", "RSA",
+        "-keysize", "2048",
+        "-validity", "9125",
+        "-keystore", debugKeystore.absolutePath,
+        "-storepass", "android",
+        "-keypass", "android",
+        "-dname", "CN=Android Debug,O=Android,C=US"
+      ).start()
+      process.waitFor()
+    } catch (_: Exception) {
+      // Gracefully fall back if keytool process is unavailable in environment
+    }
   }
 
   signingConfigs {
@@ -32,10 +57,13 @@ android {
       keyPassword = System.getenv("KEY_PASSWORD")
     }
     create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
+      val keystore = file("${rootDir}/debug.keystore")
+      if (keystore.exists()) {
+        storeFile = keystore
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
     }
   }
 
@@ -46,7 +74,12 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
-    debug { signingConfig = signingConfigs.getByName("debugConfig") }
+    debug {
+      val keystore = file("${rootDir}/debug.keystore")
+      if (keystore.exists()) {
+        signingConfig = signingConfigs.getByName("debugConfig")
+      }
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11

@@ -87,32 +87,32 @@ fun CliInstallerDialog(viewModel: ManusCloudViewModel) {
         CliPlatformInstall(
             platformName = "Linux",
             osBadge = "🐧 Linux (Ubuntu / Debian / Arch)",
-            installCommand = "curl -fsSL https://manus.cloud/install.sh | bash",
-            runCommand = "manus login && manus start --port 8080",
+            installCommand = "curl -fsSL https://virgoyt.cloud/install.sh | bash",
+            runCommand = "virgoyt login && virgoyt start --port 8080",
             description = "Native x86_64 and aarch64 binary with systemd service integration and isolated cgroups sandbox.",
             requirements = "curl, bash, sudo (optional for systemd)"
         ),
         CliPlatformInstall(
             platformName = "macOS",
             osBadge = "🍎 macOS (Apple Silicon / Intel)",
-            installCommand = "brew install manus-ai/tap/manus-cli",
-            runCommand = "manus start",
+            installCommand = "brew install virgoyt-ai/tap/virgoyt-cli",
+            runCommand = "virgoyt start",
             description = "Homebrew formula and universal binary compiled for arm64 & x86_64 Darwin kernels.",
             requirements = "Homebrew / curl, zsh or bash"
         ),
         CliPlatformInstall(
             platformName = "Windows",
             osBadge = "🪟 Windows (PowerShell / WSL2 / Cmd)",
-            installCommand = "powershell -c \"irm https://manus.cloud/install.ps1 | iex\"",
-            runCommand = "manus.exe start",
+            installCommand = "powershell -c \"irm https://virgoyt.cloud/install.ps1 | iex\"",
+            runCommand = "virgoyt.exe start",
             description = "Native Windows terminal CLI with WSL2 bridge and ConPTY pseudo-console support.",
             requirements = "PowerShell 5.1+ or Windows Terminal / WSL2"
         ),
         CliPlatformInstall(
             platformName = "Termux",
             osBadge = "📱 Android (Termux Terminal)",
-            installCommand = "pkg update && pkg install -y git python curl openssh nodejs && curl -fsSL https://manus.cloud/install-termux.sh | bash",
-            runCommand = "manus-termux --host 127.0.0.1:8080",
+            installCommand = "pkg update && pkg install -y git python curl openssh nodejs && curl -fsSL https://virgoyt.cloud/install-termux.sh | bash",
+            runCommand = "virgoyt-termux --host 127.0.0.1:8080",
             description = "Termux package for on-device Android terminal execution and localhost bridge server.",
             requirements = "Termux app (F-Droid / GitHub releases)"
         )
@@ -166,7 +166,7 @@ fun CliInstallerDialog(viewModel: ManusCloudViewModel) {
                         }
                         Column {
                             Text(
-                                text = "Manus Terminal CLI Installer",
+                                text = "VirgoYT Terminal CLI Installer",
                                 color = ManusWhite,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold

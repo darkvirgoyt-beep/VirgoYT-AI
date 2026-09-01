@@ -30,9 +30,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloseFullscreen
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.FastRewind
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mouse
 import androidx.compose.material.icons.filled.OpenInFull
@@ -102,6 +105,7 @@ fun LiveComputerDiffView(
     var selectedDiffMode by remember { mutableIntStateOf(2) } // 0 = Diff, 1 = Original, 2 = Modified (matches screenshot)
     var timelineProgress by remember { mutableFloatStateOf(0.92f) }
     var isUserInRemoteControl by remember { mutableStateOf(false) }
+    var isComputerExpanded by remember { mutableStateOf(false) } // Toggles small/compact vs big/expanded fullscreen computer view
     var virtualCursorX by remember { mutableFloatStateOf(180f) }
     var virtualCursorY by remember { mutableFloatStateOf(240f) }
 
@@ -121,7 +125,7 @@ fun LiveComputerDiffView(
             .fillMaxSize()
             .background(ManusSlate950)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        verticalArrangement = Arrangement.spacedBy(if (isComputerExpanded) 8.dp else 14.dp)
     ) {
         // ==========================================
         // Top Header: "VirgoYT AI's computer" + Stream Controls
@@ -144,17 +148,49 @@ fun LiveComputerDiffView(
             }
 
             Text(
-                text = "VirgoYT AI's computer",
+                text = if (isComputerExpanded) "VirgoYT AI's Computer (Expanded)" else "VirgoYT AI's computer",
                 color = ManusWhite,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
 
-            // Live Remote Cast / Take Control Pill
+            // Resize & Live Remote Cast Controls
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
+                // Small / Big Size Toggle Button
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (isComputerExpanded) ManusIndigo else ManusSlate850)
+                        .border(1.dp, if (isComputerExpanded) ManusIndigoLight else SleekBorder, RoundedCornerShape(8.dp))
+                        .clickable {
+                            isComputerExpanded = !isComputerExpanded
+                            viewModel.showToast(if (isComputerExpanded) "🖥 Cloud Computer Expanded (Big)" else "📱 Cloud Computer Compact (Small)")
+                        }
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        .testTag("cloud_computer_resize_toggle")
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isComputerExpanded) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
+                            contentDescription = "Resize Computer",
+                            tint = if (isComputerExpanded) ManusWhite else ManusCyan,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = if (isComputerExpanded) "Small" else "Big",
+                            color = ManusWhite,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
@@ -193,10 +229,17 @@ fun LiveComputerDiffView(
         // ==========================================
         Card(
             modifier = Modifier
-                .weight(1f)
+                .weight(if (isComputerExpanded) 1f else 0.85f)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, SleekBorder, RoundedCornerShape(12.dp))
+                .border(1.dp, if (isComputerExpanded) ManusCyan.copy(alpha = 0.6f) else SleekBorder, RoundedCornerShape(12.dp))
+                .clickable {
+                    // Tap on screen to toggle small and big when not actively dragging cursor
+                    if (!isUserInRemoteControl) {
+                        isComputerExpanded = !isComputerExpanded
+                        viewModel.showToast(if (isComputerExpanded) "🖥 Cloud Computer Expanded (Big)" else "📱 Cloud Computer Compact (Small)")
+                    }
+                }
                 .pointerInput(isUserInRemoteControl) {
                     if (isUserInRemoteControl) {
                         detectDragGestures { change, dragAmount ->
@@ -210,21 +253,38 @@ fun LiveComputerDiffView(
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    // Window Top Bar: Centered File Name "llm.ts" / "VirgoYTCharacter.cpp"
+                    // Window Top Bar: Centered File Name "llm.ts" + Tap to Resize Hint
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(ManusSlate850)
-                            .padding(vertical = 10.dp),
+                            .padding(vertical = 10.dp, horizontal = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "llm.ts",
-                            color = ManusSlate300,
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (isComputerExpanded) "🖥 EXPANDED" else "📱 COMPACT",
+                                color = ManusCyan,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "llm.ts",
+                                color = ManusSlate300,
+                                fontSize = 13.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Tap screen to toggle size",
+                                color = ManusSlate500,
+                                fontSize = 9.sp
+                            )
+                        }
                     }
 
                     // Code Content Area with Syntax & Diff

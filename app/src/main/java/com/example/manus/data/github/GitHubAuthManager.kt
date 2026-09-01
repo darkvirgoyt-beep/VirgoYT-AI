@@ -44,14 +44,7 @@ class GitHubAuthManager {
     private val _pendingDeviceAuth = MutableStateFlow<GitHubDeviceAuth?>(null)
     val pendingDeviceAuth: StateFlow<GitHubDeviceAuth?> = _pendingDeviceAuth.asStateFlow()
 
-    private val _userRepos = MutableStateFlow<List<GitHubRepo>>(
-        listOf(
-            GitHubRepo("VirgoYT-AI", "darkvirgoyt-beep/VirgoYT-AI", "Autonomous AI Software Engineer Platform & Multi-Agent Swarm", "Kotlin", 420),
-            GitHubRepo("autonomous-agent-hive", "darkvirgoyt-beep/autonomous-agent-hive", "15 Specialized Sub-Agents with Vector Communication", "TypeScript", 185),
-            GitHubRepo("unreal-engine-ai-bridge", "darkvirgoyt-beep/unreal-engine-ai-bridge", "Realtime AI code generation bridge for UE5 and Unity", "C++", 142),
-            GitHubRepo("vector-rag-engine", "darkvirgoyt-beep/vector-rag-engine", "1536-Dimensional embedding memory lookup system", "Rust", 97)
-        )
-    )
+    private val _userRepos = MutableStateFlow<List<GitHubRepo>>(emptyList())
     val userRepos: StateFlow<List<GitHubRepo>> = _userRepos.asStateFlow()
 
     fun createDeviceAuth(): GitHubDeviceAuth {
@@ -72,31 +65,45 @@ class GitHubAuthManager {
         return auth
     }
 
-    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "darkvirgoyt-beep"): Boolean {
+    fun authorizeWithTokenOrCode(codeOrToken: String, username: String = "developer", email: String = ""): Boolean {
         val trimmed = codeOrToken.trim()
         val pending = _pendingDeviceAuth.value
 
-        val valid = trimmed.isNotEmpty() && (
-            (pending != null && (trimmed.equals(pending.userCode, ignoreCase = true) || trimmed.equals(pending.generatedToken, ignoreCase = true))) ||
-            trimmed.startsWith("ghp_") || trimmed.startsWith("gho_") || trimmed.startsWith("github_pat_") ||
-            trimmed.contains("-") || trimmed.length >= 6
+        // Accept user activation code, device code, personal access token (ghp_), oauth token (gho_), fine-grained (github_pat_), or any valid token input
+        val isMatchPendingCode = pending != null && (
+            trimmed.equals(pending.userCode, ignoreCase = true) ||
+            trimmed.equals(pending.userCode.replace("-", ""), ignoreCase = true) ||
+            trimmed.equals(pending.generatedToken, ignoreCase = true) ||
+            trimmed.equals(pending.deviceCode, ignoreCase = true)
         )
+        val isValidFormat = trimmed.startsWith("ghp_") || trimmed.startsWith("gho_") ||
+            trimmed.startsWith("github_pat_") || trimmed.contains("-") || trimmed.length >= 4
 
-        if (valid) {
-            val finalToken = if (pending != null && (trimmed.equals(pending.userCode, ignoreCase = true) || trimmed.equals(pending.generatedToken, ignoreCase = true))) {
+        if (isMatchPendingCode || isValidFormat || trimmed.isNotBlank()) {
+            val finalToken = if (isMatchPendingCode && pending != null) {
                 pending.generatedToken
+            } else if (trimmed.startsWith("ghp_") || trimmed.startsWith("gho_") || trimmed.startsWith("github_pat_")) {
+                trimmed
             } else {
                 "gho_" + UUID.randomUUID().toString().replace("-", "").take(24)
             }
 
+            val cleanUser = if (username.isNotBlank() && username != "guest") username.trim().lowercase() else "dev_${UUID.randomUUID().toString().take(4)}"
+            val userEmail = if (email.isNotBlank()) email.trim() else "$cleanUser@users.noreply.github.com"
+
             _currentUser.value = GitHubUser(
-                username = username,
-                name = "VirgoYT AI",
-                email = "darkvirgoyt@gmail.com",
-                avatarUrl = "https://avatars.githubusercontent.com/u/849201?v=4",
-                publicRepos = _userRepos.value.size,
-                followers = 256,
+                username = cleanUser,
+                name = cleanUser.replaceFirstChar { it.uppercase() },
+                email = userEmail,
+                avatarUrl = "https://avatars.githubusercontent.com/u/${(100000..999999).random()}?v=4",
+                publicRepos = 3,
+                followers = 12,
                 token = finalToken
+            )
+            _userRepos.value = listOf(
+                GitHubRepo("my-cloud-app", "$cleanUser/my-cloud-app", "Cloud Application built with VirgoYT AI", "Kotlin", 1),
+                GitHubRepo("ai-agent-scripts", "$cleanUser/ai-agent-scripts", "Custom Autonomous Agent Prompts and Workflows", "TypeScript", 0),
+                GitHubRepo("mobile-studio", "$cleanUser/mobile-studio", "Android & Jetpack Compose Development Workspace", "Kotlin", 0)
             )
             _isConnected.value = true
             _pendingDeviceAuth.value = null
@@ -105,16 +112,22 @@ class GitHubAuthManager {
         return false
     }
 
-    fun connectDirectWeb(username: String = "darkvirgoyt-beep") {
+    fun connectDirectWeb(username: String = "developer", email: String = "") {
+        val cleanUser = if (username.isNotBlank() && username != "guest") username.trim().lowercase() else "dev_${UUID.randomUUID().toString().take(4)}"
         val token = "gho_" + UUID.randomUUID().toString().replace("-", "").take(24)
+        val userEmail = if (email.isNotBlank()) email.trim() else "$cleanUser@users.noreply.github.com"
         _currentUser.value = GitHubUser(
-            username = username,
-            name = "VirgoYT AI",
-            email = "darkvirgoyt@gmail.com",
-            avatarUrl = "https://avatars.githubusercontent.com/u/849201?v=4",
-            publicRepos = _userRepos.value.size,
-            followers = 256,
+            username = cleanUser,
+            name = cleanUser.replaceFirstChar { it.uppercase() },
+            email = userEmail,
+            avatarUrl = "https://avatars.githubusercontent.com/u/${(100000..999999).random()}?v=4",
+            publicRepos = 2,
+            followers = 5,
             token = token
+        )
+        _userRepos.value = listOf(
+            GitHubRepo("my-cloud-app", "$cleanUser/my-cloud-app", "Cloud Application built with VirgoYT AI", "Kotlin", 1),
+            GitHubRepo("ai-agent-scripts", "$cleanUser/ai-agent-scripts", "Custom Autonomous Agent Prompts and Workflows", "TypeScript", 0)
         )
         _isConnected.value = true
         _pendingDeviceAuth.value = null
@@ -124,10 +137,11 @@ class GitHubAuthManager {
         _isConnected.value = false
         _currentUser.value = null
         _pendingDeviceAuth.value = null
+        _userRepos.value = emptyList()
     }
 
     fun addRepo(name: String, description: String = "", language: String = "Kotlin"): GitHubRepo {
-        val user = _currentUser.value?.username ?: "darkvirgoyt-beep"
+        val user = _currentUser.value?.username ?: "developer"
         val repo = GitHubRepo(
             name = name,
             fullName = "$user/$name",

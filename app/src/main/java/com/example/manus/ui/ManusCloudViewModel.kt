@@ -358,17 +358,46 @@ class ManusCloudViewModel : ViewModel() {
         }
     }
 
-    fun signup(username: String, email: String, password: String) {
-        val result = authManager.signup(username, email, password)
+    fun signup(username: String, email: String, password: String, displayName: String = "") {
+        val result = authManager.signup(username, email, password, displayName)
         if (result.isSuccess) {
             val user = result.getOrNull()!!
             vfs.createDirectory(user.homeDir, user.username)
-            vfs.addFile("${user.homeDir}/welcome.txt", "Welcome ${user.username}!\nIsolated user environment initialized.\n", user.username)
+            vfs.addFile("${user.homeDir}/welcome.txt", "Welcome ${user.displayName}!\nIsolated user environment initialized.\n", user.username)
             _explorerCurrentDir.value = user.homeDir
-            showToast("✓ Account created for ${user.username}!")
+            showToast("✓ Account created for ${user.displayName}!")
             closeAuthDialog()
         } else {
             showToast("Registration failed: ${result.exceptionOrNull()?.message}")
+        }
+    }
+
+    fun signupWithGoogle(email: String, displayName: String) {
+        val result = authManager.signupWithGoogle(email, displayName)
+        if (result.isSuccess) {
+            val user = result.getOrNull()!!
+            vfs.createDirectory(user.homeDir, user.username)
+            vfs.addFile("${user.homeDir}/google_profile.json", "{\n  \"provider\": \"google\",\n  \"email\": \"${user.email}\",\n  \"name\": \"${user.displayName}\"\n}\n", user.username)
+            _explorerCurrentDir.value = user.homeDir
+            showToast("✓ Signed up with Google as ${user.displayName} (${user.email})")
+            closeAuthDialog()
+        } else {
+            showToast("Google sign up failed: ${result.exceptionOrNull()?.message}")
+        }
+    }
+
+    fun signupWithGitHub(githubUsername: String, email: String, displayName: String) {
+        val result = authManager.signupWithGitHub(githubUsername, email, displayName)
+        if (result.isSuccess) {
+            val user = result.getOrNull()!!
+            vfs.createDirectory(user.homeDir, user.username)
+            vfs.addFile("${user.homeDir}/.gitconfig", "[user]\n\tname = ${user.displayName}\n\temail = ${user.email}\n", user.username)
+            _explorerCurrentDir.value = user.homeDir
+            githubManager.connectDirectWeb(user.username, user.email)
+            showToast("✓ Signed up with GitHub as @${user.username}!")
+            closeAuthDialog()
+        } else {
+            showToast("GitHub sign up failed: ${result.exceptionOrNull()?.message}")
         }
     }
 
@@ -542,9 +571,14 @@ class ManusCloudViewModel : ViewModel() {
         selectTab(ActiveWorkspaceTab.TERMINAL)
 
         val cmd = when (file.language) {
+            "csharp" -> "dotnet run"
+            "cpp" -> "g++ -std=c++23 -O3 ${file.name} -o run_bin && ./run_bin"
+            "c" -> "gcc -O3 ${file.name} -o run_bin && ./run_bin"
+            "rust" -> "rustc -O ${file.name} && ./${file.name.substringBeforeLast('.')}"
+            "go" -> "go run ${file.name}"
+            "java" -> "javac ${file.name} && java ${file.name.substringBeforeLast('.')}"
             "python" -> "python3 ${file.name}"
-            "javascript" -> "node ${file.name}"
-            "c" -> "gcc ${file.name} -o run_bin && ./run_bin"
+            "javascript", "typescript" -> "node ${file.name}"
             "shell" -> "bash ${file.name}"
             "html" -> {
                 selectTab(ActiveWorkspaceTab.BROWSER)

@@ -654,6 +654,7 @@ fun GitHubAuthDialog(viewModel: ManusCloudViewModel) {
                         // ==========================================
                         // Flow 2: Direct Web-to-Web GitHub Auth
                         // ==========================================
+                        var directUsernameInput by remember { mutableStateOf("") }
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -662,25 +663,44 @@ fun GitHubAuthDialog(viewModel: ManusCloudViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Connect GitHub account @darkvirgoyt-beep directly with 1-click Web OAuth authentication.",
+                                text = "Connect any GitHub account directly with 1-click Web OAuth or your username.",
                                 color = ManusSlate300,
                                 fontSize = 12.sp
                             )
 
+                            OutlinedTextField(
+                                value = directUsernameInput,
+                                onValueChange = { directUsernameInput = it },
+                                placeholder = { Text("GitHub Username (e.g. torvalds or your username)", color = ManusSlate500, fontSize = 11.sp) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
+                                textStyle = TextStyle(color = ManusWhite, fontSize = 11.5.sp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ManusIndigo,
+                                    unfocusedBorderColor = SleekBorder,
+                                    focusedContainerColor = ManusSlate950,
+                                    unfocusedContainerColor = ManusSlate950
+                                )
+                            )
+
                             Button(
-                                onClick = { viewModel.connectGitHubDirectWeb() },
+                                onClick = {
+                                    val currentUsername = if (directUsernameInput.isNotBlank()) directUsernameInput.trim() else (ghUser?.username ?: "developer")
+                                    viewModel.githubManager.connectDirectWeb(currentUsername)
+                                    viewModel.showToast("✓ Connected GitHub account @$currentUsername")
+                                },
                                 colors = ButtonDefaults.buttonColors(containerColor = ManusIndigo),
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.fillMaxWidth().height(44.dp).testTag("github_direct_web_button")
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Icon(Icons.Default.Language, contentDescription = null, tint = ManusWhite, modifier = Modifier.size(16.dp))
-                                    Text("Direct Web Authorize with @darkvirgoyt-beep", color = ManusWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text("Authorize GitHub Account", color = ManusWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
 
                             Text(
-                                text = "✓ Sets up git credentials and syncs your repositories across both Cloud VM and Localhost daemon.",
+                                text = "✓ Sets up git credentials and syncs your personal repositories across both Cloud VM and Localhost daemon.",
                                 color = ManusSlate400,
                                 fontSize = 10.5.sp
                             )

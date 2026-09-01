@@ -116,7 +116,7 @@ fun UserProfileDialog(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "V",
+                                text = (currentSession?.user?.displayName?.take(1) ?: "U").uppercase(),
                                 color = ManusWhite,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
@@ -124,13 +124,13 @@ fun UserProfileDialog(
                         }
                         Column {
                             Text(
-                                text = currentSession?.user?.displayName ?: "darkvirgoyt-beep",
+                                text = currentSession?.user?.displayName ?: "Developer",
                                 color = ManusWhite,
                                 fontSize = 13.5.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Chief AI Architect • ${currentSession?.user?.email ?: "darkvirgoyt@gmail.com"}",
+                                text = "${currentSession?.user?.role ?: "Developer"} • ${currentSession?.user?.email ?: "dev@manus.cloud"}",
                                 color = VirgoCyanGlow,
                                 fontSize = 10.sp
                             )

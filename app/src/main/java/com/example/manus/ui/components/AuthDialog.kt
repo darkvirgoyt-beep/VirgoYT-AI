@@ -430,6 +430,69 @@ fun AuthDialog(viewModel: ManusCloudViewModel) {
                             ) {
                                 Text("Create Account & Provision VFS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                             }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Box(modifier = Modifier.weight(1f).height(1.dp).background(ManusBorderLight))
+                                Text("OR SIGN UP WITH", color = ManusSlate400, fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
+                                Box(modifier = Modifier.weight(1f).height(1.dp).background(ManusBorderLight))
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Google Sign Up Button
+                            Button(
+                                onClick = {
+                                    val targetEmail = if (emailInput.isNotBlank() && emailInput.contains("@")) emailInput.trim() else "user@gmail.com"
+                                    val targetName = if (usernameInput.isNotBlank()) usernameInput.trim() else "Google User"
+                                    viewModel.signupWithGoogle(targetEmail, targetName)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("google_signup_btn"),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F2937)),
+                                shape = RoundedCornerShape(8.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF374151))
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text("🌐", fontSize = 14.sp)
+                                    Text("Sign Up with Google", color = ManusWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // GitHub Sign Up Button
+                            Button(
+                                onClick = {
+                                    val targetGhUser = if (usernameInput.isNotBlank()) usernameInput.trim() else "developer"
+                                    val targetEmail = if (emailInput.isNotBlank()) emailInput.trim() else "$targetGhUser@users.noreply.github.com"
+                                    val targetName = if (usernameInput.isNotBlank()) usernameInput.trim() else "GitHub Developer"
+                                    viewModel.signupWithGitHub(targetGhUser, targetEmail, targetName)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("github_signup_btn"),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF24292E)),
+                                shape = RoundedCornerShape(8.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF4B5563))
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text("🐙", fontSize = 14.sp)
+                                    Text("Sign Up with GitHub", color = ManusWhite, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
                         }
                     }
 

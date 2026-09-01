@@ -32,7 +32,7 @@ class VirtualFileSystem {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manus Cloud PC - Interactive Workspace</title>
+  <title>VirgoYT Cloud AI - Interactive Workspace</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -42,7 +42,7 @@ class VirtualFileSystem {
     <header class="flex justify-between items-center py-4 border-b border-slate-800">
       <div class="flex items-center gap-3">
         <div class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
-        <h1 class="text-xl font-bold tracking-tight text-cyan-400">⚡ Manus Cloud App Sandbox</h1>
+        <h1 class="text-xl font-bold tracking-tight text-cyan-400">⚡ VirgoYT Cloud AI Sandbox</h1>
       </div>
       <div class="flex gap-2">
         <span class="px-2.5 py-1 text-xs rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">PORT 3000 // LIVE</span>
@@ -92,7 +92,7 @@ class VirtualFileSystem {
     <section class="mt-6 bg-slate-900 border border-slate-800 rounded-xl p-4">
       <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Terminal Event Bus</h3>
       <div id="eventLogs" class="font-mono text-xs space-y-1 max-h-24 overflow-y-auto text-slate-400">
-        <div class="text-cyan-400">[SYSTEM] Manus Cloud Sandbox initialized successfully.</div>
+        <div class="text-cyan-400">[SYSTEM] VirgoYT Cloud AI Sandbox initialized successfully.</div>
         <div class="text-emerald-400">[COMPILER] Web bundle compiled & hot-reloaded.</div>
       </div>
     </section>
@@ -104,7 +104,7 @@ class VirtualFileSystem {
 """.trimIndent()
 
         val stylesCss = """
-/* Manus Cloud Sandbox Styles */
+/* VirgoYT Cloud AI Sandbox Styles */
 body {
   margin: 0;
   background-color: #070b14;
@@ -261,13 +261,13 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
-console.log('Manus Cloud PC Sandbox application mounted.');
+console.log('VirgoYT Cloud AI Sandbox application mounted.');
 """.trimIndent()
 
         // 2. Python Data Analysis script
         val pythonScript = """
 # /workspace/scripts/data_analyzer.py
-# Manus Cloud Computer - Python Data Science Engine
+# VirgoYT Cloud AI Computer - Python Data Science Engine
 
 import sys
 import math
@@ -275,7 +275,7 @@ import json
 
 def analyze_dataset():
     print("========================================")
-    print("  MANUS CLOUD PC - DATA ANALYZER v2.4  ")
+    print("  VIRGOYT CLOUD AI - DATA ANALYZER v2.4  ")
     print("========================================")
     
     data_points = [
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 // /workspace/scripts/benchmark.js
 // JavaScript Execution & Algorithm Benchmark
 
-console.log("--> Starting Manus Cloud JS Engine Benchmark...");
+console.log("--> Starting VirgoYT Cloud AI JS Engine Benchmark...");
 const startTime = Date.now();
 
 // 1. Prime Sieve Benchmark
@@ -367,7 +367,7 @@ void bubble_sort(int arr[], int n) {
 }
 
 int main() {
-    printf("[*] Manus Cloud GCC 14.2 Compiler Test\n");
+    printf("[*] VirgoYT Cloud AI GCC 14.2 Compiler Test\n");
     int data[] = {64, 34, 25, 12, 22, 11, 90, 48, 88, 1};
     int n = sizeof(data) / sizeof(data[0]);
 
@@ -384,11 +384,58 @@ int main() {
 }
 """.trimIndent()
 
+        // 4b. Sample Modern C++23 Code
+        val mainCpp = """
+// /workspace/main.cpp - High-Performance Modern C++23
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <chrono>
+
+int main() {
+    std::cout << "🚀 VirgoYT Cloud AI - C++23 High-Performance Engine\n";
+    std::vector<int> numbers(100);
+    std::iota(numbers.begin(), numbers.end(), 1);
+
+    long long sum = 0;
+    for (int n : numbers) sum += n * n;
+
+    std::cout << "[+] Sum of squares (1..100): " << sum << std::endl;
+    std::cout << "[✓] C++23 SIMD vectorized calculations completed in 0.042ms." << std::endl;
+    return 0;
+}
+""".trimIndent()
+
+        // 4c. Sample .NET 9.0 C# 13 Code
+        val programCs = """
+// /workspace/Program.cs - .NET 9.0 C# 13 High-Performance Microservice
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+Console.WriteLine("⚡ VirgoYT Cloud AI - .NET 9.0 / C# 13 Runtime");
+var squares = Enumerable.Range(1, 10).Select(x => $"{x}^2={x*x}");
+Console.WriteLine($"[+] Computed Series: {string.Join(", ", squares)}");
+Console.WriteLine("[✓] Task async pipeline dispatched: 0 allocations, 0ms latency.");
+""".trimIndent()
+
+        // 4d. Sample Rust Code
+        val mainRs = """
+// /workspace/main.rs - Rust 1.80 Zero-Cost Memory-Safe Engine
+fn main() {
+    println!("🦀 VirgoYT Cloud AI - Rust 1.80 Core Engine");
+    let values: Vec<i32> = (1..=8).map(|x| x * 3).collect();
+    println!("[+] Generated vector: {:?}", values);
+    println!("[✓] Safe memory allocation checked: OK");
+}
+""".trimIndent()
+
         // 5. Shell Build Script
         val runSh = """
 #!/bin/bash
 # /workspace/run.sh
-echo "[MANUS CLOUD PC] Starting Isolated Sandbox Build Pipeline..."
+echo "[VIRGOYT CLOUD AI] Starting Isolated Sandbox Build Pipeline..."
 echo "[1/4] Checking workspace dependencies..."
 sleep 0.5
 echo "[2/4] Compiling CSS bundle with Tailwind engine..."
@@ -402,9 +449,9 @@ echo "✓ App live at http://localhost:3000"
         // 6. package.json
         val packageJson = """
 {
-  "name": "manus-cloud-workspace",
+  "name": "virgoyt-cloud-workspace",
   "version": "1.0.0",
-  "description": "Manus AI Virtual PC Isolated Sandbox Environment",
+  "description": "VirgoYT Cloud AI Virtual Supercomputer Sandbox Environment",
   "main": "app.js",
   "scripts": {
     "dev": "node scripts/benchmark.js",
@@ -420,10 +467,10 @@ echo "✓ App live at http://localhost:3000"
 
         // 7. README.md
         val readmeMd = """
-# Manus Cloud Computer & Virtual Sandbox 🚀
+# VirgoYT Cloud AI Supercomputer & Virtual Sandbox 🚀
 
-Welcome to your isolated Cloud PC! You have full access to:
-- **Manus Autonomous AI Agent**: Delegate complex coding and research tasks.
+Welcome to your isolated Cloud AI environment! You have full access to:
+- **VirgoYT Autonomous AI Agent**: Delegate complex coding and research tasks.
 - **Linux Terminal**: Execute Python, Node.js, C compilers, and bash commands.
 - **Code Editor**: Edit HTML, CSS, JavaScript, and Python files with live reload.
 - **Isolated Browser**: Live preview your web apps in real-time with DevTools.
@@ -451,6 +498,9 @@ timestamp,region,cpu_usage,mem_mb,requests_per_sec,latency_p99
         addFile("/workspace/app.js", appJs)
         addFile("/workspace/scripts/data_analyzer.py", pythonScript)
         addFile("/workspace/scripts/benchmark.js", benchmarkJs)
+        addFile("/workspace/main.cpp", mainCpp)
+        addFile("/workspace/Program.cs", programCs)
+        addFile("/workspace/main.rs", mainRs)
         addFile("/workspace/main.c", mainC)
         addFile("/workspace/run.sh", runSh)
         addFile("/workspace/package.json", packageJson)
@@ -463,8 +513,8 @@ timestamp,region,cpu_usage,mem_mb,requests_per_sec,latency_p99
         addDir("/home/admin")
         addDir("/home/guest")
         addFile("/home/developer/.bashrc", "export PATH=/workspace/bin:${'$'}PATH\nalias ll='ls -la'\n")
-        addFile("/home/admin/admin_notes.txt", "# Manus Cloud PC Admin Telemetry\n- Kernel: Ubuntu 24.04\n- Security: Sandboxed VFS\n")
-        addFile("/home/guest/welcome.txt", "Welcome to Manus Cloud PC Sandbox!\nYou are operating in an isolated guest session.\n")
+        addFile("/home/admin/admin_notes.txt", "# VirgoYT Cloud AI Admin Telemetry\n- Kernel: Ubuntu 24.04\n- Security: Sandboxed VFS\n")
+        addFile("/home/guest/welcome.txt", "Welcome to VirgoYT Cloud AI Sandbox!\nYou are operating in an isolated guest session.\n")
 
         refreshList()
     }

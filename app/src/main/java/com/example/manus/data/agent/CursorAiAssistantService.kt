@@ -196,8 +196,8 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(sum(sample_input), expected_sum)
 
     def test_string_formatting(self):
-        msg = "Manus Cloud PC"
-        self.assertEqual(msg.upper(), "MANUS CLOUD PC")
+        msg = "VirgoYT Cloud AI"
+        self.assertEqual(msg.upper(), "VIRGOYT CLOUD AI")
 
 if __name__ == '__main__':
     unittest.main()
