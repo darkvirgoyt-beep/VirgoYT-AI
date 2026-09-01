@@ -147,7 +147,7 @@ fun CloudPcHeader(
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
-                                text = "VirgoYT AI",
+                                text = "VirgoYT Cloud AI",
                                 color = ManusWhite,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,

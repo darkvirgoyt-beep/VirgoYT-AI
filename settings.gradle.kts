@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "VirgoYT AI"
+rootProject.name = "VirgoYT Cloud AI"
 
 include(":app")
