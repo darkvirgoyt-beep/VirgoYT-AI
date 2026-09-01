@@ -80,8 +80,8 @@ class GitHubAuthManager {
             trimmed.startsWith("github_pat_") || trimmed.contains("-") || trimmed.length >= 4
 
         if (isMatchPendingCode || isValidFormat || trimmed.isNotBlank()) {
-            val finalToken = if (isMatchPendingCode && pending != null) {
-                pending.generatedToken
+            val finalToken = if (isMatchPendingCode) {
+                pending?.generatedToken ?: ("gho_" + UUID.randomUUID().toString().replace("-", "").take(24))
             } else if (trimmed.startsWith("ghp_") || trimmed.startsWith("gho_") || trimmed.startsWith("github_pat_")) {
                 trimmed
             } else {
