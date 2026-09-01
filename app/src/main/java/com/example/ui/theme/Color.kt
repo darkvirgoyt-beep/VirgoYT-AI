@@ -45,3 +45,13 @@ val TermMuted = Color(0xFF64748B)
 val SleekBorder = Color(0x14FFFFFF)       // 8% white border
 val SleekSurface = Color(0x0DFFFFFF)      // 5% white surface
 
+// Futuristic Holographic & Glassmorphism Palette
+val VirgoCyanGlow = Color(0xFF00F0FF)
+val VirgoNeonViolet = Color(0xFF8B5CF6)
+val VirgoHoloPink = Color(0xFFEC4899)
+val VirgoMatrixGreen = Color(0xFF10B981)
+val VirgoGlassBg = Color(0x1A0F172A)
+val VirgoGlassCard = Color(0x2E1E293B)
+val VirgoGlassBorder = Color(0x3300F0FF)
+val VirgoNeonOrange = Color(0xFFF97316)
+

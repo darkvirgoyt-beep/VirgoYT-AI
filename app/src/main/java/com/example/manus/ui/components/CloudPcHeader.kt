@@ -229,7 +229,7 @@ fun CloudPcHeader(
                             .clip(RoundedCornerShape(8.dp))
                             .background(if (currentUser != null) ManusIndigoBg else SleekSurface)
                             .border(1.dp, if (currentUser != null) ManusIndigo else SleekBorder, RoundedCornerShape(8.dp))
-                            .clickable { viewModel.openAuthDialog() }
+                            .clickable { viewModel.openUserProfileDialog() }
                             .padding(horizontal = 6.dp, vertical = 4.dp)
                             .testTag("user_auth_header_btn")
                     ) {
@@ -239,12 +239,12 @@ fun CloudPcHeader(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "User Auth",
+                                contentDescription = "User Profile",
                                 tint = if (currentUser != null) ManusIndigoLight else ManusSlate400,
                                 modifier = Modifier.size(13.dp)
                             )
                             Text(
-                                text = currentUser?.username ?: "Login",
+                                text = currentUser?.username ?: "Profile",
                                 color = if (currentUser != null) ManusWhite else ManusSlate300,
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold
@@ -366,11 +366,39 @@ fun CloudPcHeader(
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.AGENT) }
                 )
                 TabButton(
+                    tab = ActiveWorkspaceTab.VOICE_ASSISTANT,
+                    selected = activeTab == ActiveWorkspaceTab.VOICE_ASSISTANT,
+                    icon = Icons.Default.Security, // fallback or Mic
+                    badge = "VOICE",
+                    onClick = { viewModel.selectTab(ActiveWorkspaceTab.VOICE_ASSISTANT) }
+                )
+                TabButton(
+                    tab = ActiveWorkspaceTab.WEB_DASHBOARD,
+                    selected = activeTab == ActiveWorkspaceTab.WEB_DASHBOARD,
+                    icon = Icons.Default.Public,
+                    badge = "REACT",
+                    onClick = { viewModel.selectTab(ActiveWorkspaceTab.WEB_DASHBOARD) }
+                )
+                TabButton(
                     tab = ActiveWorkspaceTab.APP_GEN,
                     selected = activeTab == ActiveWorkspaceTab.APP_GEN,
                     icon = Icons.Default.RocketLaunch,
                     badge = "NEW",
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.APP_GEN) }
+                )
+                TabButton(
+                    tab = ActiveWorkspaceTab.PLUGINS_TOOLS,
+                    selected = activeTab == ActiveWorkspaceTab.PLUGINS_TOOLS,
+                    icon = Icons.Default.Hub,
+                    badge = "TOOLS",
+                    onClick = { viewModel.selectTab(ActiveWorkspaceTab.PLUGINS_TOOLS) }
+                )
+                TabButton(
+                    tab = ActiveWorkspaceTab.WORKFLOWS,
+                    selected = activeTab == ActiveWorkspaceTab.WORKFLOWS,
+                    icon = Icons.Default.Refresh,
+                    badge = "CRON",
+                    onClick = { viewModel.selectTab(ActiveWorkspaceTab.WORKFLOWS) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.PROJECT_SCAN,
@@ -392,6 +420,13 @@ fun CloudPcHeader(
                     icon = Icons.Default.Psychology,
                     badge = "1536D",
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.MEMORY_RAG) }
+                )
+                TabButton(
+                    tab = ActiveWorkspaceTab.CLOUD_STORAGE,
+                    selected = activeTab == ActiveWorkspaceTab.CLOUD_STORAGE,
+                    icon = Icons.Default.Cloud,
+                    badge = "S3",
+                    onClick = { viewModel.selectTab(ActiveWorkspaceTab.CLOUD_STORAGE) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.LIVE_COMPUTER,

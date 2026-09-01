@@ -42,6 +42,7 @@ import com.example.manus.ui.components.AuthDialog
 import com.example.manus.ui.components.BrowserSandboxView
 import com.example.manus.ui.components.CliInstallerDialog
 import com.example.manus.ui.components.CloudPcHeader
+import com.example.manus.ui.components.CloudStorageView
 import com.example.manus.ui.components.CloudTerminalView
 import com.example.manus.ui.components.CodeEditorView
 import com.example.manus.ui.components.DatabaseAiStudioView
@@ -51,10 +52,15 @@ import com.example.manus.ui.components.GitHubAuthDialog
 import com.example.manus.ui.components.LiveComputerDiffView
 import com.example.manus.ui.components.ManusAgentView
 import com.example.manus.ui.components.MemoryRagView
+import com.example.manus.ui.components.PluginsAndToolsView
 import com.example.manus.ui.components.ProjectUnderstandingView
 import com.example.manus.ui.components.SecretCredentialBoxDialog
 import com.example.manus.ui.components.SystemMonitorView
 import com.example.manus.ui.components.UniversalPromptBar
+import com.example.manus.ui.components.UserProfileDialog
+import com.example.manus.ui.components.VoiceAssistantView
+import com.example.manus.ui.components.WebDashboardView
+import com.example.manus.ui.components.WorkflowAutomationView
 import com.example.ui.theme.ManusIndigoLight
 import com.example.ui.theme.ManusSlate900
 import com.example.ui.theme.ManusSlate950
@@ -121,6 +127,18 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
                             ActiveWorkspaceTab.AGENT -> {
                                 ManusAgentView(viewModel = viewModel)
                             }
+                            ActiveWorkspaceTab.VOICE_ASSISTANT -> {
+                                VoiceAssistantView(viewModel = viewModel)
+                            }
+                            ActiveWorkspaceTab.WEB_DASHBOARD -> {
+                                WebDashboardView(viewModel = viewModel)
+                            }
+                            ActiveWorkspaceTab.PLUGINS_TOOLS -> {
+                                PluginsAndToolsView(viewModel = viewModel)
+                            }
+                            ActiveWorkspaceTab.WORKFLOWS -> {
+                                WorkflowAutomationView(viewModel = viewModel)
+                            }
                             ActiveWorkspaceTab.PROJECT_SCAN -> {
                                 ProjectUnderstandingView(viewModel = viewModel)
                             }
@@ -132,6 +150,9 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
                             }
                             ActiveWorkspaceTab.MEMORY_RAG -> {
                                 MemoryRagView(viewModel = viewModel)
+                            }
+                            ActiveWorkspaceTab.CLOUD_STORAGE -> {
+                                CloudStorageView(viewModel = viewModel)
                             }
                             ActiveWorkspaceTab.LIVE_COMPUTER -> {
                                 LiveComputerDiffView(viewModel = viewModel)
@@ -160,6 +181,15 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
 
                 // Docked Universal Message Box at Bottom
                 UniversalPromptBar(viewModel = viewModel)
+            }
+
+            // User Profile & Preferences Dialog
+            val isUserProfileDialogOpen by viewModel.isUserProfileDialogOpen.collectAsState()
+            if (isUserProfileDialogOpen) {
+                UserProfileDialog(
+                    viewModel = viewModel,
+                    onDismiss = { viewModel.closeUserProfileDialog() }
+                )
             }
 
             // Authentication Modal Dialog

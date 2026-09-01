@@ -427,6 +427,27 @@ fun UniversalPromptBar(
                 })
             )
 
+            // Voice Assistant Mic Button
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(ManusSlate900)
+                    .border(1.dp, SleekBorder, CircleShape)
+                    .clickable {
+                        viewModel.openVoiceAssistant()
+                    }
+                    .testTag("universal_voice_mic_btn"),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Mic,
+                    contentDescription = "Voice Mode",
+                    tint = ManusCyan,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
             // Send Button
             Box(
                 modifier = Modifier

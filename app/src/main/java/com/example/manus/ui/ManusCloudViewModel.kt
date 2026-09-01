@@ -56,14 +56,22 @@ class ManusCloudViewModel : ViewModel() {
     val projectUnderstandingEngine = ProjectUnderstandingEngine(vfs)
     val databaseAiEngine = DatabaseAiEngine()
     val applicationGenerationEngine = ApplicationGenerationEngine(vfs)
+    val voiceAssistantEngine = com.example.manus.data.voice.VoiceAssistantEngine(viewModelScope)
+    val pluginManager = com.example.manus.data.plugins.PluginManager()
+    val workflowAutomationEngine = com.example.manus.data.workflows.WorkflowAutomationEngine(viewModelScope)
+    val cloudStorageEngine = com.example.manus.data.cloud.CloudStorageEngine()
+    val userPreferenceEngine = com.example.manus.data.preferences.UserPreferenceEngine()
 
     // Current active view tab
     private val _activeTab = MutableStateFlow(ActiveWorkspaceTab.AGENT)
     val activeTab: StateFlow<ActiveWorkspaceTab> = _activeTab.asStateFlow()
 
-    // Auth Dialog state
+    // Auth & Profile Dialog states
     private val _isAuthDialogOpen = MutableStateFlow(false)
     val isAuthDialogOpen: StateFlow<Boolean> = _isAuthDialogOpen.asStateFlow()
+
+    private val _isUserProfileDialogOpen = MutableStateFlow(false)
+    val isUserProfileDialogOpen: StateFlow<Boolean> = _isUserProfileDialogOpen.asStateFlow()
 
     val currentSession: StateFlow<AuthSession?> = authManager.currentSession
 
@@ -204,6 +212,18 @@ class ManusCloudViewModel : ViewModel() {
 
     fun closeSecretBox() {
         _secretPromptState.value = null
+    }
+
+    fun openUserProfileDialog() {
+        _isUserProfileDialogOpen.value = true
+    }
+
+    fun closeUserProfileDialog() {
+        _isUserProfileDialogOpen.value = false
+    }
+
+    fun openVoiceAssistant() {
+        selectTab(ActiveWorkspaceTab.VOICE_ASSISTANT)
     }
 
     fun submitSecretCredentials(serviceName: String, username: String, tokenOrPass: String) {

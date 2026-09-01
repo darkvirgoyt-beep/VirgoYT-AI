@@ -2,19 +2,24 @@ package com.example.manus.data.model
 
 import java.util.UUID
 
-enum class ActiveWorkspaceTab(val label: String) {
-    AGENT("AI Swarm"),
-    PROJECT_SCAN("Project AI"),
-    DATABASE_AI("Database AI"),
-    APP_GEN("App Creation"),
-    GAME_STUDIO("Unreal & 3D"),
-    LIVE_COMPUTER("Cloud PC Live"),
-    TERMINAL("Terminal"),
-    FILES("Files"),
-    EDITOR("AI Editor"),
-    MEMORY_RAG("Memory RAG"),
-    BROWSER("Sandbox"),
-    MONITOR("Monitor")
+enum class ActiveWorkspaceTab(val label: String, val iconEmoji: String) {
+    AGENT("AI Swarm", "⚡"),
+    VOICE_ASSISTANT("Voice AI", "🎙️"),
+    WEB_DASHBOARD("Web App", "🌐"),
+    APP_GEN("App Studio", "🚀"),
+    PLUGINS_TOOLS("Plugins & Tools", "🧩"),
+    WORKFLOWS("Workflows", "🔄"),
+    PROJECT_SCAN("Project AI", "🏛️"),
+    DATABASE_AI("Database AI", "🗄️"),
+    MEMORY_RAG("Memory RAG", "🧠"),
+    CLOUD_STORAGE("Cloud Storage", "☁️"),
+    LIVE_COMPUTER("Cloud PC Live", "🖥️"),
+    GAME_STUDIO("Unreal & 3D", "🎮"),
+    EDITOR("AI Editor", "💻"),
+    TERMINAL("Terminal", "⌨️"),
+    FILES("Files", "📁"),
+    BROWSER("Sandbox", "🌐"),
+    MONITOR("Telemetry", "📊")
 }
 
 enum class AiModelTier(
@@ -246,6 +251,7 @@ data class SecretCredentialPrompt(
 data class User(
     val id: String = UUID.randomUUID().toString(),
     val username: String,
+    val displayName: String = username,
     val email: String,
     val passwordHash: String,
     val role: String = "Developer",
@@ -363,5 +369,177 @@ data class ProcessInfo(
     val memory: Float,
     val command: String,
     val status: String = "RUNNING"
+)
+
+// ==========================================
+// VOICE ASSISTANT DATA MODELS
+// ==========================================
+enum class VoiceState {
+    IDLE,
+    LISTENING,
+    PROCESSING,
+    SPEAKING
+}
+
+data class VoiceProfile(
+    val id: String = "virgo_neural_aura",
+    val name: String = "Aura (Neural Hologram)",
+    val gender: String = "Female",
+    val pitch: Float = 1.05f,
+    val speed: Float = 1.0f,
+    val description: String = "Futuristic, warm, and highly analytical AI voice"
+)
+
+// ==========================================
+// TOOL CALLING & PLUGIN FRAMEWORK MODELS
+// ==========================================
+enum class ToolCategory(val label: String, val iconEmoji: String) {
+    SYSTEM("System Execution", "⚙️"),
+    SEARCH("Search & Web Crawl", "🔍"),
+    CODE("Code & Compiler", "💻"),
+    STORAGE("Cloud Storage", "☁️"),
+    DATABASE("Database Ops", "🗄️"),
+    MULTIMODAL("Vision & Media", "🎨"),
+    CUSTOM("Community Plugins", "🔌")
+}
+
+data class AiToolDefinition(
+    val id: String,
+    val name: String,
+    val description: String,
+    val category: ToolCategory,
+    val isEnabled: Boolean = true,
+    val parametersSchema: String = "{}",
+    val sampleUsage: String = ""
+)
+
+data class PluginManifest(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val version: String = "1.0.0",
+    val author: String = "VirgoYT Ecosystem",
+    val description: String,
+    val iconEmoji: String,
+    val category: ToolCategory,
+    val isInstalled: Boolean = true,
+    val toolsProvided: List<String> = emptyList(),
+    val apiEndpoint: String? = null
+)
+
+data class ToolCallRecord(
+    val id: String = UUID.randomUUID().toString(),
+    val toolName: String,
+    val arguments: String,
+    val output: String,
+    val executionTimeMs: Long,
+    val status: TaskStatus = TaskStatus.COMPLETED,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+// ==========================================
+// AUTOMATION WORKFLOW MODELS
+// ==========================================
+enum class WorkflowTriggerType(val label: String, val iconEmoji: String) {
+    CRON_SCHEDULE("Scheduled Cron Job", "⏰"),
+    WEBHOOK("Inbound Webhook HTTP", "🪝"),
+    FILE_CHANGE("File Watcher Event", "📁"),
+    GIT_PUSH("Git Commit / Push", "🐙"),
+    MANUAL("Manual Trigger", "▶️")
+}
+
+enum class WorkflowActionType(val label: String, val iconEmoji: String) {
+    AI_AGENT_EXECUTE("Run Autonomous Agent Swarm", "⚡"),
+    EXECUTE_SHELL("Run Sandboxed Bash Command", "⌨️"),
+    DATABASE_BACKUP("Snapshot Database & Vector Table", "🗄️"),
+    BUILD_AND_TEST("Compile Project & Run Unit Tests", "🏗️"),
+    SYNC_CLOUD_BUCKET("Sync to S3/GCS Cloud Storage", "☁️"),
+    DISPATCH_NOTIFICATION("Send Webhook / Slack / Push", "📢")
+}
+
+data class WorkflowStep(
+    val id: String = UUID.randomUUID().toString(),
+    val title: String,
+    val actionType: WorkflowActionType,
+    val configPayload: String,
+    val isEnabled: Boolean = true
+)
+
+data class WorkflowPipeline(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val description: String,
+    val triggerType: WorkflowTriggerType,
+    val cronSchedule: String = "0 */6 * * *", // every 6 hours default
+    val steps: List<WorkflowStep> = emptyList(),
+    val isActive: Boolean = true,
+    val lastRunTimestamp: Long? = null,
+    val lastRunStatus: TaskStatus? = null,
+    val totalRuns: Int = 0
+)
+
+data class WorkflowRunLog(
+    val id: String = UUID.randomUUID().toString(),
+    val workflowName: String,
+    val triggerSource: String,
+    val status: TaskStatus,
+    val executionTimeMs: Long,
+    val logOutput: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+// ==========================================
+// CLOUD STORAGE DATA MODELS
+// ==========================================
+enum class StorageProviderType(val label: String, val icon: String) {
+    S3_COMPATIBLE("AWS S3 / Cloudflare R2", "🪣"),
+    GOOGLE_CLOUD_STORAGE("Google Cloud Storage (GCS)", "☁️"),
+    AZURE_BLOB("Azure Blob Storage", "🔷"),
+    VIRGO_LOCAL_CLUSTER("VirgoYT NVMe Fast Storage", "⚡")
+}
+
+data class CloudStorageObject(
+    val key: String,
+    val sizeBytes: Long,
+    val mimeType: String,
+    val lastModified: Long = System.currentTimeMillis(),
+    val etag: String = UUID.randomUUID().toString().substring(0, 12)
+)
+
+data class CloudStorageBucket(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val provider: StorageProviderType,
+    val region: String = "us-central1",
+    val objectCount: Int = 14,
+    val totalSizeBytes: Long = 859420800L, // ~820 MB
+    val objects: List<CloudStorageObject> = emptyList(),
+    val isPublic: Boolean = false
+)
+
+// ==========================================
+// USER PREFERENCE LEARNING & PROFILE MODELS
+// ==========================================
+enum class AiTone(val label: String) {
+    ULTRA_CONCISE("Ultra-Concise & Surgical"),
+    DETAILED_ARCHITECT("In-Depth System Architect"),
+    CREATIVE_GAME_DEV("Creative Game & 3D Designer"),
+    ACADEMIC_SCIENTIST("Academic & Mathematical")
+}
+
+enum class CodeStylePreference(val label: String) {
+    CLEAN_MODULAR("Modern Clean Architecture & Functional"),
+    MINIMAL_BOILERPLATE("High Performance & Zero Overhead"),
+    VERBOSE_DOCS("Extensively Documented & Typed")
+}
+
+data class UserPreferences(
+    val tone: AiTone = AiTone.ULTRA_CONCISE,
+    val codeStyle: CodeStylePreference = CodeStylePreference.CLEAN_MODULAR,
+    val defaultModel: AiModelTier = AiModelTier.BAZAARLINK_AI,
+    val autoRunSafeTools: Boolean = true,
+    val streamTypingSpeedMs: Long = 18L,
+    val voiceEnabled: Boolean = true,
+    val activeVoice: VoiceProfile = VoiceProfile(),
+    val customSystemPrompt: String = "You are VirgoYT AI, an autonomous supercomputer assistant. Provide clean, production-ready solutions."
 )
 
