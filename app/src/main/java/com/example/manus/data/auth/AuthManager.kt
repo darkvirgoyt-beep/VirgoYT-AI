@@ -19,10 +19,18 @@ class AuthManager {
         get() = _currentSession.value?.user
 
     init {
-        // Seed default developer and admin accounts
+        // Seed default accounts
+        val darkvirgo = User(
+            username = "darkvirgoyt-beep",
+            email = "darkvirgoyt@gmail.com",
+            passwordHash = hashPassword("virgo123"),
+            role = "Chief AI Architect",
+            avatarColorHex = 0xFF00F0FF, // Cyan
+            homeDir = "/home/darkvirgoyt-beep"
+        )
         val defaultDev = User(
             username = "developer",
-            email = "dev@manus.cloud",
+            email = "dev@virgoyt.ai",
             passwordHash = hashPassword("developer123"),
             role = "Lead Developer",
             avatarColorHex = 0xFF6366F1, // Indigo
@@ -30,7 +38,7 @@ class AuthManager {
         )
         val defaultAdmin = User(
             username = "admin",
-            email = "admin@manus.cloud",
+            email = "admin@virgoyt.ai",
             passwordHash = hashPassword("admin123"),
             role = "Root Administrator",
             avatarColorHex = 0xFF10B981, // Emerald
@@ -38,19 +46,20 @@ class AuthManager {
         )
         val guestUser = User(
             username = "guest",
-            email = "guest@manus.cloud",
+            email = "guest@virgoyt.ai",
             passwordHash = hashPassword("guest123"),
             role = "Sandbox Guest",
-            avatarColorHex = 0xFF00F0FF, // Cyan
+            avatarColorHex = 0xFFF59E0B, // Amber
             homeDir = "/home/guest"
         )
 
+        users[darkvirgo.username.lowercase()] = darkvirgo
         users[defaultDev.username.lowercase()] = defaultDev
         users[defaultAdmin.username.lowercase()] = defaultAdmin
         users[guestUser.username.lowercase()] = guestUser
 
-        // Default login as 'developer'
-        _currentSession.value = AuthSession(user = defaultDev)
+        // Default login as 'darkvirgoyt-beep'
+        _currentSession.value = AuthSession(user = darkvirgo)
     }
 
     fun getAllUsers(): List<User> = users.values.toList().sortedBy { it.username }

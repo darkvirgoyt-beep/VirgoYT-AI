@@ -24,6 +24,19 @@ class TerminalEngine(
     private val commandHistory = mutableListOf<String>()
     private var historyIndex = -1
 
+    private val environmentVariables = java.util.concurrent.ConcurrentHashMap<String, String>().apply {
+        put("OPENAI_API_BASE", "https://api.kie.ai/v1")
+        put("OPENAI_API_KEY", "your_openai_api_key_here")
+        put("BAZAARLINK_API_BASE", "https://api.bazaarlink.ai/v1")
+        put("BAZAARLINK_API_KEY", "your_bazaarlink_api_key_here")
+        put("OPENROUTER_API_KEY", "your_openrouter_api_key_here")
+        put("GROQ_API_KEY", "your_groq_api_key_here")
+        put("VIRGO_AUTH_TOKEN", "configured_vault_token")
+        put("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/workspace/node_modules/.bin")
+        put("SHELL", "/bin/bash")
+        put("TERM", "xterm-256color")
+    }
+
     private val _terminalMode = MutableStateFlow(TerminalMode.CLOUD_VM)
     val terminalMode: StateFlow<TerminalMode> = _terminalMode.asStateFlow()
 
@@ -254,6 +267,37 @@ User Session Details:
                     }
                     appendEntry(status, OutputType.STDOUT)
                     outputBuilder.append(status)
+                }
+
+                "export" -> {
+                    val fullArg = args.joinToString(" ")
+                    if (fullArg.isBlank()) {
+                        val envList = environmentVariables.entries.sortedBy { it.key }
+                            .joinToString("\n") { "declare -x ${it.key}=\"${it.value}\"" }
+                        appendEntry(envList, OutputType.STDOUT)
+                        outputBuilder.append(envList)
+                    } else {
+                        val clean = fullArg.replace("export ", "").trim()
+                        if (clean.contains("=")) {
+                            val key = clean.substringBefore("=").trim()
+                            val value = clean.substringAfter("=").trim().trim('"', '\'')
+                            environmentVariables[key] = value
+                            val msg = "✓ [export] $key=\"$value\" set in environment"
+                            appendEntry(msg, OutputType.SUCCESS)
+                            outputBuilder.append(msg)
+                        } else {
+                            val msg = "declare -x $clean=\"${environmentVariables[clean] ?: ""}\""
+                            appendEntry(msg, OutputType.STDOUT)
+                            outputBuilder.append(msg)
+                        }
+                    }
+                }
+
+                "env", "printenv" -> {
+                    val envOutput = environmentVariables.entries.sortedBy { it.key }
+                        .joinToString("\n") { "${it.key}=${it.value}" }
+                    appendEntry(envOutput, OutputType.STDOUT)
+                    outputBuilder.append(envOutput)
                 }
 
                 "cp" -> {

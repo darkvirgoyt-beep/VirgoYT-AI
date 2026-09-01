@@ -23,49 +23,107 @@ enum class AiModelTier(
     val provider: String,
     val iconEmoji: String,
     val specialty: String,
-    val maxTokens: Int = 128000
+    val maxTokens: Int = 128000,
+    val baseUrl: String = "",
+    val defaultApiKey: String = "",
+    val authHeaderFormat: String = "Authorization: Bearer <API_KEY>",
+    val sdkType: String = "OpenAI Compatible / LangChain"
 ) {
     AUTO_ROUTER(
         id = "auto",
         displayName = "Auto Intelligent Router",
         provider = "VirgoYT Omni",
         iconEmoji = "⚡",
-        specialty = "Dynamically routes each task (Unreal 5, 3D GLB, C++, Video) to the best model"
+        specialty = "Dynamically routes each task across BazaarLink, OpenRouter, Groq, Kie.ai, and NVIDIA",
+        baseUrl = "https://api.bazaarlink.ai/v1",
+        defaultApiKey = ""
+    ),
+    BAZAARLINK_AI(
+        id = "bazaarlink/openai-compatible",
+        displayName = "BazaarLink AI (v1)",
+        provider = "BazaarLink.ai / OpenAI SDK",
+        iconEmoji = "🌐",
+        specialty = "High-speed OpenAI-compatible gateway (https://api.bazaarlink.ai/v1)",
+        baseUrl = "https://api.bazaarlink.ai/v1",
+        defaultApiKey = "",
+        authHeaderFormat = "Authorization: Bearer sk-bl-your-key-here",
+        sdkType = "openai (base_url=) | langchain | any OpenAI-compatible"
+    ),
+    OPENROUTER_HUB(
+        id = "openrouter/unified-hub",
+        displayName = "OpenRouter Hub",
+        provider = "OpenRouter.ai",
+        iconEmoji = "🔀",
+        specialty = "Unified multi-model aggregator with direct OpenRouter API key routing",
+        baseUrl = "https://openrouter.ai/api/v1",
+        defaultApiKey = "",
+        authHeaderFormat = "Authorization: Bearer sk-or-v1-your-key-here",
+        sdkType = "OpenRouter SDK / OpenAI Compatible"
+    ),
+    KIE_AI_GATEWAY(
+        id = "kie/openai-compatible",
+        displayName = "Kie.ai Gateway",
+        provider = "Kie.ai / OpenAI Compatible",
+        iconEmoji = "⚡",
+        specialty = "Fast inference endpoint (https://api.kie.ai/v1) with Bearer token authentication",
+        baseUrl = "https://api.kie.ai/v1",
+        defaultApiKey = "",
+        authHeaderFormat = "Authorization: Bearer your-kie-api-key",
+        sdkType = "openai (base_url=https://api.kie.ai/v1)"
+    ),
+    GROQ_LLAMA_3_3_70B(
+        id = "groq/llama-3.3-70b-versatile",
+        displayName = "Groq LPU (Llama 3.3 70B)",
+        provider = "Groq Cloud LPUs",
+        iconEmoji = "🚀",
+        specialty = "Ultra-low latency LPU engine (500+ tok/s) via Groq API (gsk_...)",
+        baseUrl = "https://api.groq.com/openai/v1",
+        defaultApiKey = "",
+        authHeaderFormat = "Authorization: Bearer gsk_your_key_here",
+        sdkType = "Groq SDK / OpenAI Compatible"
     ),
     NVIDIA_NEMOTRON_70B(
         id = "nvidia/llama-3.1-nemotron-70b-instruct",
         displayName = "NVIDIA Nemotron 70B",
         provider = "NVIDIA NIM",
         iconEmoji = "🟢",
-        specialty = "Unreal Engine 5 physics, game math, complex simulation architectures"
+        specialty = "Unreal Engine 5 physics, game math, complex simulation architectures",
+        baseUrl = "https://integrate.api.nvidia.com/v1"
     ),
     NVIDIA_LLAMA_3_3_70B(
         id = "meta/llama-3.3-70b-instruct",
         displayName = "NVIDIA Llama 3.3 70B",
         provider = "NVIDIA NIM",
         iconEmoji = "⚡",
-        specialty = "Ultra-fast low-latency code execution and live tool control"
+        specialty = "Ultra-fast low-latency code execution and live tool control",
+        baseUrl = "https://integrate.api.nvidia.com/v1"
     ),
     OPENROUTER_CLAUDE_3_5_SONNET(
         id = "anthropic/claude-3.5-sonnet",
         displayName = "Claude 3.5 Sonnet",
         provider = "OpenRouter / Anthropic",
         iconEmoji = "🧠",
-        specialty = "Highest quality C++, Blueprint logic, and complex system engineering"
+        specialty = "Highest quality C++, Blueprint logic, and complex system engineering",
+        baseUrl = "https://openrouter.ai/api/v1",
+        defaultApiKey = ""
     ),
     OPENROUTER_GPT_4O(
         id = "openai/gpt-4o",
         displayName = "OpenAI GPT-4o Omni",
         provider = "OpenRouter / OpenAI",
         iconEmoji = "👁️",
-        specialty = "Multimodal vision, satellite photogrammetry, audio & video analysis"
+        specialty = "Multimodal vision, satellite photogrammetry, audio & video analysis",
+        baseUrl = "https://openrouter.ai/api/v1",
+        defaultApiKey = ""
     ),
     OPENROUTER_DEEPSEEK_R1(
         id = "deepseek/deepseek-r1",
         displayName = "DeepSeek-R1 Thinking",
         provider = "OpenRouter / DeepSeek",
         iconEmoji = "🔬",
-        specialty = "Deep step-by-step mathematical reasoning & shader computation"
+        specialty = "Deep step-by-step mathematical reasoning & shader computation",
+        baseUrl = "https://openrouter.ai/api/v1",
+        defaultApiKey = ""
     ),
     GEMINI_2_5_PRO(
         id = "google/gemini-2.5-pro",

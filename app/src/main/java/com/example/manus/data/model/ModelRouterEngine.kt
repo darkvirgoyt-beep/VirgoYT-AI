@@ -36,11 +36,12 @@ class ModelRouterEngine {
                 ChatMessage(
                     role = "assistant",
                     content = "👋 **VirgoYT AI Autonomous Cloud Supercomputer** online.\n" +
-                            "- 🎮 **Unreal Engine 5.4 Game Studio**: Nanite & Lumen terrain, Blueprints & C++\n" +
+                            "- 🌐 **BazaarLink AI & OpenAI Hub**: High-throughput gateway `api.bazaarlink.ai/v1`\n" +
+                            "- 🚀 **Groq LPU Acceleration**: 500+ tok/s low-latency execution\n" +
+                            "- ⚡ **Kie.ai & OpenRouter Hub**: Universal OpenAI-compatible endpoints\n" +
+                            "- 🎮 **Unreal Engine 5.4 Game Studio**: Nanite, Lumen, Blueprints & C++\n" +
                             "- 🧊 **3D Model Maker**: Procedural GLB/GLTF mesh generation & PBR shaders\n" +
-                            "- 🌍 **Google Earth 3D GIS**: Real-world satellite heightmaps & biomes\n" +
-                            "- ⚡ **Multi-Model Router**: Auto, NVIDIA Nemotron 70B, Claude 3.5, GPT-4o, DeepSeek-R1\n" +
-                            "- 💻 **Full Cloud Desktop**: Interactive remote control & terminal sandbox",
+                            "- 💻 **Full Cloud Desktop & Secret Vault**: Encrypted credential manager & terminal sandbox",
                     modelUsed = _selectedModel.value
                 )
             )
@@ -98,6 +99,18 @@ class ModelRouterEngine {
         val hasImageAttachment = attachments.any { it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO }
 
         return when {
+            lower.contains("bazaarlink") || lower.contains("bazaar") || lower.contains("langchain") || lower.contains("sk-bl") -> {
+                Pair(AiModelTier.BAZAARLINK_AI, "🌐 Auto-routed to BazaarLink AI (High-Speed OpenAI & LangChain Gateway)")
+            }
+            lower.contains("groq") || lower.contains("lpu") || lower.contains("realtime") || lower.contains("500 tok") || lower.contains("gsk_") -> {
+                Pair(AiModelTier.GROQ_LLAMA_3_3_70B, "🚀 Auto-routed to Groq LPU (Ultra-Low Latency 500+ tok/s Hardware Acceleration)")
+            }
+            lower.contains("kie") || lower.contains("api.kie.ai") -> {
+                Pair(AiModelTier.KIE_AI_GATEWAY, "⚡ Auto-routed to Kie.ai Gateway (api.kie.ai/v1)")
+            }
+            lower.contains("openrouter") || lower.contains("sk-or") -> {
+                Pair(AiModelTier.OPENROUTER_HUB, "🔀 Auto-routed to OpenRouter Hub (Multi-Model Gateway)")
+            }
             lower.contains("unreal") || lower.contains("ue5") || lower.contains("physics") || lower.contains("ark") || lower.contains("bgmi") || lower.contains("palworld") -> {
                 Pair(AiModelTier.NVIDIA_NEMOTRON_70B, "⚡ Auto-routed to NVIDIA Nemotron 70B (Specialized for Unreal Engine 5 & Game Physics)")
             }
@@ -114,7 +127,7 @@ class ModelRouterEngine {
                 Pair(AiModelTier.OPENROUTER_CLAUDE_3_5_SONNET, "⚡ Auto-routed to Claude 3.5 Sonnet (Specialized for C++ & Software Architecture)")
             }
             else -> {
-                Pair(AiModelTier.NVIDIA_LLAMA_3_3_70B, "⚡ Auto-routed to NVIDIA Llama 3.3 70B (Ultra-fast execution & code generation)")
+                Pair(AiModelTier.BAZAARLINK_AI, "🌐 Auto-routed to BazaarLink AI (Default High-Throughput OpenAI Gateway)")
             }
         }
     }
