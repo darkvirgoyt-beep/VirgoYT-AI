@@ -86,6 +86,12 @@ class VirgoCloudViewModel : ViewModel() {
         _activeTab.value = tab
     }
 
+    fun runTerminalCommand(command: String) {
+        viewModelScope.launch {
+            terminalEngine.executeCommand(command)
+        }
+    }
+
     fun showToast(message: String) {
         viewModelScope.launch {
             _statusToast.value = message

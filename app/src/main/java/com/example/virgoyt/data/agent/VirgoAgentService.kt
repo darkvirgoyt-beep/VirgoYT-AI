@@ -33,6 +33,7 @@ class VirgoAgentService(
     val cursorAiService: CursorAiAssistantService = CursorAiAssistantService()
 ) {
     private val scope = CoroutineScope(Dispatchers.Main)
+    private val conversationalEngine = VirgoConversationalEngine(vfs)
 
     private val _isAgentBusy = MutableStateFlow(false)
     val isAgentBusy: StateFlow<Boolean> = _isAgentBusy.asStateFlow()
@@ -55,8 +56,8 @@ class VirgoAgentService(
         routerEngine.appendMessageToCurrentSession(userMessage)
 
         val subtasks = listOf(
-            AgentSubtask(title = "Architectural Analysis", description = "Decomposing prompt & verifying codebase structure", toolType = "system_scan"),
-            AgentSubtask(title = "Synthesize Solution", description = "Generating components and VFS modifications", toolType = "code_editor"),
+            AgentSubtask(title = "Architectural Reasoning", description = "Decomposing prompt & verifying codebase structure", toolType = "system_scan"),
+            AgentSubtask(title = "Synthesize Solution", description = "Generating components, diffs and VFS modifications", toolType = "code_editor"),
             AgentSubtask(title = "Quality Verification", description = "Checking type safety and running test assertions", toolType = "test_runner")
         )
 
@@ -70,28 +71,23 @@ class VirgoAgentService(
         _executionState.value = AgentExecutionState.PLANNING
 
         scope.launch {
-            delay(400)
+            delay(350)
             _executionState.value = AgentExecutionState.CODING
             multiAgentTeam.broadcast(AgentRole.ARCHITECT, AgentRole.FULLSTACK_CODER, "Blueprint generated for: '$userPrompt'")
 
-            delay(600)
-            _executionState.value = AgentExecutionState.REVIEWING
-            multiAgentTeam.broadcast(AgentRole.FULLSTACK_CODER, AgentRole.CODE_REVIEWER, "Code implemented in virtual workspace.")
-
             delay(400)
-            _executionState.value = AgentExecutionState.TESTING
-            multiAgentTeam.broadcast(AgentRole.CODE_REVIEWER, AgentRole.QA_AUTOMATION, "Code approved. Running test assertions.")
+            _executionState.value = AgentExecutionState.REVIEWING
+            multiAgentTeam.broadcast(AgentRole.FULLSTACK_CODER, AgentRole.CODE_REVIEWER, "Synthesizing code diffs and artifacts.")
 
             delay(300)
+            _executionState.value = AgentExecutionState.TESTING
+            multiAgentTeam.broadcast(AgentRole.CODE_REVIEWER, AgentRole.QA_AUTOMATION, "Code verified. Formulating intelligent conversational reply.")
+
+            delay(250)
             _executionState.value = AgentExecutionState.COMPLETED
             _isAgentBusy.value = false
 
-            val assistantMessage = ChatMessage(
-                role = "assistant",
-                content = "Goal completed successfully: \"$userPrompt\"\n\n- Model: ${effectiveTier.displayName} ($routeReason)\n- Architecture reviewed and verified\n- Virtual File System updated\n- 0 errors encountered",
-                modelUsed = effectiveTier,
-                toolExecutions = listOf("vfs.read_file", "vfs.write_file", "code_review_ast", "run_test_suite")
-            )
+            val assistantMessage = conversationalEngine.generateAgentReply(userPrompt, effectiveTier)
             routerEngine.appendMessageToCurrentSession(assistantMessage)
             _currentTask.value = task.copy(status = TaskStatus.COMPLETED)
         }

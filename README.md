@@ -76,6 +76,81 @@ The compiled APK will be located at:
 
 ---
 
+## 📦 Multi-Platform Downloads & Live Hosts
+
+| Platform | Download / Access Link | Description |
+| :--- | :--- | :--- |
+| 🌐 **Live Web (GitHub Pages)** | [https://darkvirgoyt-beep.github.io/VirgoYT-AI/](https://darkvirgoyt-beep.github.io/VirgoYT-AI/) | Zero-install live web app with 3D canvas and agent dashboard |
+| 📱 **Android APK (Release)** | [Direct Download (app-release.apk)](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk) | Production signed APK for ARM64 & x86 devices |
+| 📱 **Android APK (Debug)** | [Direct Download (app-debug.apk)](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-debug.apk) | Developer debug APK with inspection enabled |
+| 💻 **Windows Desktop (.exe)** | [VirgoYT-AI Releases](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest) | Windows 10/11 64-bit installer & standalone bundle |
+| 🍎 **macOS (.dmg / .app)** | [VirgoYT-AI Releases](https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest) | Apple Silicon (M1/M2/M3/M4) & Intel Mac package |
+
+---
+
+## ⚡ Terminal & Termux Download Instructions
+
+### 1. Android Termux
+
+**Option A — 1-Line Direct APK Download & Install**:
+```bash
+pkg update -y && pkg install -y curl && \
+curl -sL https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk -o VirgoYT-AI.apk && \
+termux-open VirgoYT-AI.apk
+```
+
+**Option B — Build from Source in Termux**:
+```bash
+pkg update -y && pkg install -y git openjdk-17 nodejs curl
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+chmod +x gradlew
+./gradlew assembleDebug
+```
+
+---
+
+### 2. Linux Terminal (Ubuntu, Debian, Fedora, Arch)
+
+**Option A — Download APK directly via wget / cURL**:
+```bash
+# Using wget:
+wget -O virgo-yt-ai.apk https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+
+# Using cURL:
+curl -L -O https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+```
+
+**Option B — Run Local Live Web Host**:
+```bash
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+python3 -m http.server 8080 --directory public
+# Open http://localhost:8080 in your browser
+```
+
+---
+
+### 3. macOS Terminal (zsh / bash)
+
+**Option A — Download APK or Assets via cURL**:
+```bash
+curl -sLO https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+open . # Opens Finder at current directory
+```
+
+**Option B — Clone & Build with Homebrew**:
+```bash
+brew install git openjdk@17
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+chmod +x gradlew
+./gradlew assembleDebug
+open app/build/outputs/apk/debug/
+```
+
+---
+
 ## 🔗 Live URLs & Access
 
 - **Official Web App (GitHub Pages Hosted)**: [https://darkvirgoyt-beep.github.io/VirgoYT-AI/](https://darkvirgoyt-beep.github.io/VirgoYT-AI/)

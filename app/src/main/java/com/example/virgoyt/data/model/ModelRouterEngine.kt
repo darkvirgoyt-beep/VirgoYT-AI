@@ -17,13 +17,25 @@ class ModelRouterEngine {
                 messages = listOf(
                     ChatMessage(
                         role = "assistant",
-                        content = "VirgoYT Cloud AI cluster initialized. Autonomous agents and sandbox environments ready. How can I assist with your deployment or software development today?",
+                        content = "Hey! Welcome to **VirgoYT Cloud AI** ⚡ I'm your autonomous multi-agent co-developer and 3D studio copilot!\n\n" +
+                                "What crazy or epic project are we conquering today?\n" +
+                                "• 🌐 **Full-Stack SaaS**: Next.js 15 (App Router), FastAPI async backend, Database & Auth\n" +
+                                "• 🎮 **3D Game Studio**: Three.js / Unreal Engine scene & cybernetic shader pipeline\n" +
+                                "• 📱 **Android Native**: Jetpack Compose, Kotlin Flow, Room DB & release APK packaging\n" +
+                                "• ⌨️ **Terminal & Cloud PC**: Direct bash commands, test suites & deployments\n\n" +
+                                "You don't need to switch between tabs — code generation, interactive diffs, and terminal commands all run right here in this unified chat automatically!\n\n" +
+                                "What crazy idea or project would you like to build right now?",
                         modelUsed = AiModelTier.GEMINI_2_5_PRO,
                         quickActionChips = listOf(
                             QuickActionChip(label = "Generate FullStack App", actionCommand = "Create a Next.js 15 + FastAPI SaaS application", iconEmoji = "🚀"),
-                            QuickActionChip(label = "Scan Workspace", actionCommand = "Analyze repository dependencies and API routes", iconEmoji = "🏛️"),
                             QuickActionChip(label = "Launch 3D World", actionCommand = "Build interactive Three.js procedural city", iconEmoji = "🎮"),
-                            QuickActionChip(label = "Run Tests", actionCommand = "Run unit and screenshot regression tests", iconEmoji = "🧪")
+                            QuickActionChip(label = "Run Unit Tests", actionCommand = "gradle :app:testDebugUnitTest", iconEmoji = "🧪"),
+                            QuickActionChip(label = "Download Release APK", actionCommand = "curl -sLO release.apk", iconEmoji = "📦")
+                        ),
+                        followUpQuestions = listOf(
+                            "What crazy project are you dreaming of building today?",
+                            "Should we scaffold a Next.js 15 + FastAPI SaaS?",
+                            "Would you like an interactive 3D WebGL scene?"
                         )
                     )
                 )

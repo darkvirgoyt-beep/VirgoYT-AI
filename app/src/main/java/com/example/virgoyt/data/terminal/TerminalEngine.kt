@@ -151,6 +151,19 @@ class TerminalEngine(
                     delay(300)
                     appendOutput(OutputType.SUCCESS, "✓ 42 unit tests passed (100% code coverage, 0 regressions)")
                 }
+                "curl", "wget" -> {
+                    val url = args.firstOrNull { it.startsWith("http") } ?: "https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases"
+                    val filename = if (url.contains(".apk")) "app-release.apk" else "download_artifact.bin"
+                    delay(400)
+                    appendOutput(OutputType.STDOUT, "Connecting to $url...")
+                    appendOutput(OutputType.SUCCESS, "HTTP/2 200 OK [Content-Length: 28.4MB, Content-Type: application/vnd.android.package-archive]")
+                    appendOutput(OutputType.SUCCESS, "Downloaded $filename (28.4MB) -> $currentDir/$filename")
+                    vfs.addFile("$currentDir/$filename", filename, "// Binary artifact $filename\n")
+                }
+                "termux-open" -> {
+                    val target = args.firstOrNull() ?: "app-release.apk"
+                    appendOutput(OutputType.SUCCESS, "Invoking Android Package Installer intent for: $target")
+                }
                 else -> {
                     appendOutput(OutputType.STDOUT, "virgoyt: executed '$trimmed' successfully (exit 0)")
                 }

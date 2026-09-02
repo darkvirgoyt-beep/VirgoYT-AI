@@ -90,8 +90,10 @@ fun UniversalPromptBar(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
                     if (promptInput.isNotBlank() && !isBusy) {
-                        viewModel.executePrompt(promptInput)
+                        val input = promptInput
                         promptInput = ""
+                        viewModel.selectTab(com.example.virgoyt.data.model.ActiveWorkspaceTab.AGENT)
+                        viewModel.executePrompt(input)
                     }
                 })
             )
@@ -99,8 +101,10 @@ fun UniversalPromptBar(
             IconButton(
                 onClick = {
                     if (promptInput.isNotBlank() && !isBusy) {
-                        viewModel.executePrompt(promptInput)
+                        val input = promptInput
                         promptInput = ""
+                        viewModel.selectTab(com.example.virgoyt.data.model.ActiveWorkspaceTab.AGENT)
+                        viewModel.executePrompt(input)
                     }
                 },
                 enabled = promptInput.isNotBlank() && !isBusy,

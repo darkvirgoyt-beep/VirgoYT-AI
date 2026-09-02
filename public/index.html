@@ -456,6 +456,284 @@
       font-size: 0.88rem;
     }
 
+
+    /* Download Hub Section */
+    .download-section {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .download-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .download-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.15);
+    }
+    .download-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: var(--indigo-bg);
+      color: var(--cyan);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .download-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .download-card p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .cli-guide-box {
+      background: #020617;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 28px;
+    }
+    .cli-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .cli-tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .cli-tab-btn.active, .cli-tab-btn:hover {
+      background: var(--indigo-bg);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .cli-content-pane {
+      display: none;
+    }
+    .cli-content-pane.active {
+      display: block;
+    }
+    .code-snippet-box {
+      position: relative;
+      background: #010409;
+      border: 1px solid #161b22;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e6edf3;
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .copy-btn:hover {
+      background: #30363d;
+      color: #fff;
+    }
+
+    /* 3D Viewport Controls */
+    .mode-btn {
+      background: rgba(11, 19, 41, 0.85);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.2s ease;
+    }
+    .mode-btn:hover, .mode-btn.active {
+      background: var(--cyan);
+      color: #030712;
+      border-color: var(--cyan);
+      font-weight: 700;
+      box-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    /* Web AI Chat Section */
+    .web-chat-section {
+      max-width: 1200px;
+      margin: 24px auto 40px auto;
+      padding: 0 24px;
+    }
+    .chat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .chat-messages {
+      height: 380px;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #060b19;
+    }
+    .chat-msg {
+      max-width: 88%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: #0284c7;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.ai {
+      align-self: flex-start;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      color: #f1f5f9;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+    .chat-code-block {
+      background: #030712;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .chat-code-header {
+      background: #0a1124;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .chat-code-body {
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .chat-diff-block {
+      background: #030712;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+    }
+    .chat-input-field {
+      flex: 1;
+      background: #030712;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .chat-input-field:focus {
+      border-color: var(--cyan);
+    }
+    .chat-suggestions {
+      display: flex;
+      gap: 8px;
+      padding: 10px 20px 0 20px;
+      overflow-x: auto;
+      background: var(--bg-card);
+    }
+    .chat-suggestion-chip {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .chat-suggestion-chip:hover {
+      background: var(--cyan);
+      color: #030712;
+      font-weight: 600;
+    }
+
     /* Footer */
     footer {
       border-top: 1px solid var(--border-color);
@@ -480,13 +758,17 @@
       <span class="brand-badge">v1.0.0</span>
     </a>
     <div class="nav-links">
+      <a href="#downloads" class="btn btn-outline">
+        <i data-lucide="download"></i>
+        <span>Downloads</span>
+      </a>
       <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI" target="_blank" class="btn btn-outline">
         <i data-lucide="github"></i>
         <span>GitHub Repo</span>
       </a>
       <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases" target="_blank" class="btn btn-cyan">
-        <i data-lucide="download"></i>
-        <span>Download APK</span>
+        <i data-lucide="sparkles"></i>
+        <span>Releases</span>
       </a>
     </div>
   </header>
@@ -499,14 +781,18 @@
     </div>
     <h1>Build Software & 3D Worlds at Superhuman Speed</h1>
     <p>VirgoYT AI coordinates 15 specialized sub-agents, Unreal Engine 5.4 / Unity 6 game pipelines, and 1536-dimensional vector RAG memory in one unified ecosystem.</p>
-    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
-      <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases" class="btn btn-cyan" style="padding: 12px 24px; font-size: 1rem;">
-        <i data-lucide="smartphone"></i>
-        <span>Download Android APK</span>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="#downloads" class="btn btn-cyan" style="padding: 12px 22px; font-size: 0.95rem;">
+        <i data-lucide="download"></i>
+        <span>Download App & APK</span>
       </a>
-      <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI" class="btn btn-outline" style="padding: 12px 24px; font-size: 1rem;">
+      <a href="#cli-terminal" class="btn btn-outline" style="padding: 12px 22px; font-size: 0.95rem;">
+        <i data-lucide="terminal"></i>
+        <span>Terminal & Termux Commands</span>
+      </a>
+      <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI" target="_blank" class="btn btn-outline" style="padding: 12px 22px; font-size: 0.95rem;">
         <i data-lucide="code-2"></i>
-        <span>Explore Source Code</span>
+        <span>Explore GitHub Repo</span>
       </a>
     </div>
   </section>
@@ -524,8 +810,13 @@
       </div>
       <div id="viewport3d">
         <div class="viewport-overlay">
-          <div class="stats">ROTATION: ACTIVE | SHADER: PBR WIREFRAME</div>
-          <div class="stats" id="fpsCounter">FPS: 60</div>
+          <div class="stats" id="fpsCounter">FPS: 60 &bull; PBR LUMEN &bull; WEBGL</div>
+          <div style="display: flex; gap: 6px; pointer-events: auto;">
+            <button class="mode-btn active" id="btnModeHolo" onclick="set3DMode('holo')">💎 Hologram</button>
+            <button class="mode-btn" id="btnModeWire" onclick="set3DMode('wire')">📐 Wireframe</button>
+            <button class="mode-btn" id="btnModeParticles" onclick="set3DMode('particles')">✨ Particles</button>
+            <button class="mode-btn" onclick="reset3DCamera()">🔄 Reset</button>
+          </div>
         </div>
       </div>
     </div>
@@ -723,7 +1014,54 @@
     </div>
   </section>
 
-  <!-- Live Terminal Logs -->
+  <!-- Interactive Unified Web AI Chat Workstation -->
+  <section class="web-chat-section" id="ai-chat">
+    <div class="chat-card">
+      <div class="panel-header" style="padding: 14px 20px; background: #0b1329; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 8px var(--emerald);"></div>
+          <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">VirgoYT Autonomous AI Engineer & 3D Copilot</span>
+          <span class="badge-tag">GEMINI 2.5 PRO / FLASH ACTIVE</span>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan);">
+          UNIFIED CHAT &bull; ZERO TAB SWITCHING
+        </div>
+      </div>
+
+      <!-- Messages Flow -->
+      <div class="chat-messages" id="webChatMessages">
+        <div class="chat-msg ai">
+          <div class="chat-meta">⚡ VirgoYT AI &bull; Autonomous Software Engineer</div>
+          <div>Hey! What's up! 🚀 I'm <strong>VirgoYT AI</strong>, your autonomous multi-agent co-developer and 3D studio partner.<br><br>
+          What crazy or epic project are we building today?
+          <ul style="margin: 8px 0 8px 20px;">
+            <li>🌐 <strong>Full-Stack SaaS</strong>: Next.js 15 (App Router) + FastAPI async backend + PostgreSQL</li>
+            <li>🎮 <strong>3D World & Game Engine</strong>: Procedural Three.js WebGL & cybernetic shader pipeline</li>
+            <li>📱 <strong>Android Native Studio</strong>: Jetpack Compose, Kotlin Flow, Room Database & release APKs</li>
+            <li>⌨️ <strong>Terminal & Cloud PC</strong>: Direct bash commands, Docker & git deployments</li>
+          </ul>
+          You don't need to hunt through separate tabs — code snippets, interactive diffs, and terminal commands all run right here in this unified chat automatically! What crazy idea do you want to build right now?</div>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="chat-suggestions">
+        <div class="chat-suggestion-chip" onclick="sendWebChatPrompt('Create a Next.js 15 + FastAPI SaaS application')">🚀 Create Next.js 15 SaaS</div>
+        <div class="chat-suggestion-chip" onclick="sendWebChatPrompt('Build 3D cybernetic core scene')">🎮 Build 3D Core Scene</div>
+        <div class="chat-suggestion-chip" onclick="sendWebChatPrompt('Run automated unit tests')">🧪 Run Unit Tests</div>
+        <div class="chat-suggestion-chip" onclick="sendWebChatPrompt('Download release APK')">📦 Download Release APK</div>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="chat-input-bar">
+        <input type="text" id="webChatInput" class="chat-input-field" placeholder="Ask VirgoYT AI: 'Create Next.js 15 SaaS', 'Build 3D world', or 'What crazy project can we build?'..." onkeydown="if(event.key==='Enter') submitWebChat()">
+        <button class="btn btn-cyan" onclick="submitWebChat()" style="padding: 0 20px;">
+          <i data-lucide="send" style="width: 16px;"></i>
+          <span>Send</span>
+        </button>
+      </div>
+    </div>
+  </section>
   <section class="terminal-box">
     <div class="studio-panel">
       <div class="panel-header">
@@ -740,6 +1078,201 @@
         <div><span class="success">[CI/CD]</span> Android APK Build: assembleDebug & assembleRelease generated</div>
         <div><span class="accent">[GitHub-Host]</span> GitHub Pages Live Web Distribution Active @ darkvirgoyt-beep</div>
         <div><span class="cmd">[Status]</span> VirgoYT AI Online & Listening for Autonomous Engineering Goals...</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Multi-Platform Downloads & Host Hub -->
+  <section class="download-section" id="downloads">
+    <div class="features-header">
+      <span class="download-badge">Official Multi-Platform Distributions</span>
+      <h2>Download & Deploy VirgoYT AI Everywhere</h2>
+      <p style="color: var(--text-muted); margin-top: 8px;">Run natively on Android, Windows, macOS, Linux, or in the browser via GitHub Pages.</p>
+    </div>
+
+    <div class="download-grid">
+      <!-- 1. Android APK -->
+      <div class="download-card">
+        <div>
+          <span class="download-badge" style="color: #10b981; background: rgba(16, 185, 129, 0.15);">Android (ARM64 & x86)</span>
+          <h3><i data-lucide="smartphone" style="color: #10b981;"></i> Android APK</h3>
+          <p>Native Jetpack Compose holographic UI, background agent daemon, and local RAG SQLite vector cache.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk" class="btn btn-cyan" style="width: 100%; justify-content: center;">
+            <i data-lucide="download"></i> <span>Download Release APK</span>
+          </a>
+          <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-debug.apk" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 0.8rem;">
+            <span>Download Debug APK</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Windows EXE -->
+      <div class="download-card">
+        <div>
+          <span class="download-badge" style="color: #06b6d4; background: rgba(6, 182, 212, 0.15);">Windows 10 / 11 (x64)</span>
+          <h3><i data-lucide="monitor" style="color: #06b6d4;"></i> Windows App (.exe)</h3>
+          <p>Electron & Chromium desktop package with native Unreal Engine 5.4 bridge and GPU hardware acceleration.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest" class="btn btn-cyan" style="width: 100%; justify-content: center;">
+            <i data-lucide="download"></i> <span>Download Windows EXE</span>
+          </a>
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">Standalone Portable & Installer</span>
+        </div>
+      </div>
+
+      <!-- 3. macOS App -->
+      <div class="download-card">
+        <div>
+          <span class="download-badge" style="color: #a855f7; background: rgba(168, 85, 247, 0.15);">macOS (Apple Silicon & Intel)</span>
+          <h3><i data-lucide="laptop" style="color: #a855f7;"></i> macOS (.dmg / .app)</h3>
+          <p>Optimized for M1/M2/M3/M4 Apple Silicon & Intel Macs with Metal graphics acceleration and voice control.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest" class="btn btn-cyan" style="width: 100%; justify-content: center;">
+            <i data-lucide="download"></i> <span>Download macOS DMG</span>
+          </a>
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">Universal Binary (.dmg)</span>
+        </div>
+      </div>
+
+      <!-- 4. GitHub Live Web Host -->
+      <div class="download-card">
+        <div>
+          <span class="download-badge" style="color: #f59e0b; background: rgba(245, 158, 11, 0.15);">Cloud Web / PWA</span>
+          <h3><i data-lucide="globe" style="color: #f59e0b;"></i> GitHub Pages Web</h3>
+          <p>Instant browser cloud workspace powered by GitHub Pages with 3D WebGL preview and zero installation.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="https://darkvirgoyt-beep.github.io/VirgoYT-AI/" target="_blank" class="btn btn-cyan" style="width: 100%; justify-content: center;">
+            <i data-lucide="external-link"></i> <span>Open Web App</span>
+          </a>
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">Hosted at darkvirgoyt-beep.github.io</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLI & Terminal Download Guide (Linux, macOS, Termux) -->
+    <div class="cli-guide-box" id="cli-terminal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="terminal" style="color: var(--emerald);"></i>
+          <span>Download & Run via Terminal (Linux &bull; macOS &bull; Termux)</span>
+        </h3>
+        <span style="font-size: 0.78rem; color: var(--emerald); font-family: var(--font-mono);">⚡ 1-LINE INSTALLERS</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+        Choose your platform tab below to copy the one-line command or step-by-step instructions.
+      </p>
+
+      <!-- Tabs -->
+      <div class="cli-tabs">
+        <button class="cli-tab-btn active" onclick="switchCliTab('termux')">
+          <i data-lucide="smartphone"></i> Android Termux
+        </button>
+        <button class="cli-tab-btn" onclick="switchCliTab('linux')">
+          <i data-lucide="terminal"></i> Linux (Ubuntu / Debian / Arch)
+        </button>
+        <button class="cli-tab-btn" onclick="switchCliTab('macos')">
+          <i data-lucide="command"></i> macOS Terminal
+        </button>
+        <button class="cli-tab-btn" onclick="switchCliTab('curl')">
+          <i data-lucide="download-cloud"></i> Direct cURL / Wget (APK)
+        </button>
+      </div>
+
+      <!-- Tab 1: Termux -->
+      <div id="pane-termux" class="cli-content-pane active">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option A: One-Line Termux Installer (Clone & Build APK / Web Server)</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code>pkg update -y && pkg install -y git openjdk-17 nodejs curl && git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git && cd VirgoYT-AI && chmod +x gradlew && ./gradlew assembleDebug</code>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option B: Download Pre-built Release APK directly in Termux</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code>curl -sL https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk -o VirgoYT-AI.apk && termux-open VirgoYT-AI.apk</code>
+        </div>
+      </div>
+
+      <!-- Tab 2: Linux -->
+      <div id="pane-linux" class="cli-content-pane">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option A: Quick Download Latest APK or Web Bundle (cURL / Wget)</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code># Download Release APK
+wget -O virgo-yt-ai.apk https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+
+# Or download source and run local live preview:
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+python3 -m http.server 8080 --directory public</code>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option B: Build Android APK from Source on Linux</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code>sudo apt update && sudo apt install -y git openjdk-17-jdk
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+chmod +x gradlew
+./gradlew assembleRelease</code>
+        </div>
+      </div>
+
+      <!-- Tab 3: macOS Terminal -->
+      <div id="pane-macos" class="cli-content-pane">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option A: Download APK or macOS Bundle via Terminal</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code>curl -sLO https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+open . # Opens current folder in Finder</code>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Option B: Run Web Host or Build with Homebrew</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code>brew install git openjdk@17
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git
+cd VirgoYT-AI
+./gradlew assembleDebug
+# Open built APK in Finder:
+open app/build/outputs/apk/debug/</code>
+        </div>
+      </div>
+
+      <!-- Tab 4: Direct cURL / Wget -->
+      <div id="pane-curl" class="cli-content-pane">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          <strong>Direct High-Speed Download Links (Terminal agnostic)</strong>
+        </div>
+        <div class="code-snippet-box">
+          <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+          <code># Download Release APK:
+curl -L -O https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-release.apk
+
+# Download Debug APK:
+curl -L -O https://github.com/darkvirgoyt-beep/VirgoYT-AI/releases/latest/download/app-debug.apk
+
+# Clone full repository:
+git clone https://github.com/darkvirgoyt-beep/VirgoYT-AI.git</code>
+        </div>
       </div>
     </div>
   </section>
@@ -781,6 +1314,35 @@
 
   <!-- Three.js 3D Sandbox Script -->
   <script>
+
+    // CLI Tab Switcher
+    function switchCliTab(tabId) {
+      document.querySelectorAll('.cli-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.cli-content-pane').forEach(pane => pane.classList.remove('active'));
+      
+      const activeBtn = document.querySelector(`[onclick="switchCliTab('${tabId}')"]`);
+      const activePane = document.getElementById(`pane-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      if (activePane) activePane.classList.add('active');
+    }
+
+    // Copy to clipboard helper
+    function copySnippet(button) {
+      const codeElement = button.nextElementSibling;
+      const text = codeElement.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.innerText;
+        button.innerText = 'Copied!';
+        button.style.color = 'var(--emerald)';
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.style.color = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
     lucide.createIcons();
 
     // 3D Canvas Init
@@ -798,41 +1360,110 @@
     container.appendChild(renderer.domElement);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0x06b6d4, 1.2);
+    const dirLight = new THREE.DirectionalLight(0x06b6d4, 1.5);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
 
-    const purpleLight = new THREE.PointLight(0x6366f1, 2, 20);
+    const purpleLight = new THREE.PointLight(0x6366f1, 2.5, 25);
     purpleLight.position.set(-5, 3, -2);
     scene.add(purpleLight);
 
     // 3D Wireframe Grid Floor
-    const gridHelper = new THREE.GridHelper(12, 24, 0x06b6d4, 0x1e293b);
-    gridHelper.position.y = -1;
+    const gridHelper = new THREE.GridHelper(14, 28, 0x06b6d4, 0x1e293b);
+    gridHelper.position.y = -1.2;
     scene.add(gridHelper);
 
-    // 3D Central Icosahedron & Core Ring
+    // 3D Central Holographic Core
     const geo = new THREE.IcosahedronGeometry(1.6, 1);
     const mat = new THREE.MeshStandardMaterial({
       color: 0x06b6d4,
       wireframe: true,
       emissive: 0x06b6d4,
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.35
     });
     const coreMesh = new THREE.Mesh(geo, mat);
     scene.add(coreMesh);
 
-    // Orbiting Ring
+    // Inner Glowing Core
+    const innerGeo = new THREE.DodecahedronGeometry(0.9, 0);
+    const innerMat = new THREE.MeshStandardMaterial({
+      color: 0x6366f1,
+      wireframe: false,
+      emissive: 0x6366f1,
+      emissiveIntensity: 0.6
+    });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    scene.add(innerMesh);
+
+    // Orbiting Rings
     const ringGeo = new THREE.TorusGeometry(2.6, 0.04, 16, 100);
     const ringMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true });
     const ringMesh = new THREE.Mesh(ringGeo, ringMat);
     ringMesh.rotation.x = Math.PI / 3;
     scene.add(ringMesh);
 
-    // Orbit Interaction
+    const ringGeo2 = new THREE.TorusGeometry(3.1, 0.03, 16, 100);
+    const ringMat2 = new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true });
+    const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
+    ringMesh2.rotation.y = Math.PI / 4;
+    scene.add(ringMesh2);
+
+    // Particle Swarm Constellation
+    const particleCount = 280;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      particlePositions[i] = (Math.random() - 0.5) * 12;
+      particlePositions[i + 1] = (Math.random() - 0.5) * 8;
+      particlePositions[i + 2] = (Math.random() - 0.5) * 12;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0x38bdf8,
+      size: 0.08,
+      transparent: true,
+      opacity: 0.8
+    });
+    const particleSystem = new THREE.Points(particleGeo, particleMat);
+    scene.add(particleSystem);
+
+    // 3D Mode Switching
+    let current3DMode = 'holo';
+    function set3DMode(mode) {
+      current3DMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      if (mode === 'holo') {
+        document.getElementById('btnModeHolo')?.classList.add('active');
+        mat.wireframe = true;
+        mat.color.setHex(0x06b6d4);
+        innerMesh.visible = true;
+        particleSystem.visible = true;
+      } else if (mode === 'wire') {
+        document.getElementById('btnModeWire')?.classList.add('active');
+        mat.wireframe = true;
+        mat.color.setHex(0x10b981);
+        innerMesh.visible = false;
+        particleSystem.visible = false;
+      } else if (mode === 'particles') {
+        document.getElementById('btnModeParticles')?.classList.add('active');
+        mat.wireframe = true;
+        innerMesh.visible = false;
+        particleSystem.visible = true;
+        particleMat.size = 0.14;
+      }
+    }
+
+    function reset3DCamera() {
+      camera.position.set(0, 4, 8);
+      camera.lookAt(0, 0, 0);
+      coreMesh.rotation.set(0, 0, 0);
+      innerMesh.rotation.set(0, 0, 0);
+    }
+
+    // Orbit Drag Interaction
     let isDragging = false;
     let prevMouse = { x: 0, y: 0 };
 
@@ -847,6 +1478,7 @@
       const deltaY = e.clientY - prevMouse.y;
       coreMesh.rotation.y += deltaX * 0.01;
       coreMesh.rotation.x += deltaY * 0.01;
+      innerMesh.rotation.y -= deltaX * 0.01;
       ringMesh.rotation.y += deltaX * 0.008;
       prevMouse = { x: e.clientX, y: e.clientY };
     });
@@ -872,9 +1504,12 @@
     function animate() {
       requestAnimationFrame(animate);
       if (!isDragging) {
-        coreMesh.rotation.y += 0.008;
-        coreMesh.rotation.x += 0.004;
-        ringMesh.rotation.z += 0.006;
+        coreMesh.rotation.y += 0.007;
+        coreMesh.rotation.x += 0.003;
+        innerMesh.rotation.y -= 0.012;
+        ringMesh.rotation.z += 0.005;
+        ringMesh2.rotation.x += 0.004;
+        particleSystem.rotation.y += 0.001;
       }
       renderer.render(scene, camera);
     }
@@ -885,6 +1520,116 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
+
+    // --- Interactive Web AI Chat Simulator ---
+    function sendWebChatPrompt(text) {
+      document.getElementById('webChatInput').value = text;
+      submitWebChat();
+    }
+
+    function submitWebChat() {
+      const input = document.getElementById('webChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const msgContainer = document.getElementById('webChatMessages');
+
+      // Append User Message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-msg user';
+      userDiv.innerText = text;
+      msgContainer.appendChild(userDiv);
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+
+      // Generate Conversational AI Response
+      setTimeout(() => {
+        const lower = text.toLowerCase();
+        let aiHtml = '';
+
+        if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey') || lower.includes('yo')) {
+          aiHtml = `
+            <div class="chat-meta">⚡ VirgoYT AI &bull; Autonomous Software Engineer</div>
+            <div>Hey! What's up! 🚀 What crazy idea or epic project are we building today?<br><br>
+            Everything happens right here in one unified chat flow — no tab jumping required!
+            <ul style="margin: 8px 0 8px 20px;">
+              <li>🚀 <strong>Next.js 15 + FastAPI</strong> SaaS template</li>
+              <li>🎮 <strong>3D Three.js & Unreal Engine</strong> shader graphics</li>
+              <li>📱 <strong>Android APK & Compose</strong> native build</li>
+            </ul>
+            What crazy project do you want to start right now?</div>
+          `;
+        } else if (lower.includes('next') || lower.includes('fastapi') || lower.includes('saas') || lower.includes('app')) {
+          aiHtml = `
+            <div class="chat-meta">⚡ VirgoYT AI &bull; Autonomous Software Engineer</div>
+            <div>Let's build this! 🚀 I've architected and generated a full-stack <strong>Next.js 15 (App Router)</strong> frontend paired with a high-performance <strong>FastAPI</strong> async backend.<br><br>
+            Here is the core API and frontend code synthesized directly in your virtual workspace:
+            <div class="chat-code-block">
+              <div class="chat-code-header">
+                <span>📄 backend/main.py (FastAPI Async)</span>
+                <span>python</span>
+              </div>
+              <div class="chat-code-body">from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+app = FastAPI(title="VirgoYT SaaS Backend", version="1.0.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+@app.get("/api/health")
+async def health():
+    return {"status": "healthy", "cluster": "virgoyt-cloud-ai", "engine": "FastAPI async"}</div>
+            </div>
+
+            <div class="chat-diff-block"><span style="color: #38bdf8;">📝 Unified Diff (backend/main.py & frontend/page.tsx):</span>
+<span style="color: #34d399;">+ from fastapi import FastAPI</span>
+<span style="color: #34d399;">+ @app.get("/api/health")</span>
+<span style="color: #34d399;">+ export default function SaaSOverview() { ... }</span>
+<span style="color: #10b981; font-weight: bold;">✓ Automatically applied to virtual file system (+39 additions)</span></div>
+
+            <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="chat-suggestion-chip" onclick="sendWebChatPrompt('Add Supabase Auth')">🔐 Add Supabase Auth</button>
+              <button class="chat-suggestion-chip" onclick="sendWebChatPrompt('Add Stripe Billing')">💳 Add Stripe Billing</button>
+              <button class="chat-suggestion-chip" onclick="sendWebChatPrompt('Launch 3D WebGL Canvas')">🎮 Launch 3D Canvas</button>
+            </div>
+            <div style="margin-top: 10px; color: #94a3b8; font-size: 0.82rem;">
+              💡 <strong>Next steps</strong>: Should we integrate Supabase JWT authentication or Stripe subscription checkouts next?
+            </div>
+            </div>
+          `;
+        } else if (lower.includes('3d') || lower.includes('world') || lower.includes('core')) {
+          aiHtml = `
+            <div class="chat-meta">⚡ VirgoYT AI &bull; Autonomous Software Engineer</div>
+            <div>Entering the <strong>3D & Unreal Engine Studio</strong>! 🎮<br><br>
+            I've tuned the Three.js WebGL Holographic Shader Pipeline right above in your viewport:
+            <ul style="margin: 8px 0 8px 20px;">
+              <li>💎 <strong>Dual Hologram Core</strong>: Dynamic icosahedron & inner rotating core</li>
+              <li>✨ <strong>Particle Constellation</strong>: 280 orbiting star points</li>
+              <li>⚡ <strong>60 FPS PBR Lighting</strong>: Cyan and Indigo directional falloff</li>
+            </ul>
+            You can interact with the 3D canvas directly using touch or mouse drag! What crazy 3D features should we add next? Procedural terrain or volumetric neon fog?</div>
+          `;
+        } else {
+          aiHtml = `
+            <div class="chat-meta">⚡ VirgoYT AI &bull; Autonomous Software Engineer</div>
+            <div>I've received your goal: <strong>"${text}"</strong>.<br><br>
+            Here is the breakdown and architectural plan:
+            <ul style="margin: 8px 0 8px 20px;">
+              <li>⚡ <strong>Autonomous Multi-Agent Swarm</strong>: Architecture decomposition, type check & synthesis active</li>
+              <li>📁 <strong>Unified Chat Workstation</strong>: Code snippets, unified diffs, and terminal commands will stream right here</li>
+              <li>📦 <strong>Continuous Delivery</strong>: Available for Android APK, Linux terminal, Termux, and GitHub Pages</li>
+            </ul>
+            What crazy feature or project do you want to build or run next?</div>
+          `;
+        }
+
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-msg ai';
+        aiDiv.innerHTML = aiHtml;
+        msgContainer.appendChild(aiDiv);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }, 400);
+    }
   </script>
 </body>
 </html>

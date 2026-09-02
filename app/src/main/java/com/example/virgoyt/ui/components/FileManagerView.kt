@@ -8,9 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -61,7 +61,7 @@ fun FileManagerView(
                 IconButton(onClick = {
                     viewModel.vfs.addFile("$currentDir/new_module_${System.currentTimeMillis() % 1000}.ts", "new_module.ts", "// New module\n")
                 }) {
-                    Icon(Icons.Default.NoteAdd, contentDescription = "New File", tint = Color(0xFF06B6D4))
+                    Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = "New File", tint = Color(0xFF06B6D4))
                 }
                 IconButton(onClick = {
                     viewModel.vfs.createDirectory("$currentDir/folder_${System.currentTimeMillis() % 1000}")

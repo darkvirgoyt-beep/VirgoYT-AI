@@ -3,7 +3,7 @@ package com.example.virgoyt.data.model
 import java.util.UUID
 
 enum class ActiveWorkspaceTab(val label: String, val iconEmoji: String) {
-    AGENT("AI Swarm", "⚡"),
+    AGENT("Unified AI Chat", "⚡"),
     VOICE_ASSISTANT("Voice AI", "🎙️"),
     WEB_DASHBOARD("Web App", "🌐"),
     APP_GEN("App Studio", "🚀"),
@@ -88,10 +88,10 @@ data class PromptAttachment(
 )
 
 data class QuickActionChip(
-    val id: String = UUID.randomUUID().toString(),
     val label: String,
     val actionCommand: String,
-    val iconEmoji: String
+    val iconEmoji: String = "⚡",
+    val id: String = UUID.randomUUID().toString()
 )
 
 data class SmartAiOption(
@@ -100,6 +100,19 @@ data class SmartAiOption(
     val description: String,
     val actionPrompt: String,
     val recommendedConfidence: Float = 0.95f
+)
+
+data class CodeBlockSnippet(
+    val title: String,
+    val language: String,
+    val code: String
+)
+
+data class DiffSnippet(
+    val filePath: String,
+    val diffText: String,
+    val additionsCount: Int = 0,
+    val deletionsCount: Int = 0
 )
 
 data class ChatMessage(
@@ -115,7 +128,11 @@ data class ChatMessage(
     val recommendedOptions: List<SmartAiOption> = emptyList(),
     val quickActionChips: List<QuickActionChip> = emptyList(),
     val realtimeTelemetrySnapshot: String? = null,
-    val confidenceScore: Float = 0.98f
+    val confidenceScore: Float = 0.98f,
+    val codeSnippets: List<CodeBlockSnippet> = emptyList(),
+    val inlineDiff: DiffSnippet? = null,
+    val terminalCommands: List<String> = emptyList(),
+    val followUpQuestions: List<String> = emptyList()
 )
 
 data class ChatSession(
