@@ -135,33 +135,27 @@ jobs:
           fi
 
       - name: 🧪 Run Unit & Robolectric Tests
-        env:
-          _JAVA_OPTIONS: "-Djava.awt.headless=true"
         run: |
           if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew testDebugUnitTest --no-daemon --stacktrace -Djava.awt.headless=true
+            ./gradlew testDebugUnitTest --no-daemon --stacktrace
           else
-            gradle testDebugUnitTest --no-daemon --stacktrace -Djava.awt.headless=true
+            gradle testDebugUnitTest --no-daemon --stacktrace
           fi
 
       - name: 📦 Build Debug APK
-        env:
-          _JAVA_OPTIONS: "-Djava.awt.headless=true"
         run: |
           if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+            ./gradlew assembleDebug --no-daemon --stacktrace
           else
-            gradle assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
+            gradle assembleDebug --no-daemon --stacktrace
           fi
 
       - name: 🚀 Build Release APK
-        env:
-          _JAVA_OPTIONS: "-Djava.awt.headless=true"
         run: |
           if [ -x "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            ./gradlew assembleRelease --no-daemon --stacktrace -Djava.awt.headless=true || echo "Release build completed with signing fallback"
+            ./gradlew assembleRelease --no-daemon --stacktrace || echo "Release build completed with signing fallback"
           else
-            gradle assembleRelease --no-daemon --stacktrace -Djava.awt.headless=true || echo "Release build completed with signing fallback"
+            gradle assembleRelease --no-daemon --stacktrace || echo "Release build completed with signing fallback"
           fi
 
       - name: 📤 Upload Debug APK Artifact
