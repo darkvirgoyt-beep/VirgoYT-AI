@@ -33,7 +33,7 @@ class VirgoAgentService(
     val cursorAiService: CursorAiAssistantService = CursorAiAssistantService()
 ) {
     private val scope = CoroutineScope(Dispatchers.Main)
-    private val conversationalEngine = VirgoConversationalEngine(vfs)
+    val conversationalEngine = VirgoConversationalEngine(vfs)
 
     private val _isAgentBusy = MutableStateFlow(false)
     val isAgentBusy: StateFlow<Boolean> = _isAgentBusy.asStateFlow()

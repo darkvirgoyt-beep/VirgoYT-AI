@@ -90,6 +90,26 @@ fun CloudPcHeader(
             // Action Icons
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(
+                    onClick = { viewModel.openCliDialog() },
+                    modifier = Modifier.testTag("cli_harness_btn")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Terminal,
+                        contentDescription = "Termux & CLI Agent Harness",
+                        tint = Color(0xFF10B981)
+                    )
+                }
+                IconButton(
+                    onClick = { viewModel.openSecretBoxDialog() },
+                    modifier = Modifier.testTag("ai_secret_vault_btn")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Key,
+                        contentDescription = "AI Credentials & Thinking",
+                        tint = Color(0xFF06B6D4)
+                    )
+                }
+                IconButton(
                     onClick = { viewModel.preferenceEngine.toggleTheme() },
                     modifier = Modifier.testTag("theme_toggle_btn")
                 ) {

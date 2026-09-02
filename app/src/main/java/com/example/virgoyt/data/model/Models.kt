@@ -115,6 +115,22 @@ data class DiffSnippet(
     val deletionsCount: Int = 0
 )
 
+data class GeneratedFileArtifact(
+    val path: String,
+    val description: String,
+    val language: String,
+    val previewSnippet: String
+)
+
+data class MediaGenerationArtifact(
+    val type: String, // "image" or "video"
+    val title: String,
+    val promptUsed: String,
+    val resolution: String = "1080p 60fps",
+    val status: String = "Generated Ready",
+    val placeholderSvg: String? = null
+)
+
 data class ChatMessage(
     val id: String = UUID.randomUUID().toString(),
     val role: String,
@@ -132,7 +148,10 @@ data class ChatMessage(
     val codeSnippets: List<CodeBlockSnippet> = emptyList(),
     val inlineDiff: DiffSnippet? = null,
     val terminalCommands: List<String> = emptyList(),
-    val followUpQuestions: List<String> = emptyList()
+    val followUpQuestions: List<String> = emptyList(),
+    val reasoningThought: String? = null,
+    val generatedFiles: List<GeneratedFileArtifact> = emptyList(),
+    val mediaGenerations: List<MediaGenerationArtifact> = emptyList()
 )
 
 data class ChatSession(

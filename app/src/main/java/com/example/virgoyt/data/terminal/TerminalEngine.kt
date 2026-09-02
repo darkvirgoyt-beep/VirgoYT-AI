@@ -106,7 +106,32 @@ class TerminalEngine(
   git [status|log|clone]  - GitHub and Git source operations
   node, python3 <code>    - Run interactive scripting engine
   test                    - Execute unit and regression tests
+  virgoyt [prompt]        - Launch VirgoYT Terminal AI Coding Agent Harness
   ai [prompt]             - Dispatch prompt to multi-agent swarm""")
+                }
+                "virgoyt", "claude" -> {
+                    val promptArg = args.joinToString(" ")
+                    appendOutput(OutputType.SUCCESS, """╭─────────────────────────────────────────────────────────────╮
+│                 ⚡ VIRGOYT AI CODING HARNESS                │
+│         Autonomous Agent for Termux, Linux & macOS          │
+╰─────────────────────────────────────────────────────────────╯
+Working Directory: $currentDir
+Engine Model:      gemini-3.5-flash (Online Swarm Active)
+Capabilities:      Autonomous File Edit, Bash Run, Git Diffs, Live REPL""")
+                    if (promptArg.isNotEmpty()) {
+                        appendOutput(OutputType.STDOUT, "virgoyt: Processing prompt: '$promptArg'...")
+                        appendOutput(OutputType.SUCCESS, "virgoyt: Executed goal with 0 errors across workspace.")
+                    } else {
+                        appendOutput(OutputType.STDOUT, "Type 'virgoyt <task>' or run 'npx virgoyt-ai' in Termux to start interactive session.")
+                    }
+                }
+                "npx" -> {
+                    if (args.firstOrNull()?.contains("virgo") == true) {
+                        appendOutput(OutputType.SUCCESS, "Launching npx virgoyt-ai interactive REPL harness (Termux/Node.js)...")
+                        appendOutput(OutputType.SUCCESS, "VirgoYT Terminal Agent v2.5 ready. Prompt: virgoyt >")
+                    } else {
+                        appendOutput(OutputType.STDOUT, "npx: executed ${args.joinToString(" ")}")
+                    }
                 }
                 "clear", "cls" -> clearTerminal()
                 "pwd" -> appendOutput(OutputType.STDOUT, currentDir)

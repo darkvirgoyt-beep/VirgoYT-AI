@@ -55,5 +55,41 @@ class ExampleRobolectricTest {
         val testEntries = terminal.terminalEntries.value
         assertTrue(testEntries.any { it.text.contains("passed") })
     }
+
+    @Test
+    fun `conversational engine reasoning and hard thinking`() = runBlocking {
+        val vfs = VirtualFileSystem()
+        val engine = com.example.virgoyt.data.agent.VirgoConversationalEngine(vfs)
+
+        // Test user greeting
+        val greeting = engine.generateAgentReply("Hi", com.example.virgoyt.data.model.AiModelTier.AUTO_ROUTER)
+        assertNotNull(greeting.content)
+        assertTrue(greeting.content.contains("VirgoYT"))
+        assertTrue(greeting.followUpQuestions.isNotEmpty())
+
+        // Test coding request generates reasoning, code, and files
+        val codeReply = engine.generateAgentReply("write python script to process data", com.example.virgoyt.data.model.AiModelTier.GEMINI_2_5_FLASH)
+        assertNotNull(codeReply.reasoningThought)
+        assertTrue(codeReply.reasoningThought!!.contains("Problem Decomposition"))
+        assertTrue(codeReply.codeSnippets.isNotEmpty())
+        assertTrue(codeReply.generatedFiles.isNotEmpty())
+        assertTrue(codeReply.terminalCommands.isNotEmpty())
+
+        // Test media generation generates artifacts
+        val mediaReply = engine.generateAgentReply("generate pic of cyberpunk city", com.example.virgoyt.data.model.AiModelTier.GEMINI_2_5_FLASH)
+        assertTrue(mediaReply.mediaGenerations.isNotEmpty())
+        assertEquals("image", mediaReply.mediaGenerations[0].type)
+        assertNotNull(mediaReply.reasoningThought)
+
+        // Test custom API key configuration
+        engine.setCustomApiKey("AIzaSyFakeTestKey123456789")
+        assertTrue(engine.hasValidGeminiKey())
+
+        // Test Termux & Claude Code harness intent
+        val termuxReply = engine.generateAgentReply("how to run in termux like claude code harness", com.example.virgoyt.data.model.AiModelTier.AUTO_ROUTER)
+        assertTrue(termuxReply.content.contains("Directly in Termux"))
+        assertTrue(termuxReply.content.contains("openjdk-17"))
+        assertTrue(termuxReply.terminalCommands.any { it.contains("pkg install") })
+    }
 }
 

@@ -14,7 +14,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,10 +36,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.virgoyt.data.model.AiModelTier
-import com.example.virgoyt.data.model.ChatMessage
-import com.example.virgoyt.data.model.CodeBlockSnippet
-import com.example.virgoyt.data.model.DiffSnippet
+import com.example.virgoyt.data.model.*
 import com.example.virgoyt.ui.VirgoCloudViewModel
 
 @Composable
@@ -195,12 +198,98 @@ fun ChatMessageItem(
                 .testTag(if (isUser) "user_message_bubble" else "ai_message_bubble")
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
+                // Hard Thinking / Chain-of-Thought Reasoning Block (Deep Think mode)
+                if (!isUser && !message.reasoningThought.isNullOrBlank()) {
+                    var isReasoningExpanded by remember { mutableStateOf(false) }
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isDark) Color(0xFF1E1B4B).copy(alpha = 0.5f) else Color(0xFFFAF5FF),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (isDark) Color(0xFF6366F1).copy(alpha = 0.4f) else Color(0xFFC084FC)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { isReasoningExpanded = !isReasoningExpanded }
+                            .testTag("thought_reasoning_block")
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Psychology,
+                                        contentDescription = null,
+                                        tint = Color(0xFFA855F7),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Deep Reasoning Thought Process",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFA855F7)
+                                    )
+                                }
+                                Icon(
+                                    imageVector = if (isReasoningExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                    contentDescription = "Expand Reasoning",
+                                    tint = Color(0xFFA855F7),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            if (isReasoningExpanded) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = message.reasoningThought!!,
+                                    fontSize = 11.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    lineHeight = 16.sp,
+                                    color = if (isDark) Color(0xFFE2E8F0) else Color(0xFF334155)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
                 // Conversational Text / Markdown
                 FormattedChatText(
                     text = message.content,
                     isUser = isUser,
                     isDark = isDark
                 )
+
+                // Generated Files Artifacts (Files created directly in project)
+                if (message.generatedFiles.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "📁 Files Created in Workspace:",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF10B981)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        message.generatedFiles.forEach { file ->
+                            GeneratedFileCard(file = file, isDark = isDark)
+                        }
+                    }
+                }
+
+                // Media & Artwork Generations (Images / Videos)
+                if (message.mediaGenerations.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        message.mediaGenerations.forEach { media ->
+                            MediaGenerationCard(media = media, isDark = isDark)
+                        }
+                    }
+                }
 
                 // Inline Code Snippets (Unified in chat)
                 if (message.codeSnippets.isNotEmpty()) {
@@ -622,3 +711,143 @@ fun TerminalCommandCard(
         }
     }
 }
+
+@Composable
+fun GeneratedFileCard(
+    file: GeneratedFileArtifact,
+    isDark: Boolean
+) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = if (isDark) Color(0xFF0F172A) else Color(0xFFF1F5F9),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (isDark) Color(0xFF10B981).copy(alpha = 0.4f) else Color(0xFF10B981)
+        ),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Folder,
+                contentDescription = null,
+                tint = Color(0xFF10B981),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = file.path,
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
+                )
+                Text(
+                    text = file.description,
+                    fontSize = 11.sp,
+                    color = if (isDark) Color(0xFF94A3B8) else Color(0xFF475569)
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(4.dp),
+                color = Color(0xFF10B981).copy(alpha = 0.15f)
+            ) {
+                Text(
+                    text = "SAVED",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF10B981),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MediaGenerationCard(
+    media: MediaGenerationArtifact,
+    isDark: Boolean
+) {
+    val isImage = media.type == "image"
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = if (isDark) Color(0xFF020617) else Color(0xFFF8FAFC),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (isImage) Color(0xFF06B6D4).copy(alpha = 0.5f) else Color(0xFFA855F7).copy(alpha = 0.5f)
+        ),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = if (isImage) Icons.Default.Image else Icons.Default.Movie,
+                        contentDescription = null,
+                        tint = if (isImage) Color(0xFF06B6D4) else Color(0xFFA855F7),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = media.title,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isImage) Color(0xFF38BDF8) else Color(0xFFC084FC)
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = if (isImage) Color(0xFF06B6D4).copy(alpha = 0.15f) else Color(0xFFA855F7).copy(alpha = 0.15f)
+                ) {
+                    Text(
+                        text = media.resolution,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isImage) Color(0xFF06B6D4) else Color(0xFFA855F7),
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = "Prompt: \"${media.promptUsed}\"",
+                fontSize = 11.sp,
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                color = if (isDark) Color(0xFFCBD5E1) else Color(0xFF475569)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = if (isDark) Color(0xFF0F172A) else Color(0xFFE2E8F0),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Status: ${media.status}",
+                        fontSize = 10.sp,
+                        color = Color(0xFF10B981),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = if (isImage) "4K Vector / Diffusion Canvas Ready" else "Veo 3.1 60FPS Video Manifest",
+                        fontSize = 9.sp,
+                        color = if (isDark) Color(0xFF64748B) else Color(0xFF64748B)
+                    )
+                }
+            }
+        }
+    }
+}
+

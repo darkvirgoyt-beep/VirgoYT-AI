@@ -254,6 +254,66 @@ fun WebDashboardView(
                 }
             }
         }
+
+        // Production UI & Full-Stack Website Templates Section
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "💻 Production Web & UI Templates",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = if (themeMode.isDark) Color.White else Color(0xFF0F172A)
+            )
+            Text(
+                text = "Instant 1-click starter templates ready for deployment on Vercel, Docker & Cloud Run.",
+                fontSize = 12.sp,
+                color = Color(0xFF94A3B8)
+            )
+        }
+
+        item {
+            val webTemplates = listOf(
+                Triple("Next.js 15 App Router + Tailwind v4 SaaS", "Full-stack dashboard with TypeScript, Supabase Auth & Stripe billing", Color(0xFF06B6D4)),
+                Triple("FastAPI + React 19 Modern Web App", "High-performance async Python backend with real-time WebSocket state", Color(0xFF10B981)),
+                Triple("Cyberpunk Three.js WebGL Landing", "Interactive 3D particle landscape, glow shaders and audio visualizer", Color(0xFFA855F7))
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                webTemplates.forEach { (tplTitle, tplDesc, tplColor) ->
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (themeMode.isDark) Color(0xFF0F172A) else Color(0xFFFFFFFF),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if (themeMode.isDark) Color(0xFF1E293B) else Color(0xFFE2E8F0)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(tplTitle, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = tplColor)
+                                Text(tplDesc, fontSize = 11.sp, color = Color(0xFF94A3B8))
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    viewModel.executePrompt("Scaffold $tplTitle and write full code to workspace")
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = tplColor),
+                                shape = RoundedCornerShape(6.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                modifier = Modifier.height(32.dp)
+                            ) {
+                                Text("Scaffold", fontSize = 11.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
