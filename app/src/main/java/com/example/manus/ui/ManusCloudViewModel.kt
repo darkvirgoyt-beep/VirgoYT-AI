@@ -16,6 +16,7 @@ import com.example.manus.data.github.GitHubRepo
 import com.example.manus.data.github.GitHubUser
 import com.example.manus.data.model.ActiveWorkspaceTab
 import com.example.manus.data.model.AiModelTier
+import com.example.manus.data.model.AppThemeMode
 import com.example.manus.data.model.AttachmentType
 import com.example.manus.data.model.AuthSession
 import com.example.manus.data.model.BrowserConsoleMessage
@@ -88,6 +89,10 @@ class ManusCloudViewModel : ViewModel() {
     // Secret Credential Box State
     private val _secretPromptState = MutableStateFlow<SecretCredentialPrompt?>(null)
     val secretPromptState: StateFlow<SecretCredentialPrompt?> = _secretPromptState.asStateFlow()
+
+    // App Theme Mode (Holographic Dark vs High-Contrast Engineer Mode Light)
+    private val _themeMode = MutableStateFlow(AppThemeMode.HOLOGRAPHIC_DARK)
+    val themeMode: StateFlow<AppThemeMode> = _themeMode.asStateFlow()
 
     val terminalMode: StateFlow<TerminalMode> = terminal.terminalMode
     val isGitHubConnected: StateFlow<Boolean> = githubManager.isConnected
@@ -237,6 +242,22 @@ class ManusCloudViewModel : ViewModel() {
         vfs.addFile("/home/$user/.credentials/${serviceName.lowercase().replace(" ", "_")}.enc", "ENCRYPTED_VAULT_RECORD: [User: $username, Token: SHA256_HASHED]", user)
         closeSecretBox()
         showToast("✓ $serviceName credentials saved to encrypted RAM vault")
+    }
+
+    fun toggleThemeMode() {
+        val newMode = if (_themeMode.value == AppThemeMode.HOLOGRAPHIC_DARK) {
+            AppThemeMode.ENGINEER_LIGHT
+        } else {
+            AppThemeMode.HOLOGRAPHIC_DARK
+        }
+        _themeMode.value = newMode
+        userPreferenceEngine.updateThemeMode(newMode)
+        showToast(if (newMode.isDark) "🌙 Holographic Dark Theme Active" else "☀️ High-Contrast Engineer Mode (Light) Active")
+    }
+
+    fun setThemeMode(mode: AppThemeMode) {
+        _themeMode.value = mode
+        userPreferenceEngine.updateThemeMode(mode)
     }
 
     fun startNewChatSession(title: String) {

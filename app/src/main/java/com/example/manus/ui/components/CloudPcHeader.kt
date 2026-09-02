@@ -26,12 +26,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Hub
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Psychology
@@ -42,6 +45,7 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.VideogameAsset
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -60,8 +64,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.manus.data.model.ActiveWorkspaceTab
+import com.example.manus.data.model.AppThemeMode
 import com.example.manus.data.model.SystemStats
 import com.example.manus.ui.ManusCloudViewModel
+import com.example.ui.theme.EngineerLightBorder
+import com.example.ui.theme.EngineerLightBorderStrong
+import com.example.ui.theme.EngineerLightCanvas
+import com.example.ui.theme.EngineerLightCard
+import com.example.ui.theme.EngineerLightCyan
+import com.example.ui.theme.EngineerLightEmerald
+import com.example.ui.theme.EngineerLightPrimary
+import com.example.ui.theme.EngineerLightPrimaryBg
+import com.example.ui.theme.EngineerLightPrimaryDark
+import com.example.ui.theme.EngineerLightSubtle
+import com.example.ui.theme.EngineerLightSurface
+import com.example.ui.theme.EngineerLightTextMuted
+import com.example.ui.theme.EngineerLightTextPrimary
+import com.example.ui.theme.EngineerLightTextSecondary
 import com.example.ui.theme.ManusAmber
 import com.example.ui.theme.ManusCyan
 import com.example.ui.theme.ManusEmerald
@@ -98,6 +117,8 @@ fun CloudPcHeader(
     val session by viewModel.currentSession.collectAsState()
     val currentUser = session?.user
     val selectedModel by viewModel.modelRouterEngine.selectedModel.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
+    val isDark = themeMode.isDark
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
@@ -110,20 +131,27 @@ fun CloudPcHeader(
         label = "pulseAlpha"
     )
 
+    val headerSurfaceColor = if (isDark) ManusSlate900 else EngineerLightSurface
+    val headerBorderColor = if (isDark) SleekBorder else EngineerLightBorder
+    val primaryTextColor = if (isDark) ManusWhite else EngineerLightTextPrimary
+    val secondaryPillBg = if (isDark) SleekSurface else EngineerLightSubtle
+    val secondaryPillBorder = if (isDark) SleekBorder else EngineerLightBorder
+    val secondaryPillText = if (isDark) ManusSlate300 else EngineerLightTextSecondary
+
     Surface(
-        color = ManusSlate900,
+        color = headerSurfaceColor,
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, SleekBorder)
+            .border(1.dp, headerBorderColor)
     ) {
         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-            // Sleek Interface Top Bar: Brand Badge, Status Pill, Live Metrics, User Auth Badge, Reset Action
+            // Sleek Interface Top Bar: Brand Badge, Status Pill, Live Metrics, Theme Mode Switch, User Auth Badge, Reset Action
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Left Brand: Purple-Indigo Square Badge "V" + VirgoYT AI Title + Emerald Status
+                // Left Brand: Square Badge "V" + VirgoYT AI Title + Status Pill
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -132,12 +160,12 @@ fun CloudPcHeader(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(ManusIndigo),
+                            .background(if (isDark) ManusIndigo else EngineerLightPrimary),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "V",
-                            color = ManusWhite,
+                            color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.SansSerif
@@ -148,7 +176,7 @@ fun CloudPcHeader(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
                                 text = "VirgoYT Cloud AI",
-                                color = ManusWhite,
+                                color = primaryTextColor,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 letterSpacing = (-0.2).sp
@@ -156,21 +184,23 @@ fun CloudPcHeader(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(SleekSurface)
+                                    .background(secondaryPillBg)
+                                    .border(0.5.dp, secondaryPillBorder, RoundedCornerShape(12.dp))
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                                     Icon(
                                         imageVector = Icons.Default.Cloud,
                                         contentDescription = "Cloud node",
-                                        tint = ManusCyan,
+                                        tint = if (isDark) ManusCyan else EngineerLightCyan,
                                         modifier = Modifier.size(10.dp)
                                     )
                                     Text(
                                         text = "v-cloud-titan",
-                                        color = ManusCyan,
+                                        color = if (isDark) ManusCyan else EngineerLightCyan,
                                         fontSize = 9.sp,
-                                        fontFamily = FontFamily.Monospace
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }
@@ -181,11 +211,11 @@ fun CloudPcHeader(
                                 modifier = Modifier
                                     .size(6.dp)
                                     .clip(CircleShape)
-                                    .background(if (isAgentBusy) ManusAmber else ManusEmerald.copy(alpha = pulseAlpha))
+                                    .background(if (isAgentBusy) ManusAmber else if (isDark) ManusEmerald.copy(alpha = pulseAlpha) else EngineerLightEmerald)
                             )
                             Text(
                                 text = if (isAgentBusy) "AI EXECUTING" else "CLOUD ACTIVE",
-                                color = if (isAgentBusy) ManusAmber else ManusEmerald.copy(alpha = 0.9f),
+                                color = if (isAgentBusy) ManusAmber else if (isDark) ManusEmerald.copy(alpha = 0.9f) else EngineerLightEmerald,
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 0.5.sp,
@@ -194,7 +224,7 @@ fun CloudPcHeader(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(ManusIndigoBg)
+                                    .background(if (isDark) ManusIndigoBg else EngineerLightPrimaryBg)
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -204,7 +234,7 @@ fun CloudPcHeader(
                                     )
                                     Text(
                                         text = selectedModel.displayName.take(14),
-                                        color = ManusIndigoLight,
+                                        color = if (isDark) ManusIndigoLight else EngineerLightPrimaryDark,
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace
@@ -215,7 +245,7 @@ fun CloudPcHeader(
                     }
                 }
 
-                // Center/Right: Secret Box + GitHub Sync + CPU/GPU Usage & Reset Button
+                // Center/Right: Light/Dark Theme Switch + Secret Vault + GitHub Sync + CPU/GPU Usage & Reset Button
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -223,14 +253,52 @@ fun CloudPcHeader(
                     val isGitHubConnected by viewModel.isGitHubConnected.collectAsState()
                     val gitHubUser by viewModel.gitHubUser.collectAsState()
 
+                    // =========================================================================
+                    // Light / Dark Mode Theme Toggle Switch (Holo Dark <-> Engineer Mode Light)
+                    // =========================================================================
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(
+                                if (isDark) ManusIndigoBg else EngineerLightPrimaryBg
+                            )
+                            .border(
+                                1.dp,
+                                if (isDark) ManusIndigo.copy(alpha = 0.7f) else EngineerLightPrimary,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clickable { viewModel.toggleThemeMode() }
+                            .padding(horizontal = 7.dp, vertical = 5.dp)
+                            .testTag("theme_mode_toggle_button")
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isDark) Icons.Default.DarkMode else Icons.Default.LightMode,
+                                contentDescription = "Toggle Light/Dark Theme Mode",
+                                tint = if (isDark) ManusCyan else EngineerLightPrimary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = if (isDark) "🌙 Holo Dark" else "☀️ Engineer",
+                                color = if (isDark) ManusWhite else EngineerLightPrimaryDark,
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+                    }
+
                     // User Auth Quick Trigger
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (currentUser != null) ManusIndigoBg else SleekSurface)
-                            .border(1.dp, if (currentUser != null) ManusIndigo else SleekBorder, RoundedCornerShape(8.dp))
+                            .background(if (currentUser != null) (if (isDark) ManusIndigoBg else EngineerLightPrimaryBg) else secondaryPillBg)
+                            .border(1.dp, if (currentUser != null) (if (isDark) ManusIndigo else EngineerLightPrimary) else secondaryPillBorder, RoundedCornerShape(8.dp))
                             .clickable { viewModel.openUserProfileDialog() }
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                            .padding(horizontal = 6.dp, vertical = 5.dp)
                             .testTag("user_auth_header_btn")
                     ) {
                         Row(
@@ -240,12 +308,12 @@ fun CloudPcHeader(
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "User Profile",
-                                tint = if (currentUser != null) ManusIndigoLight else ManusSlate400,
+                                tint = if (currentUser != null) (if (isDark) ManusIndigoLight else EngineerLightPrimary) else (if (isDark) ManusSlate400 else EngineerLightTextMuted),
                                 modifier = Modifier.size(13.dp)
                             )
                             Text(
                                 text = currentUser?.username ?: "Profile",
-                                color = if (currentUser != null) ManusWhite else ManusSlate300,
+                                color = if (currentUser != null) (if (isDark) ManusWhite else EngineerLightPrimaryDark) else secondaryPillText,
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -256,12 +324,12 @@ fun CloudPcHeader(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(SleekSurface)
-                            .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
+                            .background(secondaryPillBg)
+                            .border(1.dp, secondaryPillBorder, RoundedCornerShape(8.dp))
                             .clickable {
                                 viewModel.openSecretBox("GitHub / Gmail / Epic Games", "Securely enter auth credentials or take remote desktop control")
                             }
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                            .padding(horizontal = 6.dp, vertical = 5.dp)
                             .testTag("secret_vault_header_btn")
                     ) {
                         Row(
@@ -271,12 +339,12 @@ fun CloudPcHeader(
                             Icon(
                                 imageVector = Icons.Default.Security,
                                 contentDescription = "Secret Vault",
-                                tint = ManusCyan,
+                                tint = if (isDark) ManusCyan else EngineerLightCyan,
                                 modifier = Modifier.size(13.dp)
                             )
                             Text(
                                 text = "Vault",
-                                color = ManusSlate300,
+                                color = secondaryPillText,
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -287,10 +355,10 @@ fun CloudPcHeader(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isGitHubConnected) ManusIndigoBg else SleekSurface)
-                            .border(1.dp, if (isGitHubConnected) ManusEmerald.copy(alpha = 0.5f) else SleekBorder, RoundedCornerShape(8.dp))
+                            .background(if (isGitHubConnected) (if (isDark) ManusIndigoBg else EngineerLightPrimaryBg) else secondaryPillBg)
+                            .border(1.dp, if (isGitHubConnected) (if (isDark) ManusEmerald.copy(alpha = 0.5f) else EngineerLightEmerald) else secondaryPillBorder, RoundedCornerShape(8.dp))
                             .clickable { viewModel.openGitHubAuthDialog() }
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                            .padding(horizontal = 6.dp, vertical = 5.dp)
                             .testTag("github_header_badge")
                     ) {
                         Row(
@@ -300,12 +368,12 @@ fun CloudPcHeader(
                             Icon(
                                 imageVector = Icons.Default.Code,
                                 contentDescription = "GitHub Integration",
-                                tint = if (isGitHubConnected) ManusEmerald else ManusCyan,
+                                tint = if (isGitHubConnected) (if (isDark) ManusEmerald else EngineerLightEmerald) else (if (isDark) ManusCyan else EngineerLightCyan),
                                 modifier = Modifier.size(13.dp)
                             )
                             Text(
                                 text = if (isGitHubConnected) "@${gitHubUser?.username ?: "gh"}" else "GitHub",
-                                color = if (isGitHubConnected) ManusEmerald else ManusSlate300,
+                                color = if (isGitHubConnected) (if (isDark) ManusEmerald else EngineerLightEmerald) else secondaryPillText,
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -316,14 +384,14 @@ fun CloudPcHeader(
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             text = "GPU ${systemStats.gpuUsagePercent.toInt()}%",
-                            color = ManusCyan,
+                            color = if (isDark) ManusCyan else EngineerLightCyan,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
                         )
                         Text(
                             text = "CPU ${systemStats.cpuUsagePercent.toInt()}%",
-                            color = ManusIndigoLight,
+                            color = if (isDark) ManusIndigoLight else EngineerLightPrimary,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
@@ -335,14 +403,14 @@ fun CloudPcHeader(
                         modifier = Modifier
                             .size(30.dp)
                             .clip(CircleShape)
-                            .background(SleekSurface)
-                            .border(1.dp, SleekBorder, CircleShape)
+                            .background(secondaryPillBg)
+                            .border(1.dp, secondaryPillBorder, CircleShape)
                             .testTag("reset_snapshot_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Reset Snapshot",
-                            tint = ManusSlate200,
+                            tint = if (isDark) ManusSlate200 else EngineerLightTextPrimary,
                             modifier = Modifier.size(14.dp)
                         )
                     }
@@ -363,13 +431,15 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.AGENT,
                     icon = Icons.Default.AutoAwesome,
                     badge = if (isAgentBusy) "SWARM" else "15 AGENTS",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.AGENT) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.VOICE_ASSISTANT,
                     selected = activeTab == ActiveWorkspaceTab.VOICE_ASSISTANT,
-                    icon = Icons.Default.Security, // fallback or Mic
+                    icon = Icons.Default.Security,
                     badge = "VOICE",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.VOICE_ASSISTANT) }
                 )
                 TabButton(
@@ -377,6 +447,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.WEB_DASHBOARD,
                     icon = Icons.Default.Public,
                     badge = "REACT",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.WEB_DASHBOARD) }
                 )
                 TabButton(
@@ -384,6 +455,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.APP_GEN,
                     icon = Icons.Default.RocketLaunch,
                     badge = "NEW",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.APP_GEN) }
                 )
                 TabButton(
@@ -391,6 +463,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.PLUGINS_TOOLS,
                     icon = Icons.Default.Hub,
                     badge = "TOOLS",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.PLUGINS_TOOLS) }
                 )
                 TabButton(
@@ -398,6 +471,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.WORKFLOWS,
                     icon = Icons.Default.Refresh,
                     badge = "CRON",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.WORKFLOWS) }
                 )
                 TabButton(
@@ -405,6 +479,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.PROJECT_SCAN,
                     icon = Icons.Default.Hub,
                     badge = "AST",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.PROJECT_SCAN) }
                 )
                 TabButton(
@@ -412,6 +487,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.DATABASE_AI,
                     icon = Icons.Default.Storage,
                     badge = "SQL",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.DATABASE_AI) }
                 )
                 TabButton(
@@ -419,6 +495,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.MEMORY_RAG,
                     icon = Icons.Default.Psychology,
                     badge = "1536D",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.MEMORY_RAG) }
                 )
                 TabButton(
@@ -426,6 +503,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.CLOUD_STORAGE,
                     icon = Icons.Default.Cloud,
                     badge = "S3",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.CLOUD_STORAGE) }
                 )
                 TabButton(
@@ -433,6 +511,7 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.LIVE_COMPUTER,
                     icon = Icons.Default.Computer,
                     badge = "DIFF",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.LIVE_COMPUTER) }
                 )
                 TabButton(
@@ -440,36 +519,42 @@ fun CloudPcHeader(
                     selected = activeTab == ActiveWorkspaceTab.GAME_STUDIO,
                     icon = Icons.Default.VideogameAsset,
                     badge = "UE5",
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.GAME_STUDIO) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.EDITOR,
                     selected = activeTab == ActiveWorkspaceTab.EDITOR,
                     icon = Icons.Default.Code,
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.EDITOR) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.TERMINAL,
                     selected = activeTab == ActiveWorkspaceTab.TERMINAL,
                     icon = Icons.Default.Terminal,
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.TERMINAL) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.FILES,
                     selected = activeTab == ActiveWorkspaceTab.FILES,
                     icon = Icons.Default.Folder,
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.FILES) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.BROWSER,
                     selected = activeTab == ActiveWorkspaceTab.BROWSER,
                     icon = Icons.Default.Public,
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.BROWSER) }
                 )
                 TabButton(
                     tab = ActiveWorkspaceTab.MONITOR,
                     selected = activeTab == ActiveWorkspaceTab.MONITOR,
                     icon = Icons.Default.Memory,
+                    isDark = isDark,
                     onClick = { viewModel.selectTab(ActiveWorkspaceTab.MONITOR) }
                 )
             }
@@ -483,11 +568,32 @@ private fun TabButton(
     selected: Boolean,
     icon: ImageVector,
     badge: String? = null,
+    isDark: Boolean = true,
     onClick: () -> Unit
 ) {
-    val bg = if (selected) ManusIndigoBg else SleekSurface
-    val borderColor = if (selected) ManusIndigo.copy(alpha = 0.4f) else Color.Transparent
-    val contentColor = if (selected) ManusIndigoSoft else ManusSlate400
+    val bg = if (selected) {
+        if (isDark) ManusIndigoBg else EngineerLightPrimaryBg
+    } else {
+        if (isDark) SleekSurface else EngineerLightSubtle.copy(alpha = 0.5f)
+    }
+
+    val borderColor = if (selected) {
+        if (isDark) ManusIndigo.copy(alpha = 0.5f) else EngineerLightPrimary
+    } else {
+        if (isDark) Color.Transparent else EngineerLightBorder.copy(alpha = 0.6f)
+    }
+
+    val contentColor = if (selected) {
+        if (isDark) ManusIndigoSoft else EngineerLightPrimary
+    } else {
+        if (isDark) ManusSlate400 else EngineerLightTextMuted
+    }
+
+    val textColor = if (selected) {
+        if (isDark) ManusWhite else EngineerLightPrimaryDark
+    } else {
+        if (isDark) ManusSlate400 else EngineerLightTextSecondary
+    }
 
     Box(
         modifier = Modifier
@@ -510,7 +616,7 @@ private fun TabButton(
             )
             Text(
                 text = tab.label,
-                color = if (selected) ManusWhite else ManusSlate400,
+                color = textColor,
                 fontSize = 11.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
                 fontFamily = FontFamily.SansSerif
@@ -519,12 +625,12 @@ private fun TabButton(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(4.dp))
-                        .background(if (badge == "UE5") ManusPurple else if (badge == "DIFF") ManusCyan else ManusAmber)
+                        .background(if (badge == "UE5") ManusPurple else if (badge == "DIFF") (if (isDark) ManusCyan else EngineerLightCyan) else ManusAmber)
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
                         text = badge,
-                        color = ManusSlate950,
+                        color = if (isDark) ManusSlate950 else Color.White,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Black,
                         fontFamily = FontFamily.Monospace
@@ -534,4 +640,5 @@ private fun TabButton(
         }
     }
 }
+
 

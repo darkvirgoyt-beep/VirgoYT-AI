@@ -1,6 +1,7 @@
 package com.example.manus.data.preferences
 
 import com.example.manus.data.model.AiTone
+import com.example.manus.data.model.AppThemeMode
 import com.example.manus.data.model.CodeStylePreference
 import com.example.manus.data.model.UserPreferences
 import com.example.manus.data.model.VoiceProfile
@@ -25,6 +26,10 @@ class UserPreferenceEngine {
 
     fun updateTone(tone: AiTone) {
         _preferences.value = _preferences.value.copy(tone = tone)
+    }
+
+    fun updateThemeMode(mode: AppThemeMode) {
+        _preferences.value = _preferences.value.copy(themeMode = mode)
     }
 
     fun updateCodeStyle(style: CodeStylePreference) {

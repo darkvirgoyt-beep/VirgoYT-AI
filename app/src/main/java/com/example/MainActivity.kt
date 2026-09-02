@@ -77,7 +77,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            MyApplicationTheme {
+            val themeMode by viewModel.themeMode.collectAsState()
+            MyApplicationTheme(themeMode = themeMode) {
                 ManusCloudApp(viewModel = viewModel)
             }
         }
@@ -90,18 +91,19 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
     val systemStats by viewModel.systemStats.collectAsState()
     val isAgentBusy by viewModel.agentService.isAgentBusy.collectAsState()
     val statusToast by viewModel.statusToast.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .testTag("virgoyt_cloud_app_root"),
-        containerColor = ManusSlate950
+        containerColor = if (themeMode.isDark) ManusSlate950 else com.example.ui.theme.EngineerLightCanvas
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(ManusSlate950)
+                .background(if (themeMode.isDark) ManusSlate950 else com.example.ui.theme.EngineerLightCanvas)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Cloud PC Header Bar & Navigation

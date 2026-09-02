@@ -67,6 +67,18 @@ import com.example.manus.data.model.AiModelTier
 import com.example.manus.data.model.AttachmentType
 import com.example.manus.data.model.PromptAttachment
 import com.example.manus.ui.ManusCloudViewModel
+import com.example.ui.theme.EngineerLightBorder
+import com.example.ui.theme.EngineerLightCanvas
+import com.example.ui.theme.EngineerLightCard
+import com.example.ui.theme.EngineerLightCyan
+import com.example.ui.theme.EngineerLightPrimary
+import com.example.ui.theme.EngineerLightPrimaryBg
+import com.example.ui.theme.EngineerLightPrimaryDark
+import com.example.ui.theme.EngineerLightSubtle
+import com.example.ui.theme.EngineerLightSurface
+import com.example.ui.theme.EngineerLightTextMuted
+import com.example.ui.theme.EngineerLightTextPrimary
+import com.example.ui.theme.EngineerLightTextSecondary
 import com.example.ui.theme.ManusCyan
 import com.example.ui.theme.ManusEmerald
 import com.example.ui.theme.ManusIndigo
@@ -94,15 +106,24 @@ fun UniversalPromptBar(
     val modelRouter = viewModel.modelRouterEngine
     val selectedModel by modelRouter.selectedModel.collectAsState()
     val pendingAttachments by modelRouter.pendingAttachments.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
+    val isDark = themeMode.isDark
 
     var promptText by remember { mutableStateOf("") }
     var isAttachMenuExpanded by remember { mutableStateOf(false) }
     var isModelMenuExpanded by remember { mutableStateOf(false) }
 
+    val barBg = if (isDark) ManusSlate950 else EngineerLightCanvas
+    val cardBg = if (isDark) ManusSlate900 else EngineerLightCard
+    val pillBg = if (isDark) ManusSlate900 else EngineerLightSurface
+    val borderColor = if (isDark) SleekBorder else EngineerLightBorder
+    val textPrimaryColor = if (isDark) ManusWhite else EngineerLightTextPrimary
+    val textPlaceholderColor = if (isDark) ManusSlate500 else EngineerLightTextMuted
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(ManusSlate950)
+            .background(barBg)
             .navigationBarsPadding()
             .imePadding()
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -118,8 +139,8 @@ fun UniversalPromptBar(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp))
-                            .background(ManusSlate850)
-                            .border(1.dp, SleekBorder, RoundedCornerShape(16.dp))
+                            .background(if (isDark) ManusSlate850 else EngineerLightSubtle)
+                            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Row(
@@ -129,14 +150,14 @@ fun UniversalPromptBar(
                             Text(text = attachment.type.icon, fontSize = 12.sp)
                             Text(
                                 text = attachment.name,
-                                color = ManusWhite,
+                                color = textPrimaryColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Remove",
-                                tint = ManusSlate400,
+                                tint = if (isDark) ManusSlate400 else EngineerLightTextMuted,
                                 modifier = Modifier
                                     .size(14.dp)
                                     .clickable { modelRouter.removeAttachment(attachment.id) }
@@ -158,8 +179,8 @@ fun UniversalPromptBar(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(ManusSlate900)
-                        .border(1.dp, SleekBorder, RoundedCornerShape(20.dp))
+                        .background(pillBg)
+                        .border(1.dp, borderColor, RoundedCornerShape(20.dp))
                         .clickable { isModelMenuExpanded = true }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                         .testTag("model_selector_pill")
@@ -171,14 +192,14 @@ fun UniversalPromptBar(
                         Text(text = selectedModel.iconEmoji, fontSize = 12.sp)
                         Text(
                             text = selectedModel.displayName,
-                            color = ManusCyan,
+                            color = if (isDark) ManusCyan else EngineerLightPrimaryDark,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
                             contentDescription = "Select Model",
-                            tint = ManusSlate400,
+                            tint = if (isDark) ManusSlate400 else EngineerLightTextMuted,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -188,8 +209,8 @@ fun UniversalPromptBar(
                     expanded = isModelMenuExpanded,
                     onDismissRequest = { isModelMenuExpanded = false },
                     modifier = Modifier
-                        .background(ManusSlate900)
-                        .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
+                        .background(pillBg)
+                        .border(1.dp, borderColor, RoundedCornerShape(8.dp))
                 ) {
                     AiModelTier.values().forEach { tier ->
                         DropdownMenuItem(
@@ -202,7 +223,7 @@ fun UniversalPromptBar(
                                         Text(tier.iconEmoji, fontSize = 13.sp)
                                         Text(
                                             tier.displayName,
-                                            color = if (selectedModel == tier) ManusCyan else ManusWhite,
+                                            color = if (selectedModel == tier) (if (isDark) ManusCyan else EngineerLightPrimary) else textPrimaryColor,
                                             fontWeight = if (selectedModel == tier) FontWeight.Bold else FontWeight.Normal,
                                             fontSize = 12.5.sp
                                         )
@@ -210,14 +231,14 @@ fun UniversalPromptBar(
                                             Icon(
                                                 imageVector = Icons.Default.Check,
                                                 contentDescription = "Active",
-                                                tint = ManusCyan,
+                                                tint = if (isDark) ManusCyan else EngineerLightPrimary,
                                                 modifier = Modifier.size(14.dp)
                                             )
                                         }
                                     }
                                     Text(
                                         text = "${tier.provider} • ${tier.specialty}",
-                                        color = ManusSlate400,
+                                        color = if (isDark) ManusSlate400 else EngineerLightTextMuted,
                                         fontSize = 10.sp
                                     )
                                 }
@@ -236,8 +257,8 @@ fun UniversalPromptBar(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(ManusSlate850)
-                    .border(1.dp, SleekBorder, RoundedCornerShape(16.dp))
+                    .background(if (isDark) ManusSlate850 else EngineerLightSubtle)
+                    .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                     .clickable {
                         viewModel.startNewChatSession("Session #${(100..999).random()}")
                         viewModel.showToast("✨ Started New Autonomous Chat Session")
@@ -247,7 +268,7 @@ fun UniversalPromptBar(
             ) {
                 Text(
                     text = "+ New Chat",
-                    color = ManusSlate300,
+                    color = if (isDark) ManusSlate300 else EngineerLightPrimaryDark,
                     fontSize = 10.5.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -268,8 +289,8 @@ fun UniversalPromptBar(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(ManusSlate900)
-                        .border(1.dp, SleekBorder, CircleShape)
+                        .background(pillBg)
+                        .border(1.dp, borderColor, CircleShape)
                         .clickable { isAttachMenuExpanded = true }
                         .testTag("universal_plus_attach_btn"),
                     contentAlignment = Alignment.Center
@@ -277,7 +298,7 @@ fun UniversalPromptBar(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Attachments",
-                        tint = ManusCyan,
+                        tint = if (isDark) ManusCyan else EngineerLightPrimary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -286,8 +307,8 @@ fun UniversalPromptBar(
                     expanded = isAttachMenuExpanded,
                     onDismissRequest = { isAttachMenuExpanded = false },
                     modifier = Modifier
-                        .background(ManusSlate900)
-                        .border(1.dp, SleekBorder, RoundedCornerShape(8.dp))
+                        .background(pillBg)
+                        .border(1.dp, borderColor, RoundedCornerShape(8.dp))
                 ) {
                     AttachmentDropdownItem(
                         icon = "📸",
@@ -401,17 +422,17 @@ fun UniversalPromptBar(
                 placeholder = {
                     Text(
                         "Ask VirgoYT AI (UE5 Game, 3D GLB, Google Earth, Code, Video)...",
-                        color = ManusSlate500,
+                        color = textPlaceholderColor,
                         fontSize = 12.sp
                     )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ManusCyan,
-                    unfocusedBorderColor = SleekBorder,
-                    focusedTextColor = ManusWhite,
-                    unfocusedTextColor = ManusWhite,
-                    focusedContainerColor = ManusSlate900,
-                    unfocusedContainerColor = ManusSlate900
+                    focusedBorderColor = if (isDark) ManusCyan else EngineerLightPrimary,
+                    unfocusedBorderColor = borderColor,
+                    focusedTextColor = textPrimaryColor,
+                    unfocusedTextColor = textPrimaryColor,
+                    focusedContainerColor = cardBg,
+                    unfocusedContainerColor = cardBg
                 ),
                 shape = RoundedCornerShape(22.dp),
                 modifier = Modifier
@@ -432,8 +453,8 @@ fun UniversalPromptBar(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(CircleShape)
-                    .background(ManusSlate900)
-                    .border(1.dp, SleekBorder, CircleShape)
+                    .background(pillBg)
+                    .border(1.dp, borderColor, CircleShape)
                     .clickable {
                         viewModel.openVoiceAssistant()
                     }
@@ -443,7 +464,7 @@ fun UniversalPromptBar(
                 Icon(
                     imageVector = Icons.Default.Mic,
                     contentDescription = "Voice Mode",
-                    tint = ManusCyan,
+                    tint = if (isDark) ManusCyan else EngineerLightPrimary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -453,8 +474,14 @@ fun UniversalPromptBar(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(CircleShape)
-                    .background(if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) ManusIndigo else ManusSlate850)
-                    .border(1.dp, SleekBorder, CircleShape)
+                    .background(
+                        if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) {
+                            if (isDark) ManusIndigo else EngineerLightPrimary
+                        } else {
+                            if (isDark) ManusSlate850 else EngineerLightSubtle
+                        }
+                    )
+                    .border(1.dp, borderColor, CircleShape)
                     .clickable {
                         if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) {
                             viewModel.dispatchUniversalAutonomousPrompt(promptText, pendingAttachments)
@@ -468,7 +495,11 @@ fun UniversalPromptBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
-                    tint = if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) ManusWhite else ManusSlate500,
+                    tint = if (promptText.isNotBlank() || pendingAttachments.isNotEmpty()) {
+                        Color.White
+                    } else {
+                        if (isDark) ManusSlate500 else EngineerLightTextMuted
+                    },
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -481,6 +512,7 @@ private fun AttachmentDropdownItem(
     icon: String,
     title: String,
     subtitle: String,
+    isDark: Boolean = true,
     onClick: () -> Unit
 ) {
     DropdownMenuItem(
@@ -491,8 +523,17 @@ private fun AttachmentDropdownItem(
             ) {
                 Text(text = icon, fontSize = 16.sp)
                 Column {
-                    Text(text = title, color = ManusWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text(text = subtitle, color = ManusSlate400, fontSize = 10.sp)
+                    Text(
+                        text = title,
+                        color = if (isDark) ManusWhite else EngineerLightTextPrimary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = subtitle,
+                        color = if (isDark) ManusSlate400 else EngineerLightTextSecondary,
+                        fontSize = 10.sp
+                    )
                 }
             }
         },

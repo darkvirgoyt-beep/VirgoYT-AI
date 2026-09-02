@@ -55,3 +55,26 @@ val VirgoGlassCard = Color(0x2E1E293B)
 val VirgoGlassBorder = Color(0x3300F0FF)
 val VirgoNeonOrange = Color(0xFFF97316)
 
+// High-Contrast 'Engineer Mode' Light Palette
+val EngineerLightCanvas = Color(0xFFF1F5F9)     // Slate-100 crisp paper canvas
+val EngineerLightSurface = Color(0xFFFFFFFF)    // Pure white primary surface
+val EngineerLightCard = Color(0xFFF8FAFC)       // Slate-50 panel card background
+val EngineerLightSubtle = Color(0xFFE2E8F0)     // Slate-200 subtle highlight
+val EngineerLightBorder = Color(0xFFCBD5E1)     // Slate-300 sharp structural border
+val EngineerLightBorderStrong = Color(0xFF94A3B8) // Slate-400 high-contrast grid border
+val EngineerLightTextPrimary = Color(0xFF0F172A) // Slate-900 sharp high-contrast ink
+val EngineerLightTextSecondary = Color(0xFF334155) // Slate-700 technical body text
+val EngineerLightTextMuted = Color(0xFF64748B)  // Slate-500 muted metadata
+val EngineerLightPrimary = Color(0xFF2563EB)    // High-contrast Royal Blueprint Blue
+val EngineerLightPrimaryDark = Color(0xFF1D4ED8) // Deep Blue
+val EngineerLightPrimaryLight = Color(0xFF3B82F6) // Bright Blue
+val EngineerLightPrimaryBg = Color(0x1A2563EB)  // Blue 10% accent tint
+val EngineerLightEmerald = Color(0xFF059669)    // Engineering Green
+val EngineerLightAmber = Color(0xFFD97706)      // Warning Amber
+val EngineerLightRed = Color(0xFFDC2626)        // Error / Alert Crimson
+val EngineerLightCyan = Color(0xFF0284C7)       // Precision Sky Cyan
+val EngineerLightTermBg = Color(0xFFF8FAFC)     // Paper white terminal canvas
+val EngineerLightTermHeaderBg = Color(0xFFE2E8F0)
+val EngineerLightTermText = Color(0xFF0F172A)
+
+

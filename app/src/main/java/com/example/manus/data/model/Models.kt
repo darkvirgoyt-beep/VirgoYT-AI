@@ -585,14 +585,41 @@ enum class CodeStylePreference(val label: String) {
     VERBOSE_DOCS("Extensively Documented & Typed")
 }
 
+enum class AppThemeMode(
+    val id: String,
+    val displayName: String,
+    val shortName: String,
+    val iconEmoji: String,
+    val description: String
+) {
+    HOLOGRAPHIC_DARK(
+        id = "holographic_dark",
+        displayName = "Holographic Dark",
+        shortName = "Dark",
+        iconEmoji = "🌙",
+        description = "Obsidian cybernetic canvas with neon cyan and indigo holographic accents"
+    ),
+    ENGINEER_LIGHT(
+        id = "engineer_light",
+        displayName = "Engineer Mode (Light)",
+        shortName = "Light",
+        iconEmoji = "☀️",
+        description = "High-contrast daylight workbench with slate-100 paper and blueprint blue accents"
+    );
+
+    val isDark: Boolean get() = this == HOLOGRAPHIC_DARK
+}
+
 data class UserPreferences(
     val tone: AiTone = AiTone.ULTRA_CONCISE,
     val codeStyle: CodeStylePreference = CodeStylePreference.CLEAN_MODULAR,
     val defaultModel: AiModelTier = AiModelTier.BAZAARLINK_AI,
+    val themeMode: AppThemeMode = AppThemeMode.HOLOGRAPHIC_DARK,
     val autoRunSafeTools: Boolean = true,
     val streamTypingSpeedMs: Long = 18L,
     val voiceEnabled: Boolean = true,
     val activeVoice: VoiceProfile = VoiceProfile(),
     val customSystemPrompt: String = "You are VirgoYT AI, an autonomous supercomputer assistant. Provide clean, production-ready solutions."
 )
+
 
