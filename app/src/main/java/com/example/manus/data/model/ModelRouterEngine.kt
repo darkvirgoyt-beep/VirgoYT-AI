@@ -37,6 +37,7 @@ class ModelRouterEngine {
                     role = "assistant",
                     content = "👋 **VirgoYT AI Autonomous Cloud Supercomputer** online.\n" +
                             "- 🌐 **BazaarLink AI & OpenAI Hub**: High-throughput gateway `api.bazaarlink.ai/v1`\n" +
+                            "- 🌙 **Moonshot AI & Kimi Hub**: 128k long-context reasoning `api.moonshot.cn/v1`\n" +
                             "- 🚀 **Groq LPU Acceleration**: 500+ tok/s low-latency execution\n" +
                             "- ⚡ **Kie.ai & OpenRouter Hub**: Universal OpenAI-compatible endpoints\n" +
                             "- 🎮 **Unreal Engine 5.4 Game Studio**: Nanite, Lumen, Blueprints & C++\n" +
@@ -99,6 +100,13 @@ class ModelRouterEngine {
         val hasImageAttachment = attachments.any { it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO }
 
         return when {
+            lower.contains("moonshot") || lower.contains("kimi") || lower.contains("sk-8d") || lower.contains("moonshot-v1") -> {
+                if (lower.contains("128k") || lower.contains("long context") || lower.contains("huge doc")) {
+                    Pair(AiModelTier.MOONSHOT_V1_128K, "🌕 Auto-routed to Moonshot Kimi 128k (Ultra-Long Context Window Engine)")
+                } else {
+                    Pair(AiModelTier.MOONSHOT_AI_V1, "🌙 Auto-routed to Moonshot AI / Kimi (High-Speed Reasoning & OpenAI Gateway)")
+                }
+            }
             lower.contains("bazaarlink") || lower.contains("bazaar") || lower.contains("langchain") || lower.contains("sk-bl") -> {
                 Pair(AiModelTier.BAZAARLINK_AI, "🌐 Auto-routed to BazaarLink AI (High-Speed OpenAI & LangChain Gateway)")
             }

@@ -130,6 +130,28 @@ enum class AiModelTier(
         baseUrl = "https://openrouter.ai/api/v1",
         defaultApiKey = ""
     ),
+    MOONSHOT_AI_V1(
+        id = "moonshot-v1-auto",
+        displayName = "Moonshot AI / Kimi (v1)",
+        provider = "Moonshot AI",
+        iconEmoji = "🌙",
+        specialty = "High-speed reasoning, long context & tool use (https://api.moonshot.cn/v1)",
+        baseUrl = "https://api.moonshot.cn/v1",
+        defaultApiKey = "sk-8dUtUs9SmRA981GISiV3JXHW9XNr7Z0xlcLwcnJ7MQmEFA30",
+        authHeaderFormat = "Authorization: Bearer sk-8dUtUs9SmRA981GISiV3JXHW9XNr7Z0xlcLwcnJ7MQmEFA30",
+        sdkType = "OpenAI Compatible / Moonshot SDK (base_url=https://api.moonshot.cn/v1)"
+    ),
+    MOONSHOT_V1_128K(
+        id = "moonshot-v1-128k",
+        displayName = "Moonshot Kimi 128k",
+        provider = "Moonshot AI",
+        iconEmoji = "🌕",
+        specialty = "Ultra-long 128k token context window for massive documents and codebase synthesis",
+        baseUrl = "https://api.moonshot.cn/v1",
+        defaultApiKey = "sk-8dUtUs9SmRA981GISiV3JXHW9XNr7Z0xlcLwcnJ7MQmEFA30",
+        authHeaderFormat = "Authorization: Bearer sk-8dUtUs9SmRA981GISiV3JXHW9XNr7Z0xlcLwcnJ7MQmEFA30",
+        sdkType = "OpenAI Compatible / Moonshot SDK (base_url=https://api.moonshot.cn/v1)"
+    ),
     GEMINI_2_5_PRO(
         id = "google/gemini-2.5-pro",
         displayName = "Gemini 2.5 Pro",
