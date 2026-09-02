@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.VirgoTheme
 import com.example.virgoyt.data.model.ActiveWorkspaceTab
 import com.example.virgoyt.ui.VirgoCloudViewModel
 import com.example.virgoyt.ui.components.AppCreationHubView
@@ -97,13 +98,13 @@ fun VirgoCloudApp(viewModel: VirgoCloudViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .testTag("virgoyt_cloud_app_root"),
-        containerColor = if (themeMode.isDark) ManusSlate950 else com.example.ui.theme.EngineerLightCanvas
+        containerColor = VirgoTheme.colors.canvas
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(if (themeMode.isDark) ManusSlate950 else com.example.ui.theme.EngineerLightCanvas)
+                .background(VirgoTheme.colors.canvas)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Cloud PC Header Bar & Navigation
@@ -187,24 +188,43 @@ fun VirgoCloudApp(viewModel: VirgoCloudViewModel) {
 
             // User Profile & Preferences Dialog
             val isUserProfileDialogOpen by viewModel.isUserProfileDialogOpen.collectAsState()
-            if (isUserProfileDialogOpen) {
-                UserProfileDialog(
-                    viewModel = viewModel,
-                    onDismiss = { viewModel.closeUserProfileDialog() }
-                )
-            }
+            UserProfileDialog(
+                isOpen = isUserProfileDialogOpen,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeUserProfileDialog() }
+            )
 
             // Authentication Modal Dialog
-            AuthDialog(viewModel = viewModel)
+            val isAuthDialogOpen by viewModel.isAuthDialogOpen.collectAsState()
+            AuthDialog(
+                isOpen = isAuthDialogOpen,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeAuthDialog() }
+            )
 
             // GitHub Authentication Modal Dialog
-            GitHubAuthDialog(viewModel = viewModel)
+            val isGitHubAuthDialogOpen by viewModel.isGitHubAuthDialogOpen.collectAsState()
+            GitHubAuthDialog(
+                isOpen = isGitHubAuthDialogOpen,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeGitHubAuthDialog() }
+            )
 
             // Multi-Platform Terminal CLI Installer Modal
-            CliInstallerDialog(viewModel = viewModel)
+            val isCliDialogOpen by viewModel.isCliDialogOpen.collectAsState()
+            CliInstallerDialog(
+                isOpen = isCliDialogOpen,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeCliDialog() }
+            )
 
             // Secret Credential Vault Modal Dialog
-            SecretCredentialBoxDialog(viewModel = viewModel)
+            val isSecretBoxDialogOpen by viewModel.isSecretBoxDialogOpen.collectAsState()
+            SecretCredentialBoxDialog(
+                isOpen = isSecretBoxDialogOpen,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeSecretBoxDialog() }
+            )
 
             // Floating Toast / Notification Banner
             if (statusToast != null) {

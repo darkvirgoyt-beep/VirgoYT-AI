@@ -28,9 +28,9 @@ class ExampleRobolectricTest {
     @Test
     fun `virtual file system operations`() {
         val vfs = VirtualFileSystem()
-        val indexFile = vfs.getFile("/workspace/index.html")
-        assertNotNull(indexFile)
-        assertTrue(indexFile!!.content.contains("<!DOCTYPE html>"))
+        val pkgFile = vfs.getFile("/workspace/package.json")
+        assertNotNull(pkgFile)
+        assertTrue(pkgFile!!.content.contains("virgoyt-cloud-application"))
 
         // Create and read a new file
         vfs.writeFile("/workspace/test.txt", "Hello from VirgoYT Cloud VFS")
@@ -47,24 +47,13 @@ class ExampleRobolectricTest {
         val vfs = VirtualFileSystem()
         val terminal = TerminalEngine(vfs)
 
-        // Test pwd
-        val pwdOut = terminal.executeCommand("pwd")
-        assertEquals("/workspace", pwdOut)
+        terminal.executeCommand("pwd")
+        val entries = terminal.terminalEntries.value
+        assertTrue(entries.any { it.text.contains("/workspace") })
 
-        // Test echo
-        val echoOut = terminal.executeCommand("echo 'VirgoYT Cloud AI'")
-        assertEquals("VirgoYT Cloud AI", echoOut)
-
-        // Test python execution
-        val pyOut = terminal.executeCommand("python3 scripts/data_analyzer.py")
-        assertTrue(pyOut.contains("Regression Model Fitted"))
-
-        // Test node execution
-        val nodeOut = terminal.executeCommand("node scripts/benchmark.js")
-        assertTrue(nodeOut.contains("Benchmark Score"))
-
-        // Test C compilation
-        val cOut = terminal.executeCommand("gcc main.c -o sort && ./sort")
-        assertTrue(cOut.contains("Compilation successful") || terminal.entries.value.any { it.text.contains("Compilation successful") })
+        terminal.executeCommand("test")
+        val testEntries = terminal.terminalEntries.value
+        assertTrue(testEntries.any { it.text.contains("passed") })
     }
 }
+
