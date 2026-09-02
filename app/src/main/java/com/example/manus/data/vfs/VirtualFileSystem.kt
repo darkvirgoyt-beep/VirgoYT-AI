@@ -456,13 +456,32 @@ echo "✓ App live at http://localhost:3000"
   "scripts": {
     "dev": "node scripts/benchmark.js",
     "start": "bash run.sh",
-    "test": "python3 scripts/data_analyzer.py"
+    "test": "node scripts/test_runner.js"
   },
   "dependencies": {
     "chart.js": "^4.4.1",
     "tailwindcss": "^3.4.1"
   }
 }
+""".trimIndent()
+
+        // 6b. test_runner.js
+        val testRunnerJs = """
+// /workspace/scripts/test_runner.js
+// Automated Sandbox Unit & Integration Test Suite
+console.log("--> Starting VirgoYT Cloud AI Automated Test Suite...");
+const suites = [
+  { name: "VFS Integrity Test", status: "PASS", durationMs: 4 },
+  { name: "DOM Canvas Rendering Engine", status: "PASS", durationMs: 12 },
+  { name: "Terminal Process IPC", status: "PASS", durationMs: 8 },
+  { name: "Subtask Pipeline Safety Verifier", status: "PASS", durationMs: 6 }
+];
+
+suites.forEach(s => {
+  console.log(`[✓] ${'$'}{s.name}: ${'$'}{s.status} (${'$'}{s.durationMs}ms)`);
+});
+console.log("════════════════════════════════════════════════");
+console.log("Total: 4 passed, 0 failed, 0 skipped. All tests green!");
 """.trimIndent()
 
         // 7. README.md
@@ -478,6 +497,7 @@ Welcome to your isolated Cloud AI environment! You have full access to:
 ### Quick Commands:
 - `python3 scripts/data_analyzer.py` - Run data science script
 - `node scripts/benchmark.js` - Run prime sieve benchmark
+- `npm run test` - Execute automated test runner
 - `npm run start` - Compile and launch preview server
 - `tree` - View full project tree
 """.trimIndent()
@@ -498,6 +518,7 @@ timestamp,region,cpu_usage,mem_mb,requests_per_sec,latency_p99
         addFile("/workspace/app.js", appJs)
         addFile("/workspace/scripts/data_analyzer.py", pythonScript)
         addFile("/workspace/scripts/benchmark.js", benchmarkJs)
+        addFile("/workspace/scripts/test_runner.js", testRunnerJs)
         addFile("/workspace/main.cpp", mainCpp)
         addFile("/workspace/Program.cs", programCs)
         addFile("/workspace/main.rs", mainRs)
@@ -506,6 +527,15 @@ timestamp,region,cpu_usage,mem_mb,requests_per_sec,latency_p99
         addFile("/workspace/package.json", packageJson)
         addFile("/workspace/README.md", readmeMd)
         addFile("/workspace/data/metrics.csv", csvData)
+        addFile("/workspace/games/VirgoYT_Game.exe", "MZ\u0090\u0000[PE32+_WINDOWS_EXECUTABLE]\nTitle=VirgoYT Cyber Odyssey\nEngine=DirectX12\nFPS=120")
+        addFile("/workspace/bin/VirgoApp.exe", "MZ\u0090\u0000[PE32+_WINDOWS_EXECUTABLE]\nTitle=VirgoYT Desktop Suite\nArchitecture=x86_64")
+
+        // Seed Wine Drive C:\ virtual environment
+        addDir("/workspace/drive_c")
+        addDir("/workspace/drive_c/Program Files")
+        addDir("/workspace/drive_c/Windows/System32")
+        addFile("/workspace/drive_c/Windows/System32/kernel32.dll", "[SYSTEM_DLL_64BIT]")
+        addFile("/workspace/drive_c/Windows/System32/d3d12.dll", "[DIRECT3D_12_DRIVER]")
 
         // Seed user home directories for session isolation
         addDir("/home")

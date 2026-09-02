@@ -61,7 +61,7 @@ class ManusAgentService(
         _agentReasoningLogs.value = _agentReasoningLogs.value + log
     }
 
-    suspend fun executeUserGoal(goal: String, onBrowserRefresh: () -> Unit) = withContext(Dispatchers.IO) {
+    suspend fun executeUserGoal(goal: String, conversationHistory: List<com.example.manus.data.model.ChatMessage> = emptyList(), onBrowserRefresh: () -> Unit) = withContext(Dispatchers.IO) {
         if (_isAgentBusy.value) return@withContext
 
         _isAgentBusy.value = true
@@ -75,7 +75,7 @@ class ManusAgentService(
 
         if (hasValidKey) {
             try {
-                executeWithGeminiApi(goal, apiKey, onBrowserRefresh)
+                executeWithGeminiApi(goal, conversationHistory, apiKey, onBrowserRefresh)
             } catch (e: Exception) {
                 addReasoningLog("⚠️ [FALLBACK] Gemini API call failed (${e.message}), switching to Autonomous Sandbox Pipeline Engine.")
                 executeWithAutonomousEngine(goal, onBrowserRefresh)
@@ -89,9 +89,9 @@ class ManusAgentService(
         _agentStatusText.value = "Task Completed Successfully"
     }
 
-    private suspend fun executeWithGeminiApi(goal: String, apiKey: String, onBrowserRefresh: () -> Unit) {
-        _agentStatusText.value = "Reasoning with Gemini 3.5..."
-        addReasoningLog("🌐 [GEMINI] Dispatching autonomous plan decomposition request to gemini-3.5-flash...")
+    private suspend fun executeWithGeminiApi(goal: String, conversationHistory: List<com.example.manus.data.model.ChatMessage>, apiKey: String, onBrowserRefresh: () -> Unit) {
+        _agentStatusText.value = "Reasoning with Gemini 2.5 Flash..."
+        addReasoningLog("🌐 [GEMINI] Dispatching autonomous plan decomposition request to gemini-2.5-flash...")
 
         val systemPrompt = """
 You are VirgoYT Sovereign JARVIS AI — an omniscient, hyper-intelligent supercomputer trained on a 20,000 Trillion Metric Universe scale neural foundation.
@@ -111,14 +111,26 @@ Return STRICTLY a JSON object with this format:
 }
 """.trimIndent()
 
-        val requestJson = JSONObject().apply {
-            put("contents", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("parts", JSONArray().apply {
-                        put(JSONObject().put("text", "Goal: $goal\n\nGenerate structured subtasks."))
-                    })
+        val contentsArray = JSONArray()
+        // Include recent conversation context (up to 6 prior turns)
+        conversationHistory.takeLast(6).forEach { msg ->
+            contentsArray.put(JSONObject().apply {
+                put("role", if (msg.role == "user") "user" else "model")
+                put("parts", JSONArray().apply {
+                    put(JSONObject().put("text", msg.content))
                 })
             })
+        }
+        // Append current goal prompt
+        contentsArray.put(JSONObject().apply {
+            put("role", "user")
+            put("parts", JSONArray().apply {
+                put(JSONObject().put("text", "Goal: $goal\n\nGenerate structured subtasks JSON."))
+            })
+        })
+
+        val requestJson = JSONObject().apply {
+            put("contents", contentsArray)
             put("systemInstruction", JSONObject().apply {
                 put("parts", JSONArray().apply {
                     put(JSONObject().put("text", systemPrompt))
@@ -131,7 +143,7 @@ Return STRICTLY a JSON object with this format:
         }
 
         val request = Request.Builder()
-            .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$apiKey")
+            .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey")
             .post(requestJson.toString().toRequestBody("application/json".toMediaType()))
             .build()
 
@@ -195,8 +207,6 @@ Return STRICTLY a JSON object with this format:
             current = current.copy(subtasks = updatedSubtasks.toList())
             _currentTask.value = current
 
-            delay(350)
-
             // Perform actual tool action in Virtual PC
             val output = executeTool(subtask.toolName ?: "bash_exec", subtask.toolInput ?: "", onBrowserRefresh)
 
@@ -208,7 +218,6 @@ Return STRICTLY a JSON object with this format:
             _currentTask.value = current
 
             addReasoningLog("✓ [SUCCESS] ${subtask.title} output: ${output.take(80)}${if (output.length > 80) "..." else ""}")
-            delay(200)
         }
 
         _currentTask.value = current.copy(status = TaskStatus.COMPLETED)
