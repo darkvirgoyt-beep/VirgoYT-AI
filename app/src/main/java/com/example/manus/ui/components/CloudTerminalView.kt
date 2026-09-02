@@ -1,5 +1,12 @@
 package com.example.manus.ui.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +38,14 @@ import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.SettingsVoice
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -53,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -60,8 +75,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.manus.data.model.ActiveWorkspaceTab
 import com.example.manus.data.model.OutputType
 import com.example.manus.data.model.TerminalEntry
+import com.example.manus.data.model.TerminalMode
+import com.example.manus.data.voice.SpeechEngineType
+import com.example.manus.data.voice.VoiceDispatchTarget
 import com.example.manus.ui.ManusCloudViewModel
 import com.example.ui.theme.ManusAmber
 import com.example.ui.theme.ManusCyan
@@ -94,16 +113,6 @@ import com.example.ui.theme.TermRed
 import com.example.ui.theme.TermText
 import com.example.ui.theme.TermYellow
 
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Hub
-import com.example.manus.data.model.ActiveWorkspaceTab
-import com.example.manus.data.model.TerminalMode
-
 @Composable
 fun CloudTerminalView(
     viewModel: ManusCloudViewModel,
@@ -124,6 +133,25 @@ fun CloudTerminalView(
     val isCursorTerminalOpen by viewModel.isCursorTerminalAiOpen.collectAsState()
     val cursorSuggestedCommand by viewModel.cursorTerminalSuggestedCommand.collectAsState()
     var cursorQueryInput by remember { mutableStateOf("") }
+
+    val voiceManager = viewModel.webSpeechVoiceManager
+    val isVoiceListening by voiceManager.isListening.collectAsState()
+    val liveVoiceTranscript by voiceManager.liveTranscript.collectAsState()
+    val partialVoiceTranscript by voiceManager.partialTranscript.collectAsState()
+    val waveformBars by voiceManager.waveformBars.collectAsState()
+    val voiceDispatchTarget by voiceManager.dispatchTarget.collectAsState()
+    val activeEngine by voiceManager.activeEngine.collectAsState()
+    val recentVoiceCommands by voiceManager.recentVoiceCommands.collectAsState()
+    var showVoiceSettingsDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        voiceManager.startListening(context) { cmd, target ->
+            viewModel.dispatchVoiceCommandToTarget(cmd, target)
+        }
+    }
 
     // Auto-scroll on new entries
     LaunchedEffect(entries.size) {
@@ -196,6 +224,41 @@ fun CloudTerminalView(
                                 Text(
                                     text = "Cursor",
                                     color = if (isCursorTerminalOpen) ManusWhite else ManusIndigoLight,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        // Web Speech API Voice Modal Trigger
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (isVoiceListening) Color(0xFFEF4444) else ManusSlate800)
+                                .border(1.dp, if (isVoiceListening) Color(0xFFFCA5A5) else SleekBorder, RoundedCornerShape(6.dp))
+                                .clickable {
+                                    if (isVoiceListening) {
+                                        voiceManager.stopListening(submit = true)
+                                    } else {
+                                        permissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                    }
+                                }
+                                .padding(horizontal = 6.dp, vertical = 3.dp)
+                                .testTag("terminal_header_voice_button")
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isVoiceListening) Icons.Default.GraphicEq else Icons.Default.Mic,
+                                    contentDescription = "Web Speech API Voice",
+                                    tint = if (isVoiceListening) ManusWhite else ManusEmerald,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Text(
+                                    text = if (isVoiceListening) "Listening..." else "Web Speech",
+                                    color = ManusWhite,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -521,6 +584,223 @@ fun CloudTerminalView(
             }
         }
 
+        // Web Speech API Voice Command & Swarm Audio Overlay (Active when listening or has transcript)
+        AnimatedVisibility(
+            visible = isVoiceListening || liveVoiceTranscript.isNotBlank() || partialVoiceTranscript.isNotBlank(),
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(ManusSlate950)
+                    .border(1.dp, if (isVoiceListening) ManusEmerald.copy(alpha = 0.8f) else SleekBorder)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    // Top strip: Engine badge + Target selector + Waveform equalizer
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isVoiceListening) Color(0xFF10B981) else ManusAmber)
+                            )
+                            Text(
+                                text = if (isVoiceListening) "🎙️ WEB SPEECH MIC ACTIVE" else "🎙️ VOICE SPEECH READY",
+                                color = if (isVoiceListening) ManusEmerald else ManusAmber,
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                letterSpacing = 0.5.sp
+                            )
+                            Text(
+                                text = "• [${activeEngine.displayName}]",
+                                color = ManusSlate500,
+                                fontSize = 9.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+
+                        // Target Selector Chips
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            VoiceDispatchTarget.values().forEach { target ->
+                                val isSelected = voiceDispatchTarget == target
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(if (isSelected) ManusIndigo else ManusSlate850)
+                                        .border(1.dp, if (isSelected) ManusIndigoLight else SleekBorder, RoundedCornerShape(4.dp))
+                                        .clickable { voiceManager.setDispatchTarget(target) }
+                                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "${target.iconEmoji} ${target.displayName}",
+                                        color = if (isSelected) ManusWhite else ManusSlate400,
+                                        fontSize = 8.5.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Live Waveform Visualizer & Transcript Display
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Animated Waveform Bars
+                        Row(
+                            modifier = Modifier
+                                .height(22.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(ManusSlate900)
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            waveformBars.forEach { heightRatio ->
+                                val barHeight = (4 + heightRatio * 16).coerceIn(4f, 20f)
+                                val barColor = when {
+                                    heightRatio > 0.6f -> ManusCyan
+                                    heightRatio > 0.3f -> ManusEmerald
+                                    else -> ManusIndigo
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .width(2.5.dp)
+                                        .height(barHeight.dp)
+                                        .clip(RoundedCornerShape(1.dp))
+                                        .background(barColor)
+                                )
+                            }
+                        }
+
+                        // Live Speech Transcript Box
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(ManusSlate900)
+                                .border(1.dp, ManusIndigo.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            val displayText = when {
+                                partialVoiceTranscript.isNotBlank() -> partialVoiceTranscript
+                                liveVoiceTranscript.isNotBlank() -> liveVoiceTranscript
+                                else -> "Listening for voice commands (e.g., 'Swarm build 3D app', 'Run wine calc.exe')..."
+                            }
+                            Text(
+                                text = displayText,
+                                color = if (partialVoiceTranscript.isNotBlank() || liveVoiceTranscript.isNotBlank()) ManusWhite else ManusSlate500,
+                                fontSize = 10.5.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = if (partialVoiceTranscript.isNotBlank()) FontWeight.Bold else FontWeight.Normal,
+                                maxLines = 2
+                            )
+                        }
+
+                        // Immediate Action buttons
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            if (isVoiceListening) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFF10B981))
+                                        .clickable {
+                                            voiceManager.stopListening(submit = true)
+                                        }
+                                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                                        .testTag("terminal_voice_submit_button")
+                                ) {
+                                    Text(
+                                        text = "⚡ Send",
+                                        color = ManusWhite,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(ManusSlate800)
+                                    .clickable {
+                                        voiceManager.stopListening(submit = false)
+                                    }
+                                    .padding(horizontal = 6.dp, vertical = 5.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Cancel Voice",
+                                    tint = ManusSlate400,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // Voice Command Shortcut Chips
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        item {
+                            Text(
+                                text = "SAY:",
+                                color = ManusSlate500,
+                                fontSize = 8.5.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        item {
+                            QuickCmdButton("🤖 Swarm: Audit full security") {
+                                viewModel.dispatchVoiceCommandToTarget("Swarm audit all security vulnerabilities", VoiceDispatchTarget.AGENT_SWARM)
+                            }
+                        }
+                        item {
+                            QuickCmdButton("🤖 Swarm: Build cross-platform app") {
+                                viewModel.dispatchVoiceCommandToTarget("Agent team build cross platform responsive web app", VoiceDispatchTarget.AGENT_SWARM)
+                            }
+                        }
+                        item {
+                            QuickCmdButton("⚡ Run: wine setup.exe") {
+                                viewModel.dispatchVoiceCommandToTarget("wine setup.exe", VoiceDispatchTarget.TERMINAL_EXEC)
+                            }
+                        }
+                        item {
+                            QuickCmdButton("⚡ Run: gcc -O3 main.c") {
+                                viewModel.dispatchVoiceCommandToTarget("gcc -O3 main.c -o app && ./app", VoiceDispatchTarget.TERMINAL_EXEC)
+                            }
+                        }
+                        item {
+                            QuickCmdButton("⚡ Run: python3 test.py") {
+                                viewModel.dispatchVoiceCommandToTarget("python3 scripts/data_analyzer.py", VoiceDispatchTarget.TERMINAL_EXEC)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Quick Command Preset Chips Bar
         Box(
             modifier = Modifier
@@ -572,6 +852,32 @@ fun CloudTerminalView(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Target Dispatch Indicator / Mode Switcher
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(ManusSlate850)
+                        .border(1.dp, SleekBorder, RoundedCornerShape(4.dp))
+                        .clickable {
+                            val nextTarget = when (voiceDispatchTarget) {
+                                VoiceDispatchTarget.AGENT_SWARM -> VoiceDispatchTarget.TERMINAL_EXEC
+                                VoiceDispatchTarget.TERMINAL_EXEC -> VoiceDispatchTarget.TERMINAL_PROMPT
+                                VoiceDispatchTarget.TERMINAL_PROMPT -> VoiceDispatchTarget.AGENT_SWARM
+                            }
+                            voiceManager.setDispatchTarget(nextTarget)
+                        }
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                        .testTag("terminal_voice_target_toggle")
+                ) {
+                    Text(
+                        text = "${voiceDispatchTarget.iconEmoji} ${voiceDispatchTarget.displayName}",
+                        color = ManusIndigoLight,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+
                 Text(
                     text = "$activeUser@cloud-pc:~$",
                     color = ManusIndigoLight,
@@ -614,6 +920,30 @@ fun CloudTerminalView(
                         }
                     })
                 )
+
+                // Voice Mic Action Button (Web Speech API)
+                IconButton(
+                    onClick = {
+                        if (isVoiceListening) {
+                            voiceManager.stopListening(submit = true)
+                        } else {
+                            permissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                        }
+                    },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (isVoiceListening) Color(0xFFEF4444) else ManusSlate800)
+                        .border(1.dp, if (isVoiceListening) Color(0xFFF87171) else SleekBorder, RoundedCornerShape(8.dp))
+                        .testTag("terminal_voice_mic_button")
+                ) {
+                    Icon(
+                        imageVector = if (isVoiceListening) Icons.Default.GraphicEq else Icons.Default.Mic,
+                        contentDescription = "Web Speech Voice Input",
+                        tint = if (isVoiceListening) ManusWhite else ManusCyan,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
 
                 IconButton(
                     onClick = { viewModel.executeTerminalCommand() },

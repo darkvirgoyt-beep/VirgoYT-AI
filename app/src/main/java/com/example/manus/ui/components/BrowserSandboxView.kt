@@ -3,6 +3,7 @@ package com.example.manus.ui.components
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.ConsoleMessage
+import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -294,8 +295,14 @@ fun BrowserSandboxView(
                             settings.allowFileAccess = true
                             settings.loadWithOverviewMode = true
                             settings.useWideViewPort = true
+                            settings.mediaPlaybackRequiresUserGesture = false
 
                             webChromeClient = object : WebChromeClient() {
+                                override fun onPermissionRequest(request: PermissionRequest?) {
+                                    // Grant microphone audio capture for Web Speech API
+                                    request?.grant(request.resources)
+                                }
+
                                 override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                                     if (consoleMessage != null) {
                                         viewModel.addBrowserConsoleLog(

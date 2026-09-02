@@ -80,7 +80,7 @@ class TerminalEngine(
         appendEntry("Switched execution host to [${mode.label}] -> $hostInfo", OutputType.SYSTEM)
     }
 
-    private fun appendEntry(text: String, type: OutputType = OutputType.STDOUT) {
+    fun appendEntry(text: String, type: OutputType = OutputType.STDOUT) {
         val newEntry = TerminalEntry(text = text, type = type)
         _entries.value = _entries.value + newEntry
     }

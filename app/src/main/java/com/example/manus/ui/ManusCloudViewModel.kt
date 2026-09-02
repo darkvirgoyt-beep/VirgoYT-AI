@@ -59,6 +59,7 @@ class ManusCloudViewModel : ViewModel() {
     val databaseAiEngine = DatabaseAiEngine()
     val applicationGenerationEngine = ApplicationGenerationEngine(vfs)
     val voiceAssistantEngine = com.example.manus.data.voice.VoiceAssistantEngine(viewModelScope)
+    val webSpeechVoiceManager = com.example.manus.data.voice.WebSpeechVoiceManager(viewModelScope)
     val pluginManager = com.example.manus.data.plugins.PluginManager()
     val workflowAutomationEngine = com.example.manus.data.workflows.WorkflowAutomationEngine(viewModelScope)
     val cloudStorageEngine = com.example.manus.data.cloud.CloudStorageEngine()
@@ -600,6 +601,45 @@ class ManusCloudViewModel : ViewModel() {
             terminal.executeCommand(commandToRun)
             if (commandToRun.contains("run.sh") || commandToRun.contains("npm") || commandToRun.contains("echo") || commandToRun.contains("cp") || commandToRun.contains("mv")) {
                 reloadBrowserSandbox()
+            }
+        }
+    }
+
+    fun dispatchVoiceCommandToTarget(command: String, target: com.example.manus.data.voice.VoiceDispatchTarget) {
+        if (command.isBlank()) return
+
+        when (target) {
+            com.example.manus.data.voice.VoiceDispatchTarget.AGENT_SWARM -> {
+                viewModelScope.launch {
+                    val swarmHeader = """
+╔════════════════════════════════════════════════════════════════════════════╗
+║ 🎙️ VOICE DIRECTIVE -> AGENT SWARM DISPATCH                                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
+• Voice Prompt : "$command"
+• Protocol     : Web Speech API Continuous Audio Processing
+• Assigned     : Multi-Agent Team (Architect, Coder, Reviewer, Security)
+• Status       : Autonomous execution launched...
+""".trimIndent()
+                    terminal.appendEntry(swarmHeader, com.example.manus.data.model.OutputType.AGENT_ACTION)
+                    delay(200)
+
+                    // Launch multi-agent swarm task and log real-time updates
+                    multiAgentTeam.launchAutonomousTeamGoal(command)
+                    runAgentGoal(command)
+                    showToast("🎙️ Voice command dispatched to Agent Swarm: \"$command\"")
+                }
+            }
+            com.example.manus.data.voice.VoiceDispatchTarget.TERMINAL_EXEC -> {
+                viewModelScope.launch {
+                    val promptLine = "🎙️ [Voice Input]: $command"
+                    terminal.appendEntry(promptLine, com.example.manus.data.model.OutputType.SYSTEM)
+                    executeTerminalCommand(command)
+                    showToast("⚡ Voice command executing in Terminal: \"$command\"")
+                }
+            }
+            com.example.manus.data.voice.VoiceDispatchTarget.TERMINAL_PROMPT -> {
+                _terminalInput.value = command
+                showToast("📝 Voice command pasted to Terminal prompt")
             }
         }
     }
