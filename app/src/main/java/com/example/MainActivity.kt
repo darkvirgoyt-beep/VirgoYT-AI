@@ -35,32 +35,32 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.manus.data.model.ActiveWorkspaceTab
-import com.example.manus.ui.ManusCloudViewModel
-import com.example.manus.ui.components.AppCreationHubView
-import com.example.manus.ui.components.AuthDialog
-import com.example.manus.ui.components.BrowserSandboxView
-import com.example.manus.ui.components.CliInstallerDialog
-import com.example.manus.ui.components.CloudPcHeader
-import com.example.manus.ui.components.CloudStorageView
-import com.example.manus.ui.components.CloudTerminalView
-import com.example.manus.ui.components.CodeEditorView
-import com.example.manus.ui.components.DatabaseAiStudioView
-import com.example.manus.ui.components.FileManagerView
-import com.example.manus.ui.components.GameStudioView
-import com.example.manus.ui.components.GitHubAuthDialog
-import com.example.manus.ui.components.LiveComputerDiffView
-import com.example.manus.ui.components.ManusAgentView
-import com.example.manus.ui.components.MemoryRagView
-import com.example.manus.ui.components.PluginsAndToolsView
-import com.example.manus.ui.components.ProjectUnderstandingView
-import com.example.manus.ui.components.SecretCredentialBoxDialog
-import com.example.manus.ui.components.SystemMonitorView
-import com.example.manus.ui.components.UniversalPromptBar
-import com.example.manus.ui.components.UserProfileDialog
-import com.example.manus.ui.components.VoiceAssistantView
-import com.example.manus.ui.components.WebDashboardView
-import com.example.manus.ui.components.WorkflowAutomationView
+import com.example.virgoyt.data.model.ActiveWorkspaceTab
+import com.example.virgoyt.ui.VirgoCloudViewModel
+import com.example.virgoyt.ui.components.AppCreationHubView
+import com.example.virgoyt.ui.components.AuthDialog
+import com.example.virgoyt.ui.components.BrowserSandboxView
+import com.example.virgoyt.ui.components.CliInstallerDialog
+import com.example.virgoyt.ui.components.CloudPcHeader
+import com.example.virgoyt.ui.components.CloudStorageView
+import com.example.virgoyt.ui.components.CloudTerminalView
+import com.example.virgoyt.ui.components.CodeEditorView
+import com.example.virgoyt.ui.components.DatabaseAiStudioView
+import com.example.virgoyt.ui.components.FileManagerView
+import com.example.virgoyt.ui.components.GameStudioView
+import com.example.virgoyt.ui.components.GitHubAuthDialog
+import com.example.virgoyt.ui.components.LiveComputerDiffView
+import com.example.virgoyt.ui.components.VirgoAgentView
+import com.example.virgoyt.ui.components.MemoryRagView
+import com.example.virgoyt.ui.components.PluginsAndToolsView
+import com.example.virgoyt.ui.components.ProjectUnderstandingView
+import com.example.virgoyt.ui.components.SecretCredentialBoxDialog
+import com.example.virgoyt.ui.components.SystemMonitorView
+import com.example.virgoyt.ui.components.UniversalPromptBar
+import com.example.virgoyt.ui.components.UserProfileDialog
+import com.example.virgoyt.ui.components.VoiceAssistantView
+import com.example.virgoyt.ui.components.WebDashboardView
+import com.example.virgoyt.ui.components.WorkflowAutomationView
 import com.example.ui.theme.ManusIndigoLight
 import com.example.ui.theme.ManusSlate900
 import com.example.ui.theme.ManusSlate950
@@ -70,7 +70,7 @@ import com.example.ui.theme.SleekBorder
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: ManusCloudViewModel by viewModels()
+    private val viewModel: VirgoCloudViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,14 +79,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeMode by viewModel.themeMode.collectAsState()
             MyApplicationTheme(themeMode = themeMode) {
-                ManusCloudApp(viewModel = viewModel)
+                VirgoCloudApp(viewModel = viewModel)
             }
         }
     }
 }
 
 @Composable
-fun ManusCloudApp(viewModel: ManusCloudViewModel) {
+fun VirgoCloudApp(viewModel: VirgoCloudViewModel) {
     val activeTab by viewModel.activeTab.collectAsState()
     val systemStats by viewModel.systemStats.collectAsState()
     val isAgentBusy by viewModel.agentService.isAgentBusy.collectAsState()
@@ -127,7 +127,7 @@ fun ManusCloudApp(viewModel: ManusCloudViewModel) {
                     ) { targetTab ->
                         when (targetTab) {
                             ActiveWorkspaceTab.AGENT -> {
-                                ManusAgentView(viewModel = viewModel)
+                                VirgoAgentView(viewModel = viewModel)
                             }
                             ActiveWorkspaceTab.VOICE_ASSISTANT -> {
                                 VoiceAssistantView(viewModel = viewModel)

@@ -2,7 +2,7 @@ package com.example
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
-import com.example.manus.ui.ManusCloudViewModel
+import com.example.virgoyt.ui.VirgoCloudViewModel
 import com.example.ui.theme.MyApplicationTheme
 import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -24,7 +24,7 @@ class GreetingScreenshotTest {
     fun greeting_screenshot() {
         composeTestRule.setContent {
             MyApplicationTheme {
-                ManusCloudApp(viewModel = ManusCloudViewModel())
+                VirgoCloudApp(viewModel = VirgoCloudViewModel())
             }
         }
 

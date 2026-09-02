@@ -2,9 +2,9 @@ package com.example
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.example.manus.data.model.OutputType
-import com.example.manus.data.terminal.TerminalEngine
-import com.example.manus.data.vfs.VirtualFileSystem
+import com.example.virgoyt.data.model.OutputType
+import com.example.virgoyt.data.terminal.TerminalEngine
+import com.example.virgoyt.data.vfs.VirtualFileSystem
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

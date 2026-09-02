@@ -2,35 +2,62 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Sleek Interface Dark Theme Palette
-val ManusSlate950 = Color(0xFF0D0D0F) // Deep obsidian canvas
-val ManusSlate900 = Color(0xFF16161A) // Primary surface
-val ManusSlate850 = Color(0xFF1A1A1E) // Card & Tab surface
-val ManusSlate800 = Color(0xFF222228) // Borders and dividers
-val ManusSlate700 = Color(0xFF33333E)
-val ManusSlate600 = Color(0xFF4B4B58)
-val ManusSlate500 = Color(0xFF64748B)
-val ManusSlate400 = Color(0xFF94A3B8)
-val ManusSlate300 = Color(0xFFCBD5E1)
-val ManusSlate200 = Color(0xFFE2E8F0)
-val ManusWhite = Color(0xFFFFFFFF)
+// VirgoYT Sleek Interface Dark Theme Palette
+val VirgoSlate950 = Color(0xFF0D0D0F) // Deep obsidian canvas
+val VirgoSlate900 = Color(0xFF16161A) // Primary surface
+val VirgoSlate850 = Color(0xFF1A1A1E) // Card & Tab surface
+val VirgoSlate800 = Color(0xFF222228) // Borders and dividers
+val VirgoSlate700 = Color(0xFF33333E)
+val VirgoSlate600 = Color(0xFF4B4B58)
+val VirgoSlate500 = Color(0xFF64748B)
+val VirgoSlate400 = Color(0xFF94A3B8)
+val VirgoSlate300 = Color(0xFFCBD5E1)
+val VirgoSlate200 = Color(0xFFE2E8F0)
+val VirgoWhite = Color(0xFFFFFFFF)
 
-// Sleek Indigo & Emerald Accent Colors
-val ManusIndigo = Color(0xFF6366F1)       // Primary Indigo (500)
-val ManusIndigoDark = Color(0xFF4F46E5)   // Deep Indigo (600)
-val ManusIndigoLight = Color(0xFF818CF8)  // Prompt Indigo (400)
-val ManusIndigoSoft = Color(0xFFA5B4FC)   // Subtitle Indigo (300)
-val ManusIndigoBg = Color(0x266366F1)     // Indigo with opacity for active states
+// VirgoYT Indigo & Emerald Accent Colors
+val VirgoIndigo = Color(0xFF6366F1)       // Primary Indigo (500)
+val VirgoIndigoDark = Color(0xFF4F46E5)   // Deep Indigo (600)
+val VirgoIndigoLight = Color(0xFF818CF8)  // Prompt Indigo (400)
+val VirgoIndigoSoft = Color(0xFFA5B4FC)   // Subtitle Indigo (300)
+val VirgoIndigoBg = Color(0x266366F1)     // Indigo with opacity for active states
 
-val ManusCyan = Color(0xFF38BDF8)         // Sky Cyan accent
-val ManusCyanAccent = Color(0xFF38BDF8)
-val ManusCyanMuted = Color(0xFF0284C7)
-val ManusEmerald = Color(0xFF10B981)      // Vibrant Emerald (500)
-val ManusGreen = Color(0xFF34D399)        // Emerald Light (400)
-val ManusAmber = Color(0xFFF59E0B)        // Warm Amber
-val ManusRed = Color(0xFFEF4444)          // Coral Red
-val ManusPurple = Color(0xFF8B5CF6)       // Purple accent
-val ManusBorderLight = Color(0x1FFFFFFF)
+val VirgoCyan = Color(0xFF38BDF8)         // Sky Cyan accent
+val VirgoCyanAccent = Color(0xFF38BDF8)
+val VirgoCyanMuted = Color(0xFF0284C7)
+val VirgoEmerald = Color(0xFF10B981)      // Vibrant Emerald (500)
+val VirgoGreen = Color(0xFF34D399)        // Emerald Light (400)
+val VirgoAmber = Color(0xFFF59E0B)        // Warm Amber
+val VirgoRed = Color(0xFFEF4444)          // Coral Red
+val VirgoPurple = Color(0xFF8B5CF6)       // Purple accent
+val VirgoBorderLight = Color(0x1FFFFFFF)
+
+// Legacy Aliases for seamless compatibility
+val ManusSlate950 = VirgoSlate950
+val ManusSlate900 = VirgoSlate900
+val ManusSlate850 = VirgoSlate850
+val ManusSlate800 = VirgoSlate800
+val ManusSlate700 = VirgoSlate700
+val ManusSlate600 = VirgoSlate600
+val ManusSlate500 = VirgoSlate500
+val ManusSlate400 = VirgoSlate400
+val ManusSlate300 = VirgoSlate300
+val ManusSlate200 = VirgoSlate200
+val ManusWhite = VirgoWhite
+val ManusIndigo = VirgoIndigo
+val ManusIndigoDark = VirgoIndigoDark
+val ManusIndigoLight = VirgoIndigoLight
+val ManusIndigoSoft = VirgoIndigoSoft
+val ManusIndigoBg = VirgoIndigoBg
+val ManusCyan = VirgoCyan
+val ManusCyanAccent = VirgoCyanAccent
+val ManusCyanMuted = VirgoCyanMuted
+val ManusEmerald = VirgoEmerald
+val ManusGreen = VirgoGreen
+val ManusAmber = VirgoAmber
+val ManusRed = VirgoRed
+val ManusPurple = VirgoPurple
+val ManusBorderLight = VirgoBorderLight
 
 // Terminal Colors (Sleek Dark)
 val TermBg = Color(0xFF000000)

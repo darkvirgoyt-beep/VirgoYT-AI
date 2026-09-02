@@ -1883,6 +1883,11 @@ date: Mon, 31 Aug 2026 05:30:00 GMT
             return res.replace("\\n", "\n")
         }
 
+        // Quoted string literal
+        if ((trimmed.startsWith("\"") && trimmed.endsWith("\"")) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+            return trimmed.substring(1, trimmed.length - 1).replace("\\n", "\n")
+        }
+
         // Direct variable check
         vars[trimmed]?.let { return it.toString() }
 

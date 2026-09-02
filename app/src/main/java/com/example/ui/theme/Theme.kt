@@ -8,32 +8,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.example.manus.data.model.AppThemeMode
+import com.example.virgoyt.data.model.AppThemeMode
 
-val ManusDarkColorScheme = darkColorScheme(
-    primary = ManusIndigo,
-    onPrimary = ManusWhite,
-    primaryContainer = ManusSlate850,
-    onPrimaryContainer = ManusIndigoLight,
-    secondary = ManusEmerald,
-    onSecondary = ManusWhite,
-    secondaryContainer = ManusSlate800,
-    onSecondaryContainer = ManusGreen,
-    tertiary = ManusCyan,
-    onTertiary = ManusSlate950,
-    background = ManusSlate950,
-    onBackground = ManusSlate200,
-    surface = ManusSlate900,
-    onSurface = ManusWhite,
-    surfaceVariant = ManusSlate850,
-    onSurfaceVariant = ManusSlate400,
-    outline = ManusSlate800,
-    outlineVariant = ManusSlate700,
-    error = ManusRed,
-    onError = ManusWhite
+val VirgoDarkColorScheme = darkColorScheme(
+    primary = VirgoIndigo,
+    onPrimary = VirgoWhite,
+    primaryContainer = VirgoSlate850,
+    onPrimaryContainer = VirgoIndigoLight,
+    secondary = VirgoEmerald,
+    onSecondary = VirgoWhite,
+    secondaryContainer = VirgoSlate800,
+    onSecondaryContainer = VirgoGreen,
+    tertiary = VirgoCyan,
+    onTertiary = VirgoSlate950,
+    background = VirgoSlate950,
+    onBackground = VirgoSlate200,
+    surface = VirgoSlate900,
+    onSurface = VirgoWhite,
+    surfaceVariant = VirgoSlate850,
+    onSurfaceVariant = VirgoSlate400,
+    outline = VirgoSlate800,
+    outlineVariant = VirgoSlate700,
+    error = VirgoRed,
+    onError = VirgoWhite
 )
 
-val ManusEngineerLightColorScheme = lightColorScheme(
+val VirgoEngineerLightColorScheme = lightColorScheme(
     primary = EngineerLightPrimary,
     onPrimary = Color.White,
     primaryContainer = Color(0xFFDBEAFE),
@@ -56,7 +56,11 @@ val ManusEngineerLightColorScheme = lightColorScheme(
     onError = Color.White
 )
 
-data class ManusThemeColors(
+// Legacy Aliases
+val ManusDarkColorScheme = VirgoDarkColorScheme
+val ManusEngineerLightColorScheme = VirgoEngineerLightColorScheme
+
+data class VirgoThemeColors(
     val canvas: Color,
     val surface: Color,
     val card: Color,
@@ -80,31 +84,33 @@ data class ManusThemeColors(
     val isDark: Boolean
 )
 
-val DarkManusThemeColors = ManusThemeColors(
-    canvas = ManusSlate950,
-    surface = ManusSlate900,
-    card = ManusSlate850,
-    cardSubtle = ManusSlate800,
+typealias ManusThemeColors = VirgoThemeColors
+
+val DarkVirgoThemeColors = VirgoThemeColors(
+    canvas = VirgoSlate950,
+    surface = VirgoSlate900,
+    card = VirgoSlate850,
+    cardSubtle = VirgoSlate800,
     border = SleekBorder,
-    borderStrong = ManusSlate700,
-    textPrimary = ManusWhite,
-    textSecondary = ManusSlate200,
-    textMuted = ManusSlate400,
-    primary = ManusIndigo,
-    primaryDark = ManusIndigoDark,
-    primaryLight = ManusIndigoLight,
-    primaryBg = ManusIndigoBg,
-    accentEmerald = ManusEmerald,
-    accentCyan = ManusCyan,
-    accentAmber = ManusAmber,
-    accentRed = ManusRed,
+    borderStrong = VirgoSlate700,
+    textPrimary = VirgoWhite,
+    textSecondary = VirgoSlate200,
+    textMuted = VirgoSlate400,
+    primary = VirgoIndigo,
+    primaryDark = VirgoIndigoDark,
+    primaryLight = VirgoIndigoLight,
+    primaryBg = VirgoIndigoBg,
+    accentEmerald = VirgoEmerald,
+    accentCyan = VirgoCyan,
+    accentAmber = VirgoAmber,
+    accentRed = VirgoRed,
     termBg = TermBg,
     termHeaderBg = TermHeaderBg,
     termText = TermText,
     isDark = true
 )
 
-val LightEngineerManusThemeColors = ManusThemeColors(
+val LightEngineerVirgoThemeColors = VirgoThemeColors(
     canvas = EngineerLightCanvas,
     surface = EngineerLightSurface,
     card = EngineerLightCard,
@@ -128,18 +134,24 @@ val LightEngineerManusThemeColors = ManusThemeColors(
     isDark = false
 )
 
-val LocalAppThemeMode = staticCompositionLocalOf { AppThemeMode.HOLOGRAPHIC_DARK }
-val LocalManusThemeColors = staticCompositionLocalOf { DarkManusThemeColors }
+val DarkManusThemeColors = DarkVirgoThemeColors
+val LightEngineerManusThemeColors = LightEngineerVirgoThemeColors
 
-object ManusTheme {
-    val colors: ManusThemeColors
+val LocalAppThemeMode = staticCompositionLocalOf { AppThemeMode.HOLOGRAPHIC_DARK }
+val LocalVirgoThemeColors = staticCompositionLocalOf { DarkVirgoThemeColors }
+val LocalManusThemeColors = LocalVirgoThemeColors
+
+object VirgoTheme {
+    val colors: VirgoThemeColors
         @Composable
-        get() = LocalManusThemeColors.current
+        get() = LocalVirgoThemeColors.current
 
     val mode: AppThemeMode
         @Composable
         get() = LocalAppThemeMode.current
 }
+
+typealias ManusTheme = VirgoTheme
 
 @Composable
 fun MyApplicationTheme(
@@ -147,12 +159,12 @@ fun MyApplicationTheme(
     content: @Composable () -> Unit
 ) {
     val isDark = themeMode.isDark
-    val colorScheme = if (isDark) ManusDarkColorScheme else ManusEngineerLightColorScheme
-    val customColors = if (isDark) DarkManusThemeColors else LightEngineerManusThemeColors
+    val colorScheme = if (isDark) VirgoDarkColorScheme else VirgoEngineerLightColorScheme
+    val customColors = if (isDark) DarkVirgoThemeColors else LightEngineerVirgoThemeColors
 
     CompositionLocalProvider(
         LocalAppThemeMode provides themeMode,
-        LocalManusThemeColors provides customColors
+        LocalVirgoThemeColors provides customColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
