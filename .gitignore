@@ -19,3 +19,20 @@ debug.keystore.base64
 local.properties
 .env
 
+# Node / Next.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Server runtime data
+server/workspaces/
+server/data/
+*.db
+*.db-journal
+*.json.tmp
+

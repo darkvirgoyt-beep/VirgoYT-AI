@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-void: #05060f;
+    --bg-panel: rgba(16, 18, 32, 0.72);
+    --accent: #3375ff;
+    --accent-glow: rgba(51, 117, 255, 0.35);
+    --terminal-green: #00ff9c;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    height: 100%;
+    overscroll-behavior: none;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg-void);
+    color: #e6edf3;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(51, 117, 255, 0.3);
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 117, 255, 0.5);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-xl bg-void-800/70 border border-white/10 rounded-2xl shadow-2xl;
+  }
+
+  .glass-panel-hover {
+    @apply backdrop-blur-xl bg-void-800/70 border border-white/10 rounded-2xl shadow-2xl transition-all duration-300 hover:border-virgo-500/40;
+  }
+
+  .hud-text {
+    @apply text-[11px] uppercase tracking-[0.2em] text-virgo-300/70;
+  }
+
+  .accent-gradient-text {
+    @apply bg-gradient-to-r from-virgo-400 via-virgo-200 to-terminal-purple bg-clip-text text-transparent;
+  }
+
+  .status-dot-online {
+    @apply h-2 w-2 rounded-full bg-terminal-green shadow-[0_0_8px_rgba(0,255,156,0.8)] animate-pulse;
+  }
+
+  .window-drag-handle {
+    @apply cursor-grab active:cursor-grabbing select-none;
+  }
+}
+
+@layer utilities {
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(185, 103, 255, 0.6);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

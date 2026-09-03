@@ -8,6 +8,51 @@
 
 ---
 
+## 🖥️ VirgoYT Cloud AI — Web Workspace (New)
+
+A full cloud AI computer that runs in the browser, built with **Next.js 15, React 19, Three.js and Node.js**.
+
+- **3D holographic workspace** — floating glass panels in a Three.js scene with particles, grid and post-processing.
+- **Real code editor** — Monaco (VS Code engine) with 50+ languages, tabs, and syntax highlighting.
+- **Live terminal** — xterm.js talking to the backend over WebSocket with a real PTY shell (node-pty) and graceful local fallback.
+- **Cloud sandbox** — per-session Docker containers (when available) or a local shell for executing commands.
+- **File manager** — real filesystem tree with read/write/create/delete via the REST API.
+- **AI assistant** — multi-model chat (Gemini flash/pro, Claude, DeepSeek, Qwen) streamed through the server proxy.
+- **Browser sandbox** — responsive viewport testing (desktop/tablet/mobile).
+- **System monitor** — live CPU, memory, disk, network, and process stats.
+- **Auth** — JWT registration/login with a lightweight JSON-file database (no native deps).
+
+### Project layout
+
+```
+web/     Next.js 15 + React 19 frontend (3D workspace + landing page)
+server/  Node.js + Express + Socket.IO backend (sandbox, terminal, files, AI proxy)
+Dockerfile / Dockerfile.web / docker-compose.yml   one-command deploy
+app/     Existing Android (Jetpack Compose) app (kept as companion)
+cli/     Existing terminal coding agents
+```
+
+### Run locally
+
+```bash
+# Backend (port 8080)
+cd server && npm install && npm run dev
+
+# Frontend (port 3000)
+cd web && npm install && npm run dev
+# then open http://localhost:3000/workspace
+```
+
+Set `GEMINI_API_KEY` in `server/.env` to enable live AI responses.
+
+### Deploy
+
+```bash
+docker compose up --build
+```
+
+---
+
 ## 🌟 Core System Architecture
 
 1. **🐝 15 Specialized Autonomous Sub-Agents (Swarm Intelligence)**:
