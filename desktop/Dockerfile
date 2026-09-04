@@ -43,7 +43,6 @@ COPY desktop/start-desktop.sh /usr/local/bin/start-desktop.sh
 RUN chmod +x /usr/local/bin/start-desktop.sh
 
 WORKDIR /home/virgo
-VOLUME ["/home/virgo"]
 EXPOSE 8080
 
 CMD ["/usr/local/bin/start-desktop.sh"]
