@@ -14,6 +14,11 @@ import { loginUser, registerUser, getUserFromToken, extractToken, newSessionId, 
 import { createPty, writePty, resizePty, destroyPty, setPtyCallbacks, getPtyCwd } from './terminal/PTYManager.js';
 import { AgentEngine } from './agent/AgentEngine.js';
 import { proxyHtml } from './tools/Browser.js';
+import { McpRegistry, DEFAULT_MCP } from './mcp/McpClient.js';
+import { PluginManager } from './plugins/PluginManager.js';
+import { Workforce } from './agent/workforce/Workforce.js';
+import { Factory } from './agent/factory/Factory.js';
+import { initMemory, remember, recall, clearMemory, toPrompt, ROOT_KEY } from './agent/memory/MemoryStore.js';
 
 const PORT = Number(process.env.PORT ?? 8080);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
@@ -238,12 +243,19 @@ app.post('/api/agent/run', async (req, res) => {
       model,
       sessionId,
       rootDir,
+      mcp: mcpRegistry,
+      plugins: pluginManager,
+      memoryContext: toPrompt(sessionId),
+      toolDescribe:
+        ['MCP tools:', ...pluginManager.all().flatMap((p) => p.tools.map((t) => `- plugin:${t.name}: ${t.description}`)), mcpRegistry.serversConnected().length ? '(MCP available via mcp:<server>:<tool>)' : ''].join('\n') ||
+        undefined,
       stream: (e) => {
         events.push(e);
         io.to(`run:${sessionId}`).emit('agent:event', e);
       },
     });
     activeAgents.set(sessionId, agent);
+    remember(sessionId, 'project', 'goal', truncateGoal(goal));
     res.json({ ok: true, runId: `run-${Date.now()}` });
     void agent.run(goal).finally(() => activeAgents.delete(sessionId));
   } catch (e: any) {
@@ -304,7 +316,11 @@ io.on('connection', (socket) => {
 
   socket.on('agent:watch', (data) => {
     const sid = data?.sessionId ?? querySession;
-    if (sid) socket.join(`run:${sid}`);
+    if (sid) {
+      socket.join(`run:${sid}`);
+      socket.join(`wf:${sid}`);
+      socket.join(`fx:${sid}`);
+    }
   });
 
   socket.on('agent:confirm', (data) => {
@@ -320,8 +336,114 @@ io.on('connection', (socket) => {
   });
 });
 
+// ---------- MCP + Plugins ----------
+
+const pluginManager = new PluginManager();
+const defaultSandbox = sandbox.createSession('mcp-boot');
+const mcpRegistry = new McpRegistry(DEFAULT_MCP(defaultSandbox.rootDir));
+
+async function bootIntegrations() {
+  initMemory();
+  await pluginManager.loadAll();
+  void mcpRegistry.startAll();
+  const connected = mcpRegistry.serversConnected();
+  console.log(`   Memory: enabled`);
+  console.log(`   Plugins: ${pluginManager.all().length} loaded`);
+  console.log(`   MCP: ${connected.length ? connected.join(', ') : 'none connected (install via npx)'}`);
+}
+void bootIntegrations();
+
+app.get('/api/agent/capabilities', async (_req, res) => {
+  let mcpTools: { server: string; tool: string; description?: string }[] = [];
+  try {
+    mcpTools = (await mcpRegistry.allTools()).map(({ server, tool }) => ({
+      server,
+      tool: tool.name,
+      description: tool.description,
+    }));
+  } catch {}
+  res.json({
+    mcp: { servers: mcpRegistry.serversConnected(), tools: mcpTools },
+    plugins: pluginManager.all().map((p) => ({ id: p.id, name: p.name, version: p.version, description: p.description, tools: p.tools.map((t) => t.name) })),
+  });
+});
+
+// ---------- Workforce ----------
+
+app.get('/api/agent/roster', (_req, res) => {
+  const workforce = new Workforce({ model: 'auto', stream: () => {} });
+  res.json({ agents: workforce.list() });
+});
+
+app.post('/api/agent/workforce', async (req, res) => {
+  try {
+    const { goal = '', sessionId = '', model = 'auto', agents } = req.body as any;
+    if (!goal) return res.status(400).json({ error: 'Missing goal' });
+    const stream = (e: any) => io.to(`wf:${sessionId}`).emit('workforce:event', e);
+    const workforce = new Workforce({ model, stream });
+    res.json({ ok: true, runId: `wf-${Date.now()}` });
+    void workforce.coordinate(goal, agents);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ---------- Factory Mode ----------
+
+app.post('/api/agent/factory', async (req, res) => {
+  try {
+    const { idea = '', sessionId = '', model = 'auto' } = req.body as any;
+    if (!idea) return res.status(400).json({ error: 'Missing idea' });
+    const s = sessions.get(sessionId);
+    if (!s) {
+      const info = sandbox.createSession(sessionId);
+      sessions.set(sessionId, { userId: null, sandbox: info as any });
+    }
+    const entry = sessions.get(sessionId)!;
+    const stream = (e: any) => io.to(`fx:${sessionId}`).emit('factory:event', e);
+    const factory = new Factory({ model, sessionId, rootDir: entry.sandbox.rootDir, stream });
+    res.json({ ok: true, runId: `fx-${Date.now()}` });
+    void factory.run(idea);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ---------- Memory ----------
+
+app.get('/api/agent/memory', (req, res) => {
+  const sessionId = (req.query.sessionId as string) || '';
+  res.json({ memory: recall(sessionId) });
+});
+
+app.post('/api/agent/memory', (req, res) => {
+  const { sessionId = '', kind = 'fact', name = '', value = '' } = req.body as any;
+  if (!name || !value) return res.status(400).json({ error: 'name and value required' });
+  remember(sessionId, kind, name, value);
+  res.json({ ok: true });
+});
+
+app.delete('/api/agent/memory', (req, res) => {
+  const sessionId = (req.query.sessionId as string) || '';
+  clearMemory(sessionId);
+  res.json({ ok: true });
+});
+
+// ---------- Skills ----------
+
+app.get('/api/agent/skills', (_req, res) => {
+  res.json({
+    skills: pluginManager.all().map((p) => ({ id: p.id, name: p.name, version: p.version, description: p.description, tools: p.tools.map((t) => t.name) })),
+    install: 'Drop a folder under server/plugins/ with plugin.json (+ optional handler) to add a skill.',
+  });
+});
+
 httpServer.listen(PORT, () => {
   console.log(`\n⚡ VirgoYT Cloud AI server`);
   console.log(`   REST API:  http://localhost:${PORT}/api`);
   console.log(`   Websocket: ws://localhost:${PORT}/\n`);
 });
+
+function truncateGoal(s: string, n = 140): string {
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}

@@ -19,6 +19,10 @@ A full cloud AI computer that runs in the browser, built with **Next.js 15, Reac
 - **File manager** — real filesystem tree with read/write/create/delete via the REST API.
 - **AI assistant** — multi-model chat (Gemini flash/pro, Claude, DeepSeek, Qwen) streamed through the server proxy.
 - **Autonomous Agent (Virgo Agent)** — a live agent loop that browses the web, runs terminal commands, edits files, and downloads binaries (APK/EXE/videos). You watch it act in real time through a streamed activity feed + live browser-preview iframe, and approve one-off actions (e.g. logging into GitHub) before anything risky runs.
+- **MCP + Plugins + Custom API** — the agent can call **MCP** servers (`npx @modelcontextprotocol/server-filesystem`, GitHub, fetch, Docker…) over the standard protocol; load **plugins** (folders under `server/plugins/` with `plugin.json` + handlers — see `plugins/helloworld/`); and route chat to **any custom OpenAI-compatible endpoint** via `CUSTOM_API_KEY` / `CUSTOM_API_BASE_URL` / `CUSTOM_API_MODEL`.
+- **Multi-Agent Workforce** — a supervisor orchestrates specialist sub-agents (Architect → Developer → Researcher → Security → DevOps → Business) that collaborate on a goal and stream their output live. REST `POST /api/agent/workforce`, roster at `GET /api/agent/roster`.
+- **Factory Mode** — describe a product ("build me a todo web app") and it runs an end-to-end pipeline: plan → scaffold → code → install → verify → README, writing real files to your workspace. `POST /api/agent/factory`.
+- **Long-term Memory** — JSON-backed per-session memory (preferences, projects, decisions, skills, lessons) that feeds the agent's planner and persists across sessions. `GET/POST/DELETE /api/agent/memory`.
 - **Browser sandbox** — responsive viewport testing (desktop/tablet/mobile).
 - **System monitor** — live CPU, memory, disk, network, and process stats.
 - **Auth** — JWT registration/login with a lightweight JSON-file database (no native deps).

@@ -1,30 +1,45 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Rocket, Loader2, Terminal, Globe, Download, FilePlus2, Check, X, Mic, ShieldAlert, Square } from 'lucide-react';
+import { Rocket, Loader2, Terminal, Globe, Download, FilePlus2, Check, X, Mic, ShieldAlert, Square, Plug, Package, Server, Users, Factory, Sparkles } from 'lucide-react';
 import { useAgentStore } from '@/stores/agent';
 import { useSystemStore } from '@/stores/system';
 
 const previewBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
+type Caps = { mcp: { servers: string[]; tools: { server: string; tool: string }[] }; plugins: { id: string; name: string; tools: string[] }[] };
+type Mode = 'agent' | 'team' | 'factory';
+
 export function AgentPanel() {
-  const { events, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear } = useAgentStore();
+  const { events, wfEvents, fxEvents, roster, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear, loadRoster, runWorkforce, runFactory } = useAgentStore();
   const sessionId = useSystemStore((s) => s.sessionId);
   const [goal, setGoal] = useState('');
+  const [mode, setMode] = useState<Mode>('agent');
   const [showPreview, setShowPreview] = useState(false);
+  const [caps, setCaps] = useState<Caps | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (sessionId) init(sessionId);
-  }, [sessionId, init]);
+    loadRoster();
+  }, [sessionId, init, loadRoster]);
+
+  useEffect(() => {
+    fetch(`${previewBase}/api/agent/capabilities`)
+      .then((r) => r.json().catch(() => null))
+      .then((d) => d && setCaps(d))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [events]);
+  }, [events, wfEvents, fxEvents]);
 
   const onRun = () => {
     if (!goal.trim() || !sessionId || running) return;
-    run(goal, sessionId);
+    if (mode === 'team') runWorkforce(goal, sessionId);
+    else if (mode === 'factory') runFactory(goal, sessionId);
+    else run(goal, sessionId);
     setGoal('');
   };
 
@@ -40,15 +55,116 @@ export function AgentPanel() {
 
   return (
     <div className="flex h-full flex-col bg-[#0a0d14]/80 text-sm">
+      {/* Mode tabs */}
+      <div className="flex items-center gap-1 border-b border-white/5 px-2 py-1">
+        {([
+          ['agent', 'Agent', Rocket],
+          ['team', 'Workforce', Users],
+          ['factory', 'Factory', Factory],
+        ] as [Mode, string, any][]).map(([m, label, Icon]) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={`flex flex-1 items-center justify-center gap-1 rounded-md py-1 text-[10px] ${
+              mode === m ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5'
+            }`}
+          >
+            <Icon size={11} /> {label}
+          </button>
+        ))}
+      </div>
       {/* Feed */}
       <div ref={scrollRef} className="flex-1 space-y-1.5 overflow-y-auto p-3 font-mono text-[11px] leading-relaxed">
-        {events.length === 0 && !running && (
+        {mode === 'agent' && events.length === 0 && !running && (
           <div className="mt-6 text-center text-[11px] text-white/30">
             Ask Virgo to browse, code, run terminal commands, or download files.
             <br />Watching everything live.
           </div>
         )}
-        {events.map((e, i) => {
+        {mode === 'team' && wfEvents.length === 0 && (
+          <div className="mt-6 text-center text-[11px] text-white/30">
+            A supervisor orchestrates {roster.length} specialist agents to research, design, build and ship.
+            <br />Type a goal and press the rocket — or pick one below.
+          </div>
+        )}
+        {mode === 'factory' && fxEvents.length === 0 && (
+          <div className="mt-6 text-center text-[11px] text-white/30">
+            Describe a product — "build me a todo web app" — and the factory will
+            <br />plan → scaffold → code → install → document → ship it to your workspace.
+          </div>
+        )}
+        {mode === 'team' && roster.length > 0 && wfEvents.length === 0 && (
+          <div className="flex flex-wrap gap-1 py-1">
+            {roster.map((a) => (
+              <span key={a.id} className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] text-white/60">
+                {a.emoji} {a.name}
+              </span>
+            ))}
+          </div>
+        )}
+        {mode === 'team' &&
+          wfEvents.map((e, i) => {
+            if (e.type === 'wf-agent-start') {
+              const a = roster.find((r) => r.id === e.agent);
+              return (
+                <div key={i} className="flex items-center gap-1.5 text-white/50">
+                  <Loader2 size={11} className="animate-spin text-cyan-400" /> {a?.emoji ?? ''} <b className="text-cyan-300">{a?.name ?? e.agent}</b> working…
+                  <span className="ml-auto text-[9px] text-white/25">▶</span>
+                </div>
+              );
+            }
+            if (e.type === 'wf-agent-done') {
+              const a = roster.find((r) => r.id === e.agent);
+              return (
+                <div key={i} className="rounded border border-emerald-500/20 bg-emerald-500/5 px-2 py-1">
+                  <div className="flex items-center gap-1.5 text-emerald-300">
+                    <Check size={12} /> {a?.emoji ?? ''} {a?.name ?? e.agent} finished
+                  </div>
+                  <div className="mt-1 whitespace-pre-wrap text-white/60">{truncate(e.output, 500)}</div>
+                </div>
+              );
+            }
+            if (e.type === 'wf-result') {
+              return <div key={i} className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1.5 text-cyan-200">✓ {e.summary}</div>;
+            }
+            if (e.type === 'wf-error') {
+              return <div key={i} className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-red-300">✕ {e.message}</div>;
+            }
+            return null;
+          })}
+        {mode === 'factory' &&
+          fxEvents.map((e, i) => {
+            if (e.type === 'factory-stage') {
+              return (
+                <div key={i} className="flex items-center gap-1.5 text-white/60">
+                  <Sparkles size={11} className="text-pink-400" /> <b className="uppercase text-pink-300">{e.stage}</b> — {e.message}
+                </div>
+              );
+            }
+            if (e.type === 'factory-file') {
+              return (
+                <div key={i} className="flex items-center gap-1.5 rounded border border-violet-500/20 bg-violet-500/5 px-2 py-1 text-violet-300">
+                  <FilePlus2 size={12} /> {e.path}
+                </div>
+              );
+            }
+            if (e.type === 'factory-command') {
+              return (
+                <div key={i} className="rounded border border-cyan-500/20 bg-cyan-500/5 px-2 py-1 text-cyan-300">
+                  <Terminal size={11} /> <span className="text-cyan-200">{e.command}</span>
+                  <div className="mt-0.5 whitespace-pre-wrap text-white/40">{truncate(e.output, 200)}</div>
+                </div>
+              );
+            }
+            if (e.type === 'factory-result') {
+              return <div key={i} className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 text-emerald-200">✓ {e.summary}</div>;
+            }
+            if (e.type === 'factory-error') {
+              return <div key={i} className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-red-300">✕ {e.message}</div>;
+            }
+            return null;
+          })}
+        {mode === 'agent' && events.map((e, i) => {
           if (e.type === 'plan') {
             return (
               <div key={i} className="rounded-md border border-white/5 bg-white/[0.03] p-2">
@@ -169,6 +285,20 @@ export function AgentPanel() {
               <X size={12} /> Deny
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Capabilities */}
+      {caps && (
+        <div className="border-t border-white/5 px-2 py-1 text-[9px] text-white/35">
+          <Plug size={10} className="mr-0.5" />
+          MCP {caps.mcp.servers.length ? caps.mcp.servers.join(', ') : 'off'}
+          <span className="ml-1.5 text-white/20">•</span>
+          <Package size={10} className="mr-0.5" />
+          Plugins {caps.plugins.length ? caps.plugins.map((p) => p.name).join(', ') : 'none'}
+          <span className="ml-1.5 text-white/20">•</span>
+          <Server size={10} className="mr-0.5" />
+          API {caps.mcp.tools.length + caps.plugins.reduce((n, p) => n + p.tools.length, 0)} tools
         </div>
       )}
 

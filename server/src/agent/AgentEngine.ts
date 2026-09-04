@@ -19,6 +19,7 @@ export type AgentStreamEvent =
   | { type: 'site-preview'; id: string; url: string }
   | { type: 'download'; id: string; url: string; path: string; size: number }
   | { type: 'file-write'; id: string; path: string }
+  | { type: 'tool-call'; id: string; server: string; tool: string; result: string }
   | { type: 'confirmation-required'; id: string; action: string; reason: string }
   | { type: 'confirmation-denied'; id: string; reason: string }
   | { type: 'result'; id: string; summary: string }
@@ -30,6 +31,11 @@ type AgentConfig = {
   sessionId: string;
   rootDir: string;
   stream: (event: AgentStreamEvent) => void;
+  mcp?: import('../mcp/McpClient.js').McpRegistry;
+  plugins?: import('../plugins/PluginManager.js').PluginManager;
+  toolNames?: string[]; // extra tools the LLM can call (mcp + plugin names)
+  toolDescribe?: string; // text desc for the planner
+  memoryContext?: string; // long-term memory recall injected into planning
 };
 
 type ToolResult = { ok: boolean; output: string };
@@ -82,7 +88,17 @@ export class AgentEngine {
   private async createPlan(goal: string): Promise<string[]> {
     const prompt = `You are an autonomous cloud AI computer. Plan a sequence of concrete, numbered terminal/browser/file actions to accomplish:
 "${goal}"
-Return ONLY a JSON array of strings, e.g. ["ls -la", "python3 --version"]. No markdown, no prose. Max 8 steps.`;
+Return ONLY a JSON array of strings, e.g. ["ls -la", "python3 --version"]. No markdown, no prose. Max 8 steps.
+${
+  this.config.memoryContext
+    ? `Long-term memory (use it, don't repeat past mistakes):\n${this.config.memoryContext}`
+    : ''
+}
+${
+  this.config.toolDescribe
+    ? `Extra capabilities you may choose between steps (call them explicitly in the list):\n${this.config.toolDescribe}`
+    : ''
+}`;
     const res = await proxyAi({ model: this.config.model, prompt });
     return this.parsePlanList(res.content);
   }
@@ -168,6 +184,40 @@ Return ONLY a JSON array of strings, e.g. ["ls -la", "python3 --version"]. No ma
         break;
       }
 
+      case 'mcp': {
+        const { server, tool, args } = this.parseMcpStep(step);
+        emit({ type: 'tool-start', id: runId, tool: `mcp:${tool}`, input: step });
+        try {
+          const result = await this.config.mcp!.call(server, tool, args);
+          const text =
+            typeof result === 'string'
+              ? result
+              : JSON.stringify(result?.content ?? result ?? {}).slice(0, 4000);
+          emit({ type: 'tool-call', id: runId, server, tool, result: text });
+          emit({ type: 'tool-end', id: runId, tool: `mcp:${tool}`, output: text });
+        } catch (e: any) {
+          emit({ type: 'tool-end', id: runId, tool: `mcp:${tool}`, output: `Error: ${e.message}` });
+        }
+        break;
+      }
+
+      case 'plugin': {
+        const { name, args } = this.parsePluginStep(step);
+        const found = this.config.plugins!.findTool(name);
+        emit({ type: 'tool-start', id: runId, tool: `plugin:${name}`, input: step });
+        if (!found) {
+          emit({ type: 'tool-end', id: runId, tool: `plugin:${name}`, output: `Unknown plugin tool "${name}"` });
+          break;
+        }
+        try {
+          const result = await found.tool.handler(args);
+          emit({ type: 'tool-call', id: runId, server: found.plugin.name, tool: name, result });
+          emit({ type: 'tool-end', id: runId, tool: `plugin:${name}`, output: result });
+        } catch (e: any) {
+          emit({ type: 'tool-end', id: runId, tool: `plugin:${name}`, output: `Error: ${e.message}` });
+        }
+        break;
+      }
       default: {
         // Fall back to terminal
         const out = await runCommandInSandbox(this.config.sessionId, step, this.config.rootDir);
@@ -179,6 +229,24 @@ Return ONLY a JSON array of strings, e.g. ["ls -la", "python3 --version"]. No ma
   // Classify a natural-language step into a tool + arguments
   private async interpretStep(step: string, goal: string) {
     const s = step.toLowerCase();
+
+    // Explicit MCP call: mcp:<server>:<tool> | MCP filesystem read_file(...)
+    if (s.startsWith('mcp')) {
+      return { tool: 'mcp' as const };
+    }
+    // Explicit plugin call: plugin:<tool> or use:list(<tool>)
+    if (s.startsWith('plugin') || s.startsWith('use:') || s.startsWith('use list') || /^use\s+/.test(s)) {
+      return { tool: 'plugin' as const };
+    }
+    // Also route if the step names a known plugin tool
+    if (this.config.plugins?.findTool(this.extractPluginName(step))) {
+      return { tool: 'plugin' as const };
+    }
+    // Also route if the step starts with a known MCP tool name (e.g. read_file ...)
+    if (this.config.mcp && this.likeMcpTool(step)) {
+      return { tool: 'mcp' as const };
+    }
+
     if (s.startsWith('http') || /\b(open|visit|go to|browse|search)\b/.test(s)) {
       return { tool: 'browse' as const, url: step.match(/https?:\/\/\S+/)?.[0] ?? null };
     }
@@ -204,6 +272,45 @@ Return ONLY a JSON array of strings, e.g. ["ls -la", "python3 --version"]. No ma
       .replace(/^(run|execute|now|please|the|command)\s+/i, '')
       .replace(/[`"]/g, '')
       .trim();
+  }
+
+  private extractPluginName(step: string): string {
+    const m = step.match(/(?:plugin:|use:list\(?\s*)?([a-zA-Z_][a-zA-Z0-9_]*)/);
+    return m ? m[1] : step.trim().split(/\s+/)[0] ?? '';
+  }
+
+  private likeMcpTool(step: string): boolean {
+    const names = this.config.mcp ? this.knownMcpTools() : [];
+    return names.some((n) => step.toLowerCase().startsWith(n.toLowerCase()));
+  }
+
+  private knownMcpTools(): string[] {
+    return [
+      'read_file', 'write_file', 'list_directory', 'search_files', 'get_file_info',
+      'fetch', 'http_request', 'web_search', 'git_', 'download',
+    ];
+  }
+
+  private parseMcpStep(step: string): { server: string; tool: string; args: Record<string, any> } {
+    // mcp:server:tool(...)  or just tool(...)
+    const explicit = step.match(/mcp:([\w-]+):([\w-]+)/);
+    const server = explicit ? explicit[1] : this.config.mcp!.serversConnected()[0] ?? 'filesystem';
+    const toolMatch = step.match(/([\w-]+)\(/);
+    const tool = toolMatch ? toolMatch[1] : 'search_files';
+    return { server, tool, args: this.parseCallArgs(step) };
+  }
+
+  private parsePluginStep(step: string): { name: string; args: Record<string, any> } {
+    const name = this.extractPluginName(step);
+    return { name, args: this.parseCallArgs(step) };
+  }
+
+  private parseCallArgs(step: string): Record<string, any> {
+    const m = step.match(/\(\s*(.*?)\s*\)/s);
+    if (!m || !m[1]) return {};
+    const inner = m[1];
+    const name = inner.match(/["']?([a-zA-Z_][\w\s-]*)["']?\s*[:,]?\s*(?::\s*)?/);
+    return { name: inner.replace(/^["']|["']$/g, ''), value: inner };
   }
 
   private async interpretFileWrite(step: string): Promise<{ path: string; content: string }> {

@@ -1,0 +1,20 @@
+{
+  "id": "helloworld",
+  "name": "Hello World",
+  "version": "1.0.0",
+  "description": "Example plugin that greets people and reports the time.",
+  "systemPrompt": "You have a 'greet' plugin tool. Use it when the user asks to be greeted or greeted personally.",
+  "handler": "index.mjs",
+  "tools": [
+    {
+      "name": "greet",
+      "description": "Greets a person by name with a friendly message",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Name of the person to greet" }
+        }
+      }
+    }
+  ]
+}

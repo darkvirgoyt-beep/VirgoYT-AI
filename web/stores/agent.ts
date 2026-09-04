@@ -18,8 +18,26 @@ export type AgentEvent =
   | { type: 'error'; id: string; message: string }
   | { type: 'run-end'; id: string };
 
+export type WorkforceEvent =
+  | { type: 'wf-agent-start'; agent: string; task: string }
+  | { type: 'wf-agent-done'; agent: string; output: string }
+  | { type: 'wf-plan'; steps: string[] }
+  | { type: 'wf-result'; summary: string }
+  | { type: 'wf-error'; message: string };
+
+export type FactoryEvent =
+  | { type: 'factory-stage'; stage: string; message: string }
+  | { type: 'factory-plan'; steps: string[] }
+  | { type: 'factory-command'; command: string; output: string }
+  | { type: 'factory-file'; path: string }
+  | { type: 'factory-result'; summary: string }
+  | { type: 'factory-error'; message: string };
+
 type AgentState = {
   events: AgentEvent[];
+  wfEvents: WorkforceEvent[];
+  fxEvents: FactoryEvent[];
+  roster: { id: string; name: string; emoji: string; role: string }[];
   running: boolean;
   socket: Socket | null;
   previewUrl: string | null;
@@ -29,12 +47,18 @@ type AgentState = {
   confirm: (approve: boolean) => void;
   setPreview: (url: string | null) => void;
   clear: () => void;
+  loadRoster: () => Promise<void>;
+  runWorkforce: (goal: string, sessionId: string, agents?: string[]) => Promise<void>;
+  runFactory: (idea: string, sessionId: string) => Promise<void>;
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 export const useAgentStore = create<AgentState>((set, get) => ({
   events: [],
+  wfEvents: [],
+  fxEvents: [],
+  roster: [],
   running: false,
   socket: null,
   previewUrl: null,
@@ -59,6 +83,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
         set({ previewUrl: e.url });
       }
     });
+    socket.on('workforce:event', (e: WorkforceEvent) => set((s) => ({ wfEvents: [...s.wfEvents, e] })));
+    socket.on('factory:event', (e: FactoryEvent) => set((s) => ({ fxEvents: [...s.fxEvents, e] })));
     set({ socket });
   },
 
@@ -86,5 +112,35 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   setPreview: (url) => set({ previewUrl: url }),
-  clear: () => set({ events: [], previewUrl: null, pendingConfirm: null }),
+  clear: () => set({ events: [], wfEvents: [], fxEvents: [], previewUrl: null, pendingConfirm: null }),
+
+  loadRoster: async () => {
+    try {
+      const res = await fetch(`${API}/api/agent/roster`);
+      const data = await res.json();
+      set({ roster: data.agents ?? [] });
+    } catch {}
+  },
+
+  runWorkforce: async (goal, sessionId, agents) => {
+    set({ wfEvents: [] });
+    try {
+      await fetch(`${API}/api/agent/workforce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal, sessionId, agents }),
+      });
+    } catch {}
+  },
+
+  runFactory: async (idea, sessionId) => {
+    set({ fxEvents: [] });
+    try {
+      await fetch(`${API}/api/agent/factory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idea, sessionId }),
+      });
+    } catch {}
+  },
 }));

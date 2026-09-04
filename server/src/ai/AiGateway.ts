@@ -82,6 +82,9 @@ const MODEL_REGISTRY: ProviderModel[] = [
   // Hugging Face (free inference)
   { id: 'hf-codellama', name: 'CodeLlama 34B (HF)', provider: 'Hugging Face', providerKey: 'HF_API_KEY', endpoint: PROVIDER_ENDPOINTS.huggingface, modelParam: 'codellama/CodeLlama-34b-Instruct-hf', defaultModelParam: 'codellama/CodeLlama-34b-Instruct-hf', free: true, context: 16000 },
   { id: 'hf-llama', name: 'Llama 3.2 3B (HF Free)', provider: 'Hugging Face / Meta', providerKey: 'HF_API_KEY', endpoint: PROVIDER_ENDPOINTS.huggingface, modelParam: 'meta-llama/Llama-3.2-3B-Instruct', defaultModelParam: 'meta-llama/Llama-3.2-3B-Instruct', free: true, context: 8000 },
+
+  // User custom OpenAI-compatible endpoint
+  { id: 'custom', name: 'Custom API', provider: 'Custom', providerKey: 'CUSTOM_API_KEY', endpoint: '__custom__', modelParam: '__custom__', defaultModelParam: '__custom__', context: 128000 },
 ];
 
 export function getModel(id: string): ProviderModel | undefined {
@@ -104,6 +107,9 @@ export const env = {
   MISTRAL_API_KEY: process.env.MISTRAL_API_KEY ?? '',
   BAZAARLINK_API_KEY: process.env.BAZAARLINK_API_KEY ?? '',
   HF_API_KEY: process.env.HF_API_KEY ?? '',
+  CUSTOM_API_KEY: process.env.CUSTOM_API_KEY ?? '',
+  CUSTOM_API_BASE_URL: process.env.CUSTOM_API_BASE_URL ?? '',
+  CUSTOM_API_MODEL: process.env.CUSTOM_API_MODEL ?? '',
 };
 
 export const SYSTEM_PROMPT = `You are VirgoYT Cloud AI — an autonomous cloud software engineer and multi-agent co-developer.
@@ -183,6 +189,18 @@ async function callProvider(model: ProviderModel, messages: any, req: GatewayReq
     }
     if (model.providerKey === 'ANTHROPIC_API_KEY') {
       return await callAnthropic(model, messages, req, apiKey);
+    }
+    if (model.providerKey === 'CUSTOM_API_KEY') {
+      // Use the user's configured custom endpoint + model name.
+      const base = env.CUSTOM_API_BASE_URL.replace(/\/$/, '');
+      const effective: ProviderModel = {
+        ...model,
+        endpoint: base || model.endpoint,
+        modelParam: env.CUSTOM_API_MODEL || 'gpt-4o',
+        defaultModelParam: env.CUSTOM_API_MODEL || 'gpt-4o',
+        provider: base || model.provider,
+      };
+      return await callOpenAICompatible(effective, messages, req, apiKey);
     }
     return await callOpenAICompatible(model, messages, req, apiKey);
   } catch (e) {
