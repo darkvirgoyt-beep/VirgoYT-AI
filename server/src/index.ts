@@ -5,7 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
-import { initDb } from './db/Database.js';
+import { initDb, dbMode } from './db/Database.js';
 import { sandbox, runCommandInSandbox } from './sandbox/DockerManager.js';
 import { listTree, readFile, writeFile, createDirectory, deleteEntry, renameEntry } from './filesystem/FileManager.js';
 import { proxyAi, getAvailableModels } from './ai/AiProxy.js';
@@ -30,7 +30,9 @@ import { exchangeCode, storeToken, authorizedIds, hasStoredToken, clearTokens, t
 const PORT = Number(process.env.PORT ?? 8080);
 const CLIENT_ORIGINS = (process.env.CLIENT_ORIGIN ?? 'https://virgo-yt-ai.vercel.app,http://localhost:3000').split(',').map((origin) => origin.trim()).filter(Boolean);
 
-initDb();
+initDb().then(() => {
+  console.log(`   DB backend: ${dbMode()}${dbMode() === 'postgres' ? '' : ` (file: ${process.env.DB_PATH ?? 'data/virgoyt.json'})`}`);
+});
 
 const app = express();
 app.use(
@@ -80,11 +82,11 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body as { email: string; password: string };
     if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
-    const result = loginUser(email, password);
+    const result = await loginUser(email, password);
     res.json(result);
   } catch (e: any) {
     res.status(e.status ?? 500).json({ error: e.message });
@@ -117,10 +119,10 @@ app.get('/api/auth/google/config', (_req, res) => {
   res.json({ enabled: Boolean(googleClientId()), clientId: googleClientId() ?? null });
 });
 
-app.get('/api/auth/me', (req, res) => {
+app.get('/api/auth/me', async (req, res) => {
   const token = extractToken(req.headers.authorization);
   if (!token) return res.status(401).json({ error: 'No token' });
-  const user = getUserFromToken(token);
+  const user = await getUserFromToken(token);
   if (!user) return res.status(401).json({ error: 'Invalid token' });
   res.json({ user });
 });

@@ -39,7 +39,7 @@ export function newSessionId(): string {
 }
 
 export async function registerUser(email: string, password: string, name: string) {
-  const existing = findUserByEmail(email);
+  const existing = await findUserByEmail(email);
   if (existing) {
     const err = new Error('Email already registered') as Error & { status?: number };
     err.status = 409;
@@ -47,20 +47,20 @@ export async function registerUser(email: string, password: string, name: string
   }
   const user = await createUser(email, password, name);
   const sessionId = newSessionId();
-  dbCreateSession(user.id, sessionId);
+  await dbCreateSession(user.id, sessionId);
   const token = signToken({ userId: user.id, email: user.email, name: user.name });
   return { token, user: { id: user.id, email: user.email, name: user.name }, sessionId };
 }
 
-export function loginUser(email: string, password: string) {
-  const user = findUserByEmail(email);
+export async function loginUser(email: string, password: string) {
+  const user = await findUserByEmail(email);
   if (!user || !verifyPasswordSync(user, password)) {
     const err = new Error('Invalid email or password') as Error & { status?: number };
     err.status = 401;
     throw err;
   }
   const sessionId = newSessionId();
-  dbCreateSession(user.id, sessionId);
+  await dbCreateSession(user.id, sessionId);
   const token = signToken({ userId: user.id, email: user.email, name: user.name });
   return { token, user: { id: user.id, email: user.email, name: user.name }, sessionId };
 }
@@ -72,21 +72,21 @@ export function googleClientId(): string | null {
 // Log in (or auto-register) a user validated by a Google ID token.
 export async function googleLogin(googleEmail: string, googleName: string) {
   const email = googleEmail.toLowerCase();
-  let user = findUserByEmail(email);
+  let user = await findUserByEmail(email);
   if (!user) {
     const randomPass = randomBytes(24).toString('base64');
     user = await createUser(email, randomPass, googleName || email.split('@')[0] || 'Google User');
   }
   const sessionId = newSessionId();
-  dbCreateSession(user.id, sessionId);
+  await dbCreateSession(user.id, sessionId);
   const token = signToken({ userId: user.id, email: user.email, name: user.name });
   return { token, user: { id: user.id, email: user.email, name: user.name }, sessionId, via: 'google' };
 }
 
-export function getUserFromToken(token: string) {
+export async function getUserFromToken(token: string) {
   const payload = verifyToken(token);
   if (!payload) return null;
-  const user = findUserById(payload.userId);
+  const user = await findUserById(payload.userId);
   if (!user) return null;
   return { id: user.id, email: user.email, name: user.name };
 }
