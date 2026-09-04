@@ -3,6 +3,8 @@
 // NVIDIA NIM, Mistral, BazaarLink, Qwen and Hugging Face.
 // All except Gemini/HF use the OpenAI-compatible /v1/chat/completions format.
 
+import { localReason } from './LocalBrain.js';
+
 export type ChatHistoryItem = { role: string; content: string };
 
 export type GatewayRequest = {
@@ -316,12 +318,8 @@ function keyMissingMessage(model: ProviderModel): string {
 }
 
 function fallbackReply(prompt: string): string {
-  const p = prompt.toLowerCase();
-  if (p.includes('hello') || p.includes('hi')) {
-    return `👋 Hello! I'm **VirgoYT Cloud AI**.\n\nNo AI API keys are configured on this server yet. Add any of these to enable live AI:\n\n- \`GEMINI_API_KEY\` (Google — free tier)\n- \`OPENAI_API_KEY\` (OpenAI / ChatGPT)\n- \`ANTHROPIC_API_KEY\` (Claude)\n- \`GROQ_API_KEY\` (free Llama!)\n- \`HF_API_KEY\` (Hugging Face — free)\n- \`OPENROUTER_API_KEY\` (200+ models)\n\nOr ask me to help with something and I'll respond in local mode.`;
-  }
-  if (p.includes('terminal') || p.includes('command')) {
-    return "I'll help you run that in the terminal panel. Tell me the task and I'll prepare the command.";
-  }
-  return `I received: "${prompt}"\n\n*(No AI provider configured — add an API key on the server to enable live responses.)*`;
+  const brain = localReason(prompt);
+  const hint = `\n\n---\n*Still on offline mode: add a \`GEMINI_API_KEY\`, \`GROQ_API_KEY\`, \`OPENAI_API_KEY\` (or set \`GOOGLE_SCRIPT_URL\`) on the server to enable fully live reasoning with your workspace context.*`;
+  if (!brain.includes('No AI provider')) return brain + hint;
+  return brain;
 }
