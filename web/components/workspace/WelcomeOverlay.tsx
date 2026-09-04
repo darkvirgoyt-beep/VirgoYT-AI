@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useWorkspaceStore } from '@/stores/workspace';
 import { APP_NAME } from '@/lib/constants';
 import { Sparkles, Code2, TerminalSquare, Globe, MonitorSmartphone } from 'lucide-react';
+import GoogleSignInButton from './GoogleSignInButton';
 
 export default function WelcomeOverlay({ onEnter }: { onEnter: () => void }) {
   const showPanel = useWorkspaceStore((s) => s.showPanel);
@@ -70,6 +71,14 @@ export default function WelcomeOverlay({ onEnter }: { onEnter: () => void }) {
             </motion.button>
           ))}
         </div>
+
+        <div className="my-4 flex items-center gap-3 max-w-xs mx-auto">
+          <span className="h-px flex-1 bg-white/10" />
+          <span className="text-[10px] uppercase tracking-widest text-gray-500">Sign in</span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+
+        <GoogleSignInButton />
 
         <motion.button
           onClick={onEnter}

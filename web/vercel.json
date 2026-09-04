@@ -4,6 +4,7 @@
   "devCommand": "next dev",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://server-darkvirgoyt-6238s-projects.vercel.app"
+    "NEXT_PUBLIC_API_URL": "https://server-darkvirgoyt-6238s-projects.vercel.app",
+    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": ""
   }
 }
