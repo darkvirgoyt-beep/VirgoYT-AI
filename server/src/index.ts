@@ -19,6 +19,10 @@ import { PluginManager } from './plugins/PluginManager.js';
 import { Workforce } from './agent/workforce/Workforce.js';
 import { Factory } from './agent/factory/Factory.js';
 import { initMemory, remember, recall, clearMemory, toPrompt, ROOT_KEY } from './agent/memory/MemoryStore.js';
+import { scanWorkspace } from './security/SecurityScanner.js';
+import { labs } from './security/Labs.js';
+import { exportProject } from './build/BuildExporter.js';
+import { listConnectors, isConfigured } from './build/DeployConnectors.js';
 
 const PORT = Number(process.env.PORT ?? 8080);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
@@ -436,6 +440,47 @@ app.get('/api/agent/skills', (_req, res) => {
     skills: pluginManager.all().map((p) => ({ id: p.id, name: p.name, version: p.version, description: p.description, tools: p.tools.map((t) => t.name) })),
     install: 'Drop a folder under server/plugins/ with plugin.json (+ optional handler) to add a skill.',
   });
+});
+
+// ---------- Cyber Defense (analyze your own code) ----------
+
+app.get('/api/cyber/labs', (req, res) => {
+  res.json({ labs: labs(req.query.q as string | undefined) });
+});
+
+app.post('/api/cyber/scan', async (req, res) => {
+  try {
+    const { sessionId = '' } = req.body as any;
+    const entry = sessions.get(sessionId);
+    const root = entry?.sandbox.rootDir;
+    if (!root) return res.status(400).json({ error: 'No active workspace for this session' });
+    const report = await scanWorkspace(root);
+    res.json(report);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ---------- Build & Deploy ----------
+
+app.get('/api/build/connectors', (_req, res) => {
+  res.json({ connectors: listConnectors() });
+});
+
+app.post('/api/build/export', async (req, res) => {
+  try {
+    const { sessionId = '', target = 'web', appName = 'virgoyt-app' } = req.body as any;
+    if (!['web', 'exe', 'apk', 'mac', 'terminal'].includes(target)) {
+      return res.status(400).json({ error: 'target must be web|exe|apk|mac|terminal' });
+    }
+    const entry = sessions.get(sessionId);
+    const root = entry?.sandbox.rootDir;
+    if (!root) return res.status(400).json({ error: 'No active workspace for this session' });
+    const result = await exportProject(root, target, appName);
+    res.json(result);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 httpServer.listen(PORT, () => {

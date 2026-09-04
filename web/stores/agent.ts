@@ -33,6 +33,25 @@ export type FactoryEvent =
   | { type: 'factory-result'; summary: string }
   | { type: 'factory-error'; message: string };
 
+export type ScanFinding = {
+  severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
+  category: 'secret' | 'dependency' | 'config' | 'hardening';
+  title: string;
+  detail: string;
+  file?: string;
+  line?: number;
+};
+
+export type ScanReport = {
+  scanned: number;
+  findings: ScanFinding[];
+  summary: string;
+  generatedAt: number;
+};
+
+export type ConnectorState = { id: string; name: string; configured: boolean; scopes: string; authUrl?: string };
+export type ExportTarget = 'web' | 'exe' | 'apk' | 'mac' | 'terminal';
+
 type AgentState = {
   events: AgentEvent[];
   wfEvents: WorkforceEvent[];
@@ -42,6 +61,9 @@ type AgentState = {
   socket: Socket | null;
   previewUrl: string | null;
   pendingConfirm: { action: string; reason: string } | null;
+  scan: ScanReport | null;
+  connectors: ConnectorState[];
+  labs: { id: string; title: string }[];
   init: (sessionId: string) => void;
   run: (goal: string, sessionId: string, model?: string) => Promise<void>;
   confirm: (approve: boolean) => void;
@@ -50,6 +72,10 @@ type AgentState = {
   loadRoster: () => Promise<void>;
   runWorkforce: (goal: string, sessionId: string, agents?: string[]) => Promise<void>;
   runFactory: (idea: string, sessionId: string) => Promise<void>;
+  runScan: (sessionId: string) => Promise<void>;
+  exportProject: (sessionId: string, target: ExportTarget, appName?: string) => Promise<string | null>;
+  loadConnectors: () => Promise<void>;
+  loadLabs: () => Promise<void>;
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -63,6 +89,9 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   socket: null,
   previewUrl: null,
   pendingConfirm: null,
+  scan: null,
+  connectors: [],
+  labs: [],
 
   init: (sessionId) => {
     if (get().socket) return;
@@ -141,6 +170,50 @@ export const useAgentStore = create<AgentState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idea, sessionId }),
       });
+    } catch {}
+  },
+
+  runScan: async (sessionId) => {
+    set({ scan: null });
+    try {
+      const res = await fetch(`${API}/api/cyber/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (!res.ok) return;
+      set({ scan: await res.json() });
+    } catch {}
+  },
+
+  exportProject: async (sessionId, target, appName) => {
+    try {
+      const res = await fetch(`${API}/api/build/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, target, appName }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.archivePath ?? null;
+    } catch {
+      return null;
+    }
+  },
+
+  loadConnectors: async () => {
+    try {
+      const res = await fetch(`${API}/api/build/connectors`);
+      const data = await res.json();
+      set({ connectors: data.connectors ?? [] });
+    } catch {}
+  },
+
+  loadLabs: async () => {
+    try {
+      const res = await fetch(`${API}/api/cyber/labs`);
+      const data = await res.json();
+      set({ labs: data.labs ?? [] });
     } catch {}
   },
 }));

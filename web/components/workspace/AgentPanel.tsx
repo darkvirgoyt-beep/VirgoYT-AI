@@ -1,28 +1,34 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Rocket, Loader2, Terminal, Globe, Download, FilePlus2, Check, X, Mic, ShieldAlert, Square, Plug, Package, Server, Users, Factory, Sparkles } from 'lucide-react';
+import { Rocket, Loader2, Terminal, Globe, Download, FilePlus2, Check, X, Mic, ShieldAlert, Square, Plug, Package, Server, Users, Factory, Sparkles, Cpu } from 'lucide-react';
 import { useAgentStore } from '@/stores/agent';
 import { useSystemStore } from '@/stores/system';
+import type { ScanReport, ConnectorState, ExportTarget } from '@/stores/agent';
 
 const previewBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 type Caps = { mcp: { servers: string[]; tools: { server: string; tool: string }[] }; plugins: { id: string; name: string; tools: string[] }[] };
-type Mode = 'agent' | 'team' | 'factory';
+type Mode = 'agent' | 'team' | 'factory' | 'devtools';
 
 export function AgentPanel() {
-  const { events, wfEvents, fxEvents, roster, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear, loadRoster, runWorkforce, runFactory } = useAgentStore();
+  const { events, wfEvents, fxEvents, roster, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear, loadRoster, runWorkforce, runFactory, runScan, scan, exportProject, connectors, loadConnectors, labs, loadLabs } = useAgentStore();
   const sessionId = useSystemStore((s) => s.sessionId);
   const [goal, setGoal] = useState('');
   const [mode, setMode] = useState<Mode>('agent');
   const [showPreview, setShowPreview] = useState(false);
   const [caps, setCaps] = useState<Caps | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (sessionId) init(sessionId);
     loadRoster();
-  }, [sessionId, init, loadRoster]);
+    loadConnectors();
+    loadLabs();
+  }, [sessionId, init, loadRoster, loadConnectors, loadLabs]);
 
   useEffect(() => {
     fetch(`${previewBase}/api/agent/capabilities`)
@@ -61,6 +67,7 @@ export function AgentPanel() {
           ['agent', 'Agent', Rocket],
           ['team', 'Workforce', Users],
           ['factory', 'Factory', Factory],
+          ['devtools', 'Build & Deploy', Cpu],
         ] as [Mode, string, any][]).map(([m, label, Icon]) => (
           <button
             key={m}
@@ -243,6 +250,20 @@ export function AgentPanel() {
             <Loader2 size={13} className="animate-spin" /> thinking…
           </div>
         )}
+        {mode === 'devtools' && <DevToolsDoc
+          sessionId={sessionId}
+          scanning={scanning}
+          setScanning={setScanning}
+          scan={scan}
+          runScan={runScan}
+          exporting={exporting}
+          setExporting={setExporting}
+          exportProject={exportProject}
+          setExportMsg={setExportMsg}
+          exportMsg={exportMsg}
+          connectors={connectors}
+          labs={labs}
+        />}
       </div>
 
       {/* Preview */}
@@ -303,7 +324,7 @@ export function AgentPanel() {
       )}
 
       {/* Input */}
-      <div className="border-t border-white/5 p-2">
+      {mode !== 'devtools' && <div className="border-t border-white/5 p-2">
         <div className="flex items-end gap-1.5 rounded-lg border border-white/10 bg-black/40 px-2 py-1.5 focus-within:border-cyan-500/40">
           <textarea
             value={goal}
@@ -329,7 +350,7 @@ export function AgentPanel() {
           )}
         </div>
         <div className="mt-1 text-[9px] text-white/25">Virgo watches your GitHub login, browser, terminal, and downloads — and asks before anything risky.</div>
-      </div>
+      </div>}
     </div>
   );
 }
@@ -343,4 +364,100 @@ function fmt(bytes: number) {
   if (bytes > 1e6) return (bytes / 1e6).toFixed(1) + ' MB';
   if (bytes > 1e3) return (bytes / 1e3).toFixed(1) + ' KB';
   return bytes + ' B';
+}
+
+const EXPORT_TARGETS: { id: ExportTarget; label: string; icon: any }[] = [
+  { id: 'web', label: 'Live Web', icon: Globe },
+  { id: 'exe', label: '.exe (Win)', icon: Square },
+  { id: 'apk', label: '.apk (Android)', icon: Package },
+  { id: 'mac', label: '.app (macOS)', icon: Server },
+  { id: 'terminal', label: 'Terminal / source', icon: Terminal },
+];
+
+type DevToolsDocProps = {
+  sessionId: string | null;
+  scanning: boolean;
+  setScanning: (b: boolean) => void;
+  scan: ScanReport | null;
+  runScan: (sessionId: string) => Promise<void>;
+  exporting: string | null;
+  setExporting: (t: string | null) => void;
+  exportProject: (s: string, t: ExportTarget, app?: string) => Promise<string | null>;
+  setExportMsg: (m: string | null) => void;
+  exportMsg: string | null;
+  connectors: ConnectorState[];
+  labs: { id: string; title: string }[];
+};
+
+function DevToolsDoc(p: DevToolsDocProps) {
+  const sevColor = { critical: 'text-red-400', high: 'text-orange-400', medium: 'text-amber-300', low: 'text-white/60', info: 'text-white/40' } as Record<string, string>;
+  const doScan = () => { const sid = p.sessionId; if (!sid || p.scanning) return; p.setScanning(true); Promise.resolve().then(() => p.runScan(sid)).finally(() => p.setScanning(false)); };
+  const doExport = async (t: ExportTarget) => { const sid = p.sessionId; if (!sid || p.exporting) return; p.setExporting(t); p.setExportMsg(null); const out = await p.exportProject(sid, t); p.setExporting(null); p.setExportMsg(out ? `Exported ${t} bundle → ${out}` : `Export ${t} failed (no workspace)`); };
+
+  return (
+    <div className="space-y-2">
+      {/* Security scan */}
+      <div className="rounded border border-white/10 bg-white/[0.03] p-2">
+        <div className="flex items-center gap-1.5 text-white/70"><ShieldAlert size={12} className="text-red-400" /> <b>Cyber Defense — audit your workspace</b></div>
+        <p className="mt-0.5 text-[10px] text-white/40">Scans YOUR code for exposed secrets & known-vulnerable deps. Defensive only.</p>
+        <button onClick={doScan} disabled={!p.sessionId || p.scanning} className="mt-1 rounded border border-red-500/40 bg-red-500/10 px-2 py-1 text-[10px] text-red-300 hover:bg-red-500/20">
+          {p.scanning ? 'Scanning…' : '🔍 Run security scan'}
+        </button>
+        {p.scan && (
+          <div className="mt-1.5">
+            <div className="text-[10px] text-white/50">{p.scan.scanned} files scanned — {p.scan.summary}</div>
+            <div className="max-h-40 overflow-y-auto">
+              {p.scan.findings.map((f, i) => (
+                <div key={i} className={`flex gap-1.5 text-[10px] ${sevColor[f.severity]}`}>
+                  <span>{f.file ? `${f.file}:${f.line ?? ''}` : f.category}</span>
+                  <span className="flex-1">{f.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Build & Deploy */}
+      <div className="rounded border border-white/10 bg-white/[0.03] p-2">
+        <div className="flex items-center gap-1.5 text-white/70"><Cpu size={12} className="text-cyan-400" /> <b>Build & Deploy — ship your workspace</b></div>
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {EXPORT_TARGETS.map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => doExport(id)} disabled={!p.sessionId || p.exporting !== null} className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] text-cyan-300 hover:bg-cyan-500/20">
+              <Icon size={11} className="mr-1" />{p.exporting === id ? '…' : label}
+            </button>
+          ))}
+        </div>
+        {p.exportMsg && <div className="mt-1 truncate text-[9px] text-white/40">{p.exportMsg}</div>}
+      </div>
+
+      {/* Connectors */}
+      <div className="rounded border border-white/10 bg-white/[0.03] p-2">
+        <div className="flex items-center gap-1.5 text-white/70"><Plug size={12} className="text-emerald-400" /> <b>Deploy connectors</b></div>
+        {p.connectors.length === 0 && <div className="text-[10px] text-white/30">No OAuth clients configured.</div>}
+        <div className="mt-1 grid grid-cols-2 gap-1.5">
+          {p.connectors.map((c) => (
+            <div key={c.id} className="rounded bg-white/5 px-2 py-1 text-[10px]">
+              <span className={c.configured ? 'text-emerald-400' : 'text-white/35'}>●</span> {c.name}
+              <span className="ml-1 text-white/30">{c.configured ? (c.authUrl ? 'ready' : 'auth') : 'unset'}</span>
+              {c.configured && c.authUrl && <a href={c.authUrl} className="ml-1 text-[9px] underline text-cyan-400">connect</a>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Ethical labs */}
+      <div className="rounded border border-white/10 bg-white/[0.03] p-2">
+        <div className="flex items-center gap-1.5 text-white/70"><Check size={12} className="text-violet-400" /> <b>Ethical hacking labs (defensive)</b></div>
+        {p.labs.length === 0 && <div className="text-[10px] text-white/30">No labs loaded.</div>}
+        <div className="mt-1 space-y-1">
+          {p.labs.map((l) => (
+            <div key={l.id} className="flex gap-1.5 text-[10px] text-white/60">
+              <span className="text-violet-400">›</span> {l.title}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
