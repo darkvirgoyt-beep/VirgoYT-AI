@@ -11,6 +11,7 @@ import { CodeEditor } from '@/components/workspace/CodeEditor';
 import { TerminalView } from '@/components/workspace/Terminal';
 import { FileManager } from '@/components/workspace/FileManager';
 import { AiChat } from '@/components/workspace/AiChat';
+import { AgentPanel } from '@/components/workspace/AgentPanel';
 import { BrowserSandbox } from '@/components/workspace/BrowserSandbox';
 import { SystemMonitor } from '@/components/workspace/SystemMonitor';
 import WelcomeOverlay from '@/components/workspace/WelcomeOverlay';
@@ -95,6 +96,10 @@ export function WorkspaceClient() {
 
         <Window panelId="ai" title="AI Assistant" icon="Sparkles" accent="#b967ff">
           <AiChat />
+        </Window>
+
+        <Window panelId="agent" title="Virgo Agent" icon="Bot" accent="#00e5ff">
+          <AgentPanel />
         </Window>
 
         <Window panelId="browser" title="Browser Sandbox" icon="Globe" accent="#00d4ff">

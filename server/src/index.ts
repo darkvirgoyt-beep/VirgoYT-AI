@@ -5,12 +5,15 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
-import { initDb, getDb } from './db/Database.js';
+import { initDb } from './db/Database.js';
 import { sandbox, runCommandInSandbox } from './sandbox/DockerManager.js';
 import { listTree, readFile, writeFile, createDirectory, deleteEntry, renameEntry } from './filesystem/FileManager.js';
-import { proxyAi } from './ai/AiProxy.js';
+import { proxyAi, getAvailableModels } from './ai/AiProxy.js';
+import { env as providerEnv } from './ai/AiGateway.js';
 import { loginUser, registerUser, getUserFromToken, extractToken, newSessionId, verifyToken } from './auth/AuthManager.js';
 import { createPty, writePty, resizePty, destroyPty, setPtyCallbacks, getPtyCwd } from './terminal/PTYManager.js';
+import { AgentEngine } from './agent/AgentEngine.js';
+import { proxyHtml } from './tools/Browser.js';
 
 const PORT = Number(process.env.PORT ?? 8080);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
@@ -187,19 +190,84 @@ app.post('/api/files/rename', requireSession, async (req, res) => {
 
 app.post('/api/ai/chat', async (req, res) => {
   try {
-    const { model, prompt, history } = req.body as any;
+    const { model, prompt, history, system, temperature, maxTokens } = req.body as any;
     if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
-    const result = await proxyAi({ model, prompt, history });
+    const result = await proxyAi({ model, prompt, history, system, temperature, maxTokens });
     res.json(result);
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
 });
 
+app.get('/api/ai/models', (_req, res) => {
+  res.json({ models: getAvailableModels() });
+});
+
+app.get('/api/ai/config', (_req, res) => {
+  res.json({
+    configured: Object.fromEntries(
+      Object.entries(providerEnv).map(([k, v]) => [k, Boolean(v)])
+    ),
+  });
+});
+
 app.get('/api/stats', (req, res) => {
   const sessionId = (req.query.sessionId as string) || '';
   const info = sessions.get(sessionId);
   res.json(info ? sandbox.stats(sessionId) : {});
+});
+
+// ---------- Autonomous Agent ----------
+
+const activeAgents = new Map<string, AgentEngine>();
+
+app.post('/api/agent/run', async (req, res) => {
+  try {
+    const { goal = '', sessionId = '', model = 'auto' } = req.body as any;
+    if (!goal) return res.status(400).json({ error: 'Missing goal' });
+    const s = sessions.get(sessionId);
+    if (!s) {
+      const info = sandbox.createSession(sessionId);
+      sessions.set(sessionId, { userId: null, sandbox: info as any });
+    }
+    const entry = sessions.get(sessionId)!;
+    const rootDir = entry.sandbox.rootDir;
+
+    const events: any[] = [];
+    const agent = new AgentEngine({
+      model,
+      sessionId,
+      rootDir,
+      stream: (e) => {
+        events.push(e);
+        io.to(`run:${sessionId}`).emit('agent:event', e);
+      },
+    });
+    activeAgents.set(sessionId, agent);
+    res.json({ ok: true, runId: `run-${Date.now()}` });
+    void agent.run(goal).finally(() => activeAgents.delete(sessionId));
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/agent/confirm', (req, res) => {
+  const { sessionId, approve } = req.body as any;
+  const agent = activeAgents.get(sessionId);
+  if (!agent) return res.status(404).json({ error: 'No active agent' });
+  agent.confirmExternal(Boolean(approve));
+  res.json({ ok: true });
+});
+
+app.get('/api/browser/preview', async (req, res) => {
+  try {
+    const url = (req.query.url as string) ?? '';
+    if (!/^https?:\/\//.test(url)) return res.status(400).json({ error: 'Invalid URL' });
+    const html = await proxyHtml(url);
+    res.type('html').send(html);
+  } catch (e: any) {
+    res.status(502).json({ error: e.message });
+  }
 });
 
 // ---------- Socket.IO ----------
@@ -232,6 +300,17 @@ io.on('connection', (socket) => {
 
   socket.on('terminal:stop', (data) => {
     destroyPty(data.sessionId ?? sessionId);
+  });
+
+  socket.on('agent:watch', (data) => {
+    const sid = data?.sessionId ?? querySession;
+    if (sid) socket.join(`run:${sid}`);
+  });
+
+  socket.on('agent:confirm', (data) => {
+    const { sessionId: sid, approve } = data ?? {};
+    const agent = activeAgents.get(sid ?? sessionId);
+    if (agent) agent.confirmExternal(Boolean(approve));
   });
 
   socket.on('disconnect', () => {

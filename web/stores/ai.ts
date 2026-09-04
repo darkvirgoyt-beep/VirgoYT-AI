@@ -20,48 +20,25 @@ export type AiModel = {
 };
 
 export const AI_MODELS: AiModel[] = [
-  {
-    id: 'auto',
-    name: 'Auto Router',
-    provider: 'VirgoYT',
-    description: 'Intelligently routes to the best model for each task',
-    capabilities: ['auto'],
-  },
-  {
-    id: 'gemini-flash',
-    name: 'Gemini 2.5 Flash',
-    provider: 'Google',
-    description: 'Fast, efficient for everyday coding tasks',
-    capabilities: ['code', 'chat', 'fast'],
-  },
-  {
-    id: 'gemini-pro',
-    name: 'Gemini 2.5 Pro',
-    provider: 'Google',
-    description: 'Powerful reasoning for complex problems',
-    capabilities: ['code', 'chat', 'reasoning', 'long'],
-  },
-  {
-    id: 'claude-sonnet',
-    name: 'Claude 3.5 Sonnet',
-    provider: 'Anthropic',
-    description: 'Balanced performance and safety',
-    capabilities: ['code', 'chat', 'reasoning'],
-  },
-  {
-    id: 'deepseek',
-    name: 'DeepSeek R1',
-    provider: 'DeepSeek',
-    description: 'Open-source reasoning powerhouse',
-    capabilities: ['code', 'reasoning', 'math'],
-  },
-  {
-    id: 'qwen',
-    name: 'Qwen 2.5 Coder',
-    provider: 'Alibaba',
-    description: 'Specialized code generation model',
-    capabilities: ['code'],
-  },
+  { id: 'auto', name: 'Auto Router', provider: 'VirgoYT', description: 'Intelligently routes to the best model for each task across all connected providers', capabilities: ['auto'] },
+  { id: 'gemini-flash', name: 'Gemini 2.5 Flash', provider: 'Google', description: 'Fast, efficient, free tier available', capabilities: ['code', 'chat', 'fast', 'vision'] },
+  { id: 'gemini-pro', name: 'Gemini 2.5 Pro', provider: 'Google', description: 'Powerful reasoning for complex problems', capabilities: ['code', 'chat', 'reasoning', 'long', 'vision'] },
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI', description: 'Multimodal flagship, strong coding', capabilities: ['code', 'chat', 'vision', 'reasoning'] },
+  { id: 'gpt-4o-mini', name: 'GPT-4o mini', provider: 'OpenAI', description: 'Fast, affordable OpenAI model', capabilities: ['code', 'chat', 'fast', 'vision'] },
+  { id: 'o3-mini', name: 'o3-mini', provider: 'OpenAI', description: 'Deep reasoning for science & code', capabilities: ['code', 'reasoning', 'math'] },
+  { id: 'claude-sonnet', name: 'Claude 3.7 Sonnet', provider: 'Anthropic', description: 'Hybrid standard & extended thinking', capabilities: ['code', 'chat', 'reasoning', 'vision'] },
+  { id: 'claude-haiku', name: 'Claude 3.5 Haiku', provider: 'Anthropic', description: 'Fast & lightweight Claude model', capabilities: ['code', 'chat', 'fast', 'vision'] },
+  { id: 'deepseek-r1', name: 'DeepSeek R1', provider: 'DeepSeek / Kie.ai', description: 'Open-weights chain-of-thought reasoning', capabilities: ['code', 'reasoning', 'math'] },
+  { id: 'deepseek-v3', name: 'DeepSeek V3', provider: 'DeepSeek / Kie.ai', description: 'Fast 671B MoE general intelligence', capabilities: ['code', 'chat', 'fast'] },
+  { id: 'openrouter', name: 'OpenRouter (200+ models)', provider: 'OpenRouter', description: 'Route to 200+ open & closed models', capabilities: ['code', 'chat', 'vision', 'reasoning'] },
+  { id: 'qwen-coder', name: 'Qwen 2.5 Coder 32B', provider: 'Alibaba', description: 'Specialized competitive coding', capabilities: ['code'] },
+  { id: 'groq-llama', name: 'Llama 3.3 70B (Groq)', provider: 'Meta / Groq', description: 'Sub-second LPU inference', capabilities: ['code', 'chat', 'fast'] },
+  { id: 'groq-fast', name: 'Llama 3.1 8B (Groq FREE)', provider: 'Meta / Groq', description: 'Free tier, very fast', capabilities: ['chat', 'fast', 'free'] },
+  { id: 'nvidia-llama', name: 'Llama 3.3 70B (NVIDIA NIM)', provider: 'NVIDIA', description: 'Enterprise GPU inference', capabilities: ['code', 'chat'] },
+  { id: 'mistral-large', name: 'Mistral Large 2', provider: 'Mistral AI', description: 'European multilingual flagship', capabilities: ['code', 'chat', 'reasoning'] },
+  { id: 'bazaarlink', name: 'BazaarLink Universal', provider: 'BazaarLink.ai', description: 'Single endpoint to all frontier models', capabilities: ['code', 'chat', 'vision'] },
+  { id: 'hf-codellama', name: 'CodeLlama 34B (HF FREE)', provider: 'Hugging Face', description: 'Free open-source coding model', capabilities: ['code', 'free'] },
+  { id: 'hf-llama', name: 'Llama 3.2 3B (HF FREE)', provider: 'Hugging Face', description: 'Free lightweight inference', capabilities: ['chat', 'fast', 'free'] },
 ];
 
 type AiState = {

@@ -18,6 +18,7 @@ A full cloud AI computer that runs in the browser, built with **Next.js 15, Reac
 - **Cloud sandbox** — per-session Docker containers (when available) or a local shell for executing commands.
 - **File manager** — real filesystem tree with read/write/create/delete via the REST API.
 - **AI assistant** — multi-model chat (Gemini flash/pro, Claude, DeepSeek, Qwen) streamed through the server proxy.
+- **Autonomous Agent (Virgo Agent)** — a live agent loop that browses the web, runs terminal commands, edits files, and downloads binaries (APK/EXE/videos). You watch it act in real time through a streamed activity feed + live browser-preview iframe, and approve one-off actions (e.g. logging into GitHub) before anything risky runs.
 - **Browser sandbox** — responsive viewport testing (desktop/tablet/mobile).
 - **System monitor** — live CPU, memory, disk, network, and process stats.
 - **Auth** — JWT registration/login with a lightweight JSON-file database (no native deps).
@@ -50,6 +51,18 @@ Set `GEMINI_API_KEY` in `server/.env` to enable live AI responses.
 ```bash
 docker compose up --build
 ```
+
+#### Vercel (frontend) + auto-deploy
+
+1. In Vercel, import the repo and set **Root Directory = `web`**.
+2. Redeploy — then open `/workspace`.
+3. **Auto-deploy on every push:** set up `.github/workflows/vercel-deploy.yml` by adding these GitHub secrets (Repo → Settings → Secrets and variables → Actions):
+   - `VERCEL_TOKEN` — from https://vercel.com/account/tokens
+   - `VERCEL_ORG_ID` — `vercel org ls` after logging in with Vercel CLI
+   - `VERCEL_PROJECT_ID` — `vercel project ls` / `vercel link` in the project
+4. Every `git push` to `main` now builds and deploys Vercel automatically.
+
+> The backend (`server/`) is a separate Node process and should be deployed to Railway/Fly.io/Render (or a VPS) — set `NEXT_PUBLIC_API_URL` in Vercel env vars to its URL so the workspace, terminal and agent can reach it.
 
 ---
 

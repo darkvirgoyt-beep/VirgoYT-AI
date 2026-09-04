@@ -9,7 +9,8 @@ export type PanelId =
   | 'browser'
   | 'monitor'
   | 'projects'
-  | 'settings';
+  | 'settings'
+  | 'agent';
 
 export type PanelPosition = {
   x: number;
@@ -53,6 +54,7 @@ const PANEL_META: Record<PanelId, { title: string; icon: string; pos: { x: numbe
   terminal: { title: 'Terminal', icon: 'TerminalSquare', pos: { x: 620, y: 520 } },
   files: { title: 'Files', icon: 'FolderTree', pos: { x: 20, y: 40 } },
   ai: { title: 'AI Assistant', icon: 'Sparkles', pos: { x: 380, y: 100 } },
+  agent: { title: 'Virgo Agent', icon: 'Bot', pos: { x: 320, y: 250 } },
   browser: { title: 'Browser Sandbox', icon: 'Globe', pos: { x: 120, y: 140 } },
   monitor: { title: 'System Monitor', icon: 'Activity', pos: { x: 700, y: 200 } },
   projects: { title: 'Projects', icon: 'FolderKanban', pos: { x: 200, y: 400 } },
@@ -63,7 +65,7 @@ function initialState(): Record<PanelId, PanelState> {
   const panels = {} as Record<PanelId, PanelState>;
   (Object.keys(PANEL_META) as PanelId[]).forEach((id, i) => {
     const meta = PANEL_META[id];
-    const visible = id === 'editor' || id === 'terminal' || id === 'files';
+    const visible = id === 'editor' || id === 'terminal' || id === 'files' || id === 'agent';
     panels[id] = {
       id,
       title: meta.title,

@@ -23,6 +23,7 @@ export function AiChat() {
 
   const [input, setInput] = useState('');
   const [showModels, setShowModels] = useState(false);
+  const [backendOnline, setBackendOnline] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,12 +39,29 @@ export function AiChat() {
 
     const model = AI_MODELS.find((m) => m.id === selectedModel);
 
-    // Local demo response generation (real backend connects AI proxy)
+    try {
+      const res = await api.post<{ content: string; model: string; provider: string; keyConfigured: boolean }>(
+        '/api/ai/chat',
+        { model: selectedModel, prompt: text }
+      );
+      if (res.content) {
+        setBackendOnline(true);
+        const shownModel = res.model === selectedModel || !res.model ? model?.name ?? res.model : res.model;
+        addAssistantMessage(res.content, shownModel);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      setBackendOnline(false);
+      // backend unreachable — fall through to local
+    }
+
+    // Local fallback (backend offline)
     setTimeout(() => {
       setLoading(false);
       const reply = generateReply(text);
-      addAssistantMessage(reply, model?.name ?? 'auto');
-    }, 800 + Math.random() * 600);
+      addAssistantMessage(reply, `${model?.name ?? 'auto'}${backendOnline ? '' : ' (offline)'}`);
+    }, 500 + Math.random() * 400);
   };
 
   const generateReply = (prompt: string): string => {

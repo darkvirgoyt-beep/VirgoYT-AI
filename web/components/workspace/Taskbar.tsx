@@ -10,6 +10,7 @@ const DOCK_ITEMS: { id: PanelId; icon: string; label: string; color: string }[] 
   { id: 'terminal', icon: 'TerminalSquare', label: 'Terminal', color: '#00ff9c' },
   { id: 'files', icon: 'FolderTree', label: 'Files', color: '#ffb547' },
   { id: 'ai', icon: 'Sparkles', label: 'AI', color: '#b967ff' },
+  { id: 'agent', icon: 'Bot', label: 'Agent', color: '#00e5ff' },
   { id: 'browser', icon: 'Globe', label: 'Browser', color: '#00d4ff' },
   { id: 'monitor', icon: 'Activity', label: 'Monitor', color: '#ff5c7a' },
 ];
