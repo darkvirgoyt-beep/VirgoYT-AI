@@ -219,6 +219,7 @@ app.get('/api/ai/config', (_req, res) => {
     configured: Object.fromEntries(
       Object.entries(providerEnv).map(([k, v]) => [k, Boolean(v)])
     ),
+    googleScript: Boolean(process.env.GOOGLE_SCRIPT_URL),
   });
 });
 
