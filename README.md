@@ -58,15 +58,17 @@ docker compose up --build
 
 #### Vercel (frontend) + auto-deploy
 
-1. In Vercel, import the repo and set **Root Directory = `web`**.
-2. Redeploy — then open `/workspace`.
-3. **Auto-deploy on every push:** set up `.github/workflows/vercel-deploy.yml` by adding these GitHub secrets (Repo → Settings → Secrets and variables → Actions):
+> **To use Virgo **live in the browser** (like Claude/Manus, no local install) all 4 of these must be true:**
+
+1. **Frontend live on Vercel** — import the repo, set **Root Directory = `web`**, deploy. Open `/workspace`.
+2. **Auto-deploy works** — add these GitHub secrets (Repo → Settings → Secrets and variables → Actions):
    - `VERCEL_TOKEN` — from https://vercel.com/account/tokens
    - `VERCEL_ORG_ID` — `vercel org ls` after logging in with Vercel CLI
    - `VERCEL_PROJECT_ID` — `vercel project ls` / `vercel link` in the project
-4. Every `git push` to `main` now builds and deploys Vercel automatically.
+3. **Backend online** — deploy `server/` to Railway/Fly.io/Render (or a VPS). It's a separate Node process that powers the agent, terminal, browser and cyber-tools.
+4. **Web points at the backend** — in **Vercel → project → Settings → Environment Variables**, add `NEXT_PUBLIC_API_URL = https://<your-backend-url>` (Production). The web falls back to `http://localhost:8080` if it's missing.
 
-> The backend (`server/`) is a separate Node process and should be deployed to Railway/Fly.io/Render (or a VPS) — set `NEXT_PUBLIC_API_URL` in Vercel env vars to its URL so the workspace, terminal and agent can reach it.
+Then every `git push` to `main` builds and deploys Vercel automatically.
 
 ---
 
