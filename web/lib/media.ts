@@ -23,3 +23,26 @@ export function useIsMobile(breakpoint = 768) {
 
   return mobile;
 }
+
+// Tracks the visual viewport height (shrinks when mobile keyboard opens)
+// and exposes it so components can adjust their layout.
+export function useVisualViewportHeight() {
+  const [vh, setVh] = useState<string>('100dvh');
+
+  useEffect(() => {
+    const apply = () => {
+      const vvh = window.visualViewport?.height;
+      if (vvh) setVh(vvh + 'px');
+      else setVh(window.innerHeight + 'px');
+    };
+    apply();
+    window.visualViewport?.addEventListener('resize', apply);
+    window.visualViewport?.addEventListener('scroll', apply);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', apply);
+      window.visualViewport?.removeEventListener('scroll', apply);
+    };
+  }, []);
+
+  return vh;
+}

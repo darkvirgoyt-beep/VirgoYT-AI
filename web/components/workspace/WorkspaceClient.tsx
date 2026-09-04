@@ -54,7 +54,7 @@ export function WorkspaceClient() {
     ) : null;
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-void-950 select-none">
+    <div className="relative w-screen h-screen bg-void-950 select-none max-md:overflow-auto overflow-hidden">
       {/* 3D background */}
       <Scene3D onReady={() => setShowWelcome(true)} />
 

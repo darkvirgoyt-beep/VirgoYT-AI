@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -47,6 +48,7 @@ type AiState = {
   isStreaming: boolean;
   contextFiles: string[];
   loading: boolean;
+  memory: string[];
   setSelectedModel: (model: string) => void;
   addUserMessage: (content: string) => void;
   addAssistantMessage: (content: string, model?: string) => void;
@@ -57,9 +59,14 @@ type AiState = {
   addContextFile: (path: string) => void;
   removeContextFile: (path: string) => void;
   clearContextFiles: () => void;
+  loadMemory: (sessionId: string) => Promise<void>;
+  remember: (sessionId: string, name: string, value: string) => Promise<void>;
+  memoryPrompt: string;
 };
 
-export const useAiStore = create<AiState>((set) => ({
+export const useAiStore = create<AiState>()(
+  persist(
+    (set) => ({
   messages: [
     {
       id: 'welcome',
@@ -74,6 +81,8 @@ export const useAiStore = create<AiState>((set) => ({
   isStreaming: false,
   contextFiles: [],
   loading: false,
+  memory: [],
+  memoryPrompt: '',
 
   setSelectedModel: (selectedModel) => set({ selectedModel }),
 
@@ -141,5 +150,45 @@ export const useAiStore = create<AiState>((set) => ({
       contextFiles: s.contextFiles.filter((p) => p !== path),
     })),
 
-  clearContextFiles: () => set({ contextFiles: [] }),
-}));
+  clearContextFiles: () => set({ contextFiles: [], memoryPrompt: '' }),
+
+  loadMemory: async (sessionId) => {
+    if (!sessionId) return;
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+      const res = await fetch(`${API}/api/agent/memory?sessionId=${encodeURIComponent(sessionId)}`);
+      const data = await res.json();
+      const rec = Array.isArray(data.memory) ? data.memory : [];
+      set({
+        memory: rec,
+        memoryPrompt:
+          rec.length > 0
+            ? 'Remembered about this user:\n' + rec.map((m: any) => `- ${m.name}: ${m.value}`).join('\n')
+            : '',
+      });
+    } catch {}
+  },
+
+  remember: async (sessionId, name, value) => {
+    if (!sessionId) return;
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+      await fetch(`${API}/api/agent/memory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, kind: 'preference', name, value }),
+      });
+      await useAiStore.getState().loadMemory(sessionId);
+    } catch {}
+  },
+    }),
+    {
+      name: 'virgo-ai-chat',
+      partialize: (s) => ({
+        messages: s.messages,
+        selectedModel: s.selectedModel,
+        contextFiles: s.contextFiles,
+      }),
+    }
+  )
+);

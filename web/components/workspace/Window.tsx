@@ -41,14 +41,13 @@ export function Window({ panelId, children, title, icon, accent = '#3375ff', onF
   // Mobile/tablet: show a single fullscreen window at a time, switched from the dock.
   if (isMobile) {
     if (activePanel !== panelId || !panel.visible) return null;
-    return (
+      return (
       <div className="absolute inset-0 z-50 flex flex-col bg-void-950/60" style={{ zIndex: z + 10 }}>
-        <div className="flex items-center gap-2 px-3 py-2 bg-void-900/80 border-b border-white/10">
+        <div className="flex items-center gap-2 px-3 py-2 bg-void-900/80 border-b border-white/10 shrink-0">
           <Icon size={14} style={{ color: accent }} />
           <span className="text-xs font-medium text-gray-300 truncate flex-1">{title}</span>
-          <span className="text-[9px] text-white/25 uppercase tracking-wider">{isMobile ? 'mobile' : ''}</span>
         </div>
-        <div className="flex-1 overflow-hidden bg-void-950/40">{minimized ? null : children}</div>
+        <div className="flex-1 overflow-auto bg-void-950/40 min-h-0">{minimized ? null : children}</div>
       </div>
     );
   }

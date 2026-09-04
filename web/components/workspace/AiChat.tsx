@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import * as Icons from 'lucide-react';
-import { Send, Sparkles, Cpu, Brain, Zap, Bot, Settings2 } from 'lucide-react';
+import { Send, Sparkles, Cpu, Brain, Zap, Bot, Settings2, MemoryStick } from 'lucide-react';
 import { useAiStore, AI_MODELS } from '@/stores/ai';
+import { useSystemStore } from '@/stores/system';
 import { api } from '@/lib/api';
 
 export function AiChat() {
@@ -19,13 +20,25 @@ export function AiChat() {
     setLoading,
     loading,
     clearMessages,
+    memoryPrompt,
+    loadMemory,
+    remember,
   } = useAiStore();
 
+  const sessionId = useSystemStore((s) => s.sessionId);
   const [input, setInput] = useState('');
   const [showModels, setShowModels] = useState(false);
   const [backendOnline, setBackendOnline] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const { memory } = useAiStore();
+
+  useEffect(() => {
+    if (sessionId) loadMemory(sessionId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -38,13 +51,17 @@ export function AiChat() {
     setLoading(true);
 
     const model = AI_MODELS.find((m) => m.id === selectedModel);
+    const prompt = memoryPrompt ? `${memoryPrompt}\n\nUser: ${text}` : text;
+
+    // Light memory: if they introduce themselves, remember their name.
+    const nameMatch = text.match(/\b(?:my name is|i am|call me)\s+([a-zA-Z]+)\b/i);
+    if (nameMatch && sessionId) remember(sessionId, 'user-name', nameMatch[1]);
 
     try {
-      // Bound the request so a missing/hung backend can never leave the
-      // send button stuck in the disabled "loading" state.
       const req = api.post<{ content: string; model: string; keyConfigured: boolean }>('/api/ai/chat', {
         model: selectedModel,
-        prompt: text,
+        prompt,
+        history: messages.slice(-8).map((m) => ({ role: m.role, content: m.content })),
       });
       const res = await withTimeout(req, 12000);
       if (res.content) {
@@ -56,10 +73,8 @@ export function AiChat() {
       }
     } catch {
       setBackendOnline(false);
-      // backend unreachable — fall through to local
     }
 
-    // Local fallback (backend offline)
     const reply = generateReply(text);
     addAssistantMessage(reply, `${model?.name ?? 'auto'}${offlineLabel()}`);
     setLoading(false);
@@ -116,6 +131,13 @@ export function AiChat() {
         <span className="text-[10px] uppercase tracking-widest text-gray-500">AI Assistant</span>
         <div className="relative ml-auto">
           <button
+            className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 mr-1"
+            onClick={() => setShowMemory((m) => !m)}
+            title="Memory"
+          >
+            <MemoryStick size={12} className={memory.length ? 'text-emerald-400' : 'text-gray-500'} />
+          </button>
+          <button
             className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10"
             onClick={() => setShowModels((s) => !s)}
           >
@@ -123,6 +145,17 @@ export function AiChat() {
             <span className="text-gray-300">{currentModelName()}</span>
             <Settings2 size={11} className="text-gray-500" />
           </button>
+          {showMemory && (
+            <div className="absolute right-0 top-8 w-60 glass-panel p-2 z-50">
+              <div className="text-[9px] uppercase tracking-wider text-gray-500 mb-1">Long-term memory</div>
+              {memory.length === 0 && <div className="text-[11px] text-gray-400">No memories yet. Tell me your name or preferences and I'll remember.</div>}
+              {memory.map((m: any, i: number) => (
+                <div key={i} className="text-[11px] text-gray-300 py-0.5 border-b border-white/5 last:border-0">
+                  <span className="text-virgo-300">{m.name}:</span> {m.value}
+                </div>
+              ))}
+            </div>
+          )}
           {showModels && (
             <div className="absolute right-0 top-8 w-56 glass-panel p-1 z-50">
               {AI_MODELS.map((m) => (
@@ -186,21 +219,23 @@ export function AiChat() {
         )}
       </div>
 
-      <div className="px-3 pb-3 pt-1">
+      <div className="px-3 pb-3 pt-1 shrink-0">
         <div className="flex items-end gap-2 glass-panel p-2">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onClick={() => inputRef.current?.focus()}
             placeholder="Ask VirgoYT to build something..."
             rows={1}
-            className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-200 placeholder-gray-600 max-h-32"
+            className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-200 placeholder-gray-600 max-h-32 touch-manipulation"
           />
           <button
+            type="button"
             onClick={() => sendQuery(input)}
-            disabled={loading}
-            className="p-2 rounded-lg bg-virgo-600 hover:bg-virgo-500 disabled:opacity-40 transition-colors flex items-center justify-center"
+            disabled={loading || !input.trim()}
+            className="p-2 rounded-lg bg-virgo-600 hover:bg-virgo-500 disabled:opacity-40 transition-colors flex items-center justify-center shrink-0"
             aria-label="Send"
           >
             <Send size={15} className="text-white" />
