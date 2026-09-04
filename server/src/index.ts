@@ -27,14 +27,14 @@ import { listConnectors, type ProviderId } from './build/DeployConnectors.js';
 import { exchangeCode, storeToken, authorizedIds, hasStoredToken, clearTokens, tokenMeta } from './build/OAuth.js';
 
 const PORT = Number(process.env.PORT ?? 8080);
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
+const CLIENT_ORIGINS = (process.env.CLIENT_ORIGIN ?? 'https://virgo-yt-ai.vercel.app,http://localhost:3000').split(',').map((origin) => origin.trim()).filter(Boolean);
 
 initDb();
 
 const app = express();
 app.use(
   cors({
-    origin: CLIENT_ORIGIN,
+    origin: CLIENT_ORIGINS,
     credentials: true,
   })
 );
@@ -43,7 +43,7 @@ app.use(cookieParser());
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: CLIENT_ORIGIN, credentials: true },
+  cors: { origin: CLIENT_ORIGINS, credentials: true },
 });
 
 const sessions = new Map<
@@ -489,7 +489,7 @@ app.get('/api/build/oauth/status', (_req, res) => {
   const ids = authorizedIds();
   res.json({
     authorized: ids,
-    meta: Object.fromEntries(ids.map((id) => [id, tokenMeta(id)])),
+    meta: Object.fromEntries(ids.map((id: ProviderId) => [id, tokenMeta(id)])),
     secretScanning: false,
   });
 });

@@ -2,5 +2,8 @@
   "framework": "nextjs",
   "buildCommand": "next build",
   "devCommand": "next dev",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://server-darkvirgoyt-6238s-projects.vercel.app"
+  }
 }
