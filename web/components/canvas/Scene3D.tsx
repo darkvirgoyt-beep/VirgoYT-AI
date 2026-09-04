@@ -6,8 +6,19 @@ import { Float, Sparkles, Stars } from '@react-three/drei';
 import { Particles } from './Particles';
 import { HolographicGrid } from './HolographicGrid';
 import { HolographicCore } from './HolographicCore';
+import { AgentNodeNetwork } from './AgentNodeNetwork';
+import { OrbitRings } from './OrbitRings';
 import { OrbitControls } from '@react-three/drei';
 import { ConnectionStatus } from './ConnectionStatus';
+
+function AtmosphericFog() {
+  useThree(({ gl }) => {
+    if ('setClearColor' in gl) {
+      gl.setClearColor('#05060f', 0);
+    }
+  });
+  return null;
+}
 
 export function Scene3D({
   onReady,
@@ -32,10 +43,13 @@ export function Scene3D({
         <ambientLight intensity={0.3} />
         <directionalLight position={[5, 10, 5]} intensity={0.8} color="#3375ff" />
         <directionalLight position={[-5, -5, -5]} intensity={0.4} color="#b967ff" />
+        <AtmosphericFog />
 
         <HolographicGrid />
-        <Stars radius={80} depth={50} count={3000} factor={4} saturation={0} fade speed={0.5} />
-        <Particles count={4000} />
+        <Stars radius={90} depth={60} count={4000} factor={5} saturation={0} fade speed={0.6} />
+        <Particles count={4500} />
+        <OrbitRings />
+        <AgentNodeNetwork />
         <Float speed={1.5} rotationIntensity={0.3} floatIntensity={1}>
           <HolographicCore />
         </Float>
