@@ -36,3 +36,5 @@ server/data/
 *.db-journal
 *.json.tmp
 
+.vercel
+.env*
