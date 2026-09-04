@@ -13,16 +13,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     thunar mousepad ristretto \
     libreoffice-writer libreoffice-calc libreoffice-impress \
     pulseaudio pavucontrol \
+    xdg-utils \
     curl ca-certificates wget gnupg sudo supervisor \
     fonts-dejavu fonts-liberation fonts-noto-color-emoji fonts-noto-cjk \
     htop neofetch \
     && rm -rf /var/lib/apt/lists/*
 
 # Google Chrome (real browser, works in Docker)
-RUN wget -q -O /tmp/chrome.deb \
+RUN apt-get update && wget -q -O /tmp/chrome.deb \
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
     && apt-get install -y --no-install-recommends /tmp/chrome.deb \
-    && rm -f /tmp/chrome.deb
+    && rm -f /tmp/chrome.deb && rm -rf /var/lib/apt/lists/*
 
 # Firefox ESR via Mozilla's official apt repo
 RUN install -d -m 0755 /etc/apt/keyrings \
