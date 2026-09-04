@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes } from 'crypto';
 import {
   createUser,
   findUserByEmail,
@@ -63,6 +63,24 @@ export function loginUser(email: string, password: string) {
   dbCreateSession(user.id, sessionId);
   const token = signToken({ userId: user.id, email: user.email, name: user.name });
   return { token, user: { id: user.id, email: user.email, name: user.name }, sessionId };
+}
+
+export function googleClientId(): string | null {
+  return process.env.GOOGLE_CLIENT_ID ?? null;
+}
+
+// Log in (or auto-register) a user validated by a Google ID token.
+export async function googleLogin(googleEmail: string, googleName: string) {
+  const email = googleEmail.toLowerCase();
+  let user = findUserByEmail(email);
+  if (!user) {
+    const randomPass = randomBytes(24).toString('base64');
+    user = await createUser(email, randomPass, googleName || email.split('@')[0] || 'Google User');
+  }
+  const sessionId = newSessionId();
+  dbCreateSession(user.id, sessionId);
+  const token = signToken({ userId: user.id, email: user.email, name: user.name });
+  return { token, user: { id: user.id, email: user.email, name: user.name }, sessionId, via: 'google' };
 }
 
 export function getUserFromToken(token: string) {

@@ -10,7 +10,8 @@ import { sandbox, runCommandInSandbox } from './sandbox/DockerManager.js';
 import { listTree, readFile, writeFile, createDirectory, deleteEntry, renameEntry } from './filesystem/FileManager.js';
 import { proxyAi, getAvailableModels } from './ai/AiProxy.js';
 import { env as providerEnv } from './ai/AiGateway.js';
-import { loginUser, registerUser, getUserFromToken, extractToken, newSessionId, verifyToken } from './auth/AuthManager.js';
+import { loginUser, registerUser, getUserFromToken, extractToken, newSessionId, verifyToken, googleLogin, googleClientId } from './auth/AuthManager.js';
+import { verifyGoogleIdToken } from './auth/GoogleVerify.js';
 import { createPty, writePty, resizePty, destroyPty, setPtyCallbacks, getPtyCwd } from './terminal/PTYManager.js';
 import { AgentEngine } from './agent/AgentEngine.js';
 import { proxyHtml } from './tools/Browser.js';
@@ -88,6 +89,32 @@ app.post('/api/auth/login', (req, res) => {
   } catch (e: any) {
     res.status(e.status ?? 500).json({ error: e.message });
   }
+});
+
+// Google Sign-In: client sends an ID token obtained from Google Identity
+// Services; we verify its signature/audience server-side, then log the user in
+// (auto-creating an account on first use). Never trust a client secret here.
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { idToken } = req.body as { idToken?: string };
+    if (!idToken || typeof idToken !== 'string') {
+      return res.status(400).json({ error: 'Missing idToken' });
+    }
+    const clientId = googleClientId();
+    if (!clientId) {
+      return res.status(500).json({ error: 'Google login not configured on server (set GOOGLE_CLIENT_ID)' });
+    }
+    const info = await verifyGoogleIdToken(idToken, clientId);
+    if (!info) return res.status(401).json({ error: 'Invalid Google token' });
+    const result = await googleLogin(info.email, info.name);
+    res.json(result);
+  } catch (e: any) {
+    res.status(e.status ?? 500).json({ error: e.message });
+  }
+});
+
+app.get('/api/auth/google/config', (_req, res) => {
+  res.json({ enabled: Boolean(googleClientId()), clientId: googleClientId() ?? null });
 });
 
 app.get('/api/auth/me', (req, res) => {
