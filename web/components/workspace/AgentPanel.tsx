@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Rocket, Loader2, Terminal, Globe, Download, FilePlus2, Check, X, Mic, ShieldAlert, Square, Plug, Package, Server, Users, Factory, Sparkles, Cpu } from 'lucide-react';
 import { useAgentStore } from '@/stores/agent';
 import { useSystemStore } from '@/stores/system';
-import type { ScanReport, ConnectorState, ExportTarget } from '@/stores/agent';
+import type { ScanReport, ConnectorState, ExportTarget, RunbookKind } from '@/stores/agent';
 
 const previewBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
@@ -12,7 +12,7 @@ type Caps = { mcp: { servers: string[]; tools: { server: string; tool: string }[
 type Mode = 'agent' | 'team' | 'factory' | 'devtools';
 
 export function AgentPanel() {
-  const { events, wfEvents, fxEvents, roster, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear, loadRoster, runWorkforce, runFactory, runScan, scan, exportProject, connectors, loadConnectors, labs, loadLabs } = useAgentStore();
+  const { events, wfEvents, fxEvents, roster, running, pendingConfirm, init, run, confirm, setPreview, previewUrl, clear, loadRoster, runWorkforce, runFactory, runScan, scan, exportProject, connectors, loadConnectors, labs, loadLabs, runbookKinds, loadRunbookKinds, runbook } = useAgentStore();
   const sessionId = useSystemStore((s) => s.sessionId);
   const [goal, setGoal] = useState('');
   const [mode, setMode] = useState<Mode>('agent');
@@ -28,7 +28,9 @@ export function AgentPanel() {
     loadRoster();
     loadConnectors();
     loadLabs();
-  }, [sessionId, init, loadRoster, loadConnectors, loadLabs]);
+    loadRunbookKinds();
+  }, [sessionId, init, loadRoster, loadConnectors, loadLabs, loadRunbookKinds]);
+
 
   useEffect(() => {
     fetch(`${previewBase}/api/agent/capabilities`)
@@ -263,6 +265,8 @@ export function AgentPanel() {
           exportMsg={exportMsg}
           connectors={connectors}
           labs={labs}
+          runbookKinds={runbookKinds}
+          runbook={runbook}
         />}
       </div>
 
@@ -387,12 +391,19 @@ type DevToolsDocProps = {
   exportMsg: string | null;
   connectors: ConnectorState[];
   labs: { id: string; title: string }[];
+  runbookKinds: RunbookKind[];
+  runbook: (kind: string, context: string, owner?: string) => Promise<string | null>;
 };
 
 function DevToolsDoc(p: DevToolsDocProps) {
+  const [rbKind, setRbKind] = useState<string>('breach');
+  const [rbContext, setRbContext] = useState('');
+  const [rbOwner, setRbOwner] = useState('');
+  const [rbOut, setRbOut] = useState<string | null>(null);
   const sevColor = { critical: 'text-red-400', high: 'text-orange-400', medium: 'text-amber-300', low: 'text-white/60', info: 'text-white/40' } as Record<string, string>;
   const doScan = () => { const sid = p.sessionId; if (!sid || p.scanning) return; p.setScanning(true); Promise.resolve().then(() => p.runScan(sid)).finally(() => p.setScanning(false)); };
   const doExport = async (t: ExportTarget) => { const sid = p.sessionId; if (!sid || p.exporting) return; p.setExporting(t); p.setExportMsg(null); const out = await p.exportProject(sid, t); p.setExporting(null); p.setExportMsg(out ? `Exported ${t} bundle → ${out}` : `Export ${t} failed (no workspace)`); };
+  const doRunbook = async () => { const md = await p.runbook(rbKind, rbContext, rbOwner); setRbOut(md ?? null); };
 
   return (
     <div className="space-y-2">
@@ -434,16 +445,32 @@ function DevToolsDoc(p: DevToolsDocProps) {
       {/* Connectors */}
       <div className="rounded border border-white/10 bg-white/[0.03] p-2">
         <div className="flex items-center gap-1.5 text-white/70"><Plug size={12} className="text-emerald-400" /> <b>Deploy connectors</b></div>
+        <p className="mt-0.5 text-[9px] text-white/35">Set CLIENT_ID/SECRET in server env to enable; connect authorizes your account.</p>
         {p.connectors.length === 0 && <div className="text-[10px] text-white/30">No OAuth clients configured.</div>}
         <div className="mt-1 grid grid-cols-2 gap-1.5">
           {p.connectors.map((c) => (
             <div key={c.id} className="rounded bg-white/5 px-2 py-1 text-[10px]">
-              <span className={c.configured ? 'text-emerald-400' : 'text-white/35'}>●</span> {c.name}
-              <span className="ml-1 text-white/30">{c.configured ? (c.authUrl ? 'ready' : 'auth') : 'unset'}</span>
-              {c.configured && c.authUrl && <a href={c.authUrl} className="ml-1 text-[9px] underline text-cyan-400">connect</a>}
+              <span className={c.authorized ? 'text-emerald-400' : c.configured ? 'text-amber-300' : 'text-white/35'}>●</span> {c.name}
+              <span className="ml-1 text-white/30">{c.authorized ? 'authorized' : c.configured && c.authUrl ? 'ready' : 'unset'}</span>
+              {c.configured && c.authUrl && !c.authorized && <a href={c.authUrl} className="ml-1 text-[9px] underline text-cyan-400">connect</a>}
+              {c.authorized && <span className="ml-1 text-emerald-400">✓</span>}
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Incident response runbook */}
+      <div className="rounded border border-white/10 bg-white/[0.03] p-2">
+        <div className="flex items-center gap-1.5 text-white/70"><ShieldAlert size={12} className="text-orange-400" /> <b>Incident-response runbook</b></div>
+        <select value={rbKind} onChange={(e) => setRbKind(e.target.value)} className="mt-1 w-full rounded border border-white/10 bg-black/40 px-1.5 py-0.5 text-[10px] text-white/70">
+          {p.runbookKinds.map((k) => <option key={k.id} value={k.id}>{k.label}</option>)}
+        </select>
+        <textarea value={rbContext} onChange={(e) => setRbContext(e.target.value)} rows={2} placeholder="What happened? (systems, scope, first detection…)" className="mt-1 w-full rounded border border-white/10 bg-black/40 px-1.5 py-0.5 text-[10px] text-white/70 placeholder:text-white/30" />
+        <div className="mt-1 flex items-center gap-1.5">
+          <input value={rbOwner} onChange={(e) => setRbOwner(e.target.value)} placeholder="Owner (optional)" className="w-full flex-1 rounded border border-white/10 bg-black/40 px-1.5 py-0.5 text-[10px] text-white/70 placeholder:text-white/30" />
+          <button onClick={doRunbook} className="rounded border border-orange-500/40 bg-orange-500/10 px-2 py-1 text-[10px] text-orange-300 hover:bg-orange-500/20">Generate</button>
+        </div>
+        {rbOut && <pre className="mt-1 max-h-44 overflow-y-auto whitespace-pre-wrap rounded border border-white/10 bg-black/60 p-1.5 text-[9px] text-white/60">{rbOut}</pre>}
       </div>
 
       {/* Ethical labs */}

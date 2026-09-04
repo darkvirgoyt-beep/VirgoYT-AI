@@ -49,8 +49,9 @@ export type ScanReport = {
   generatedAt: number;
 };
 
-export type ConnectorState = { id: string; name: string; configured: boolean; scopes: string; authUrl?: string };
+export type ConnectorState = { id: string; name: string; configured: boolean; authorized: boolean; scopes: string; authUrl?: string };
 export type ExportTarget = 'web' | 'exe' | 'apk' | 'mac' | 'terminal';
+export type RunbookKind = { id: string; label: string };
 
 type AgentState = {
   events: AgentEvent[];
@@ -64,6 +65,7 @@ type AgentState = {
   scan: ScanReport | null;
   connectors: ConnectorState[];
   labs: { id: string; title: string }[];
+  runbookKinds: RunbookKind[];
   init: (sessionId: string) => void;
   run: (goal: string, sessionId: string, model?: string) => Promise<void>;
   confirm: (approve: boolean) => void;
@@ -76,6 +78,8 @@ type AgentState = {
   exportProject: (sessionId: string, target: ExportTarget, appName?: string) => Promise<string | null>;
   loadConnectors: () => Promise<void>;
   loadLabs: () => Promise<void>;
+  loadRunbookKinds: () => Promise<void>;
+  runbook: (kind: string, context: string, owner?: string) => Promise<string | null>;
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -92,6 +96,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   scan: null,
   connectors: [],
   labs: [],
+  runbookKinds: [],
 
   init: (sessionId) => {
     if (get().socket) return;
@@ -215,5 +220,28 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       const data = await res.json();
       set({ labs: data.labs ?? [] });
     } catch {}
+  },
+
+  loadRunbookKinds: async () => {
+    try {
+      const res = await fetch(`${API}/api/cyber/runbook/kinds`);
+      const data = await res.json();
+      set({ runbookKinds: data.kinds ?? [] });
+    } catch {}
+  },
+
+  runbook: async (kind, context, owner) => {
+    try {
+      const res = await fetch(`${API}/api/cyber/runbook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind, context, owner }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.markdown ?? null;
+    } catch {
+      return null;
+    }
   },
 }));

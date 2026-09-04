@@ -21,8 +21,10 @@ import { Factory } from './agent/factory/Factory.js';
 import { initMemory, remember, recall, clearMemory, toPrompt, ROOT_KEY } from './agent/memory/MemoryStore.js';
 import { scanWorkspace } from './security/SecurityScanner.js';
 import { labs } from './security/Labs.js';
+import { generateRunbook, runbookKinds } from './security/IncidentResponse.js';
 import { exportProject } from './build/BuildExporter.js';
-import { listConnectors, isConfigured } from './build/DeployConnectors.js';
+import { listConnectors, type ProviderId } from './build/DeployConnectors.js';
+import { exchangeCode, storeToken, authorizedIds, hasStoredToken, clearTokens, tokenMeta } from './build/OAuth.js';
 
 const PORT = Number(process.env.PORT ?? 8080);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:3000';
@@ -461,10 +463,60 @@ app.post('/api/cyber/scan', async (req, res) => {
   }
 });
 
+app.get('/api/cyber/runbook/kinds', (_req, res) => {
+  res.json({ kinds: runbookKinds() });
+});
+
+app.post('/api/cyber/runbook', (req, res) => {
+  try {
+    const { kind = 'breach', context = '', owner = '' } = req.body as any;
+    if (!['breach', 'leaked-secret', 'malware', 'ransomware', 'phishing', 'ddos', 'data-exposure'].includes(kind)) {
+      return res.status(400).json({ error: 'kind must be one of the runbook kinds' });
+    }
+    res.json({ markdown: generateRunbook(kind, context, owner), kind, generatedAt: Date.now() });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ---------- Build & Deploy ----------
 
 app.get('/api/build/connectors', (_req, res) => {
-  res.json({ connectors: listConnectors() });
+  res.json({ connectors: listConnectors(authorizedIds()) });
+});
+
+app.get('/api/build/oauth/status', (_req, res) => {
+  const ids = authorizedIds();
+  res.json({
+    authorized: ids,
+    meta: Object.fromEntries(ids.map((id) => [id, tokenMeta(id)])),
+    secretScanning: false,
+  });
+});
+
+app.post('/api/build/oauth/revoke', (req, res) => {
+  clearTokens();
+  res.json({ ok: true });
+});
+
+app.get('/api/build/oauth/callback', async (req, res) => {
+  const provider = req.query.provider as string | undefined;
+  const code = req.query.code as string | undefined;
+  const error = req.query.error as string | undefined;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  if (error) {
+    return res.send(`<h3>Authorization failed</h3><p>${escapeHtml(error)}</p><p>You can close this tab and return to Virgo.</p>`);
+  }
+  if (!provider || !code) return res.status(400).send('<h3>Missing provider or code</h3>');
+  if (!['github', 'vercel', 'supabase', 'render'].includes(provider)) return res.status(400).send('<h3>Unknown provider</h3>');
+  try {
+    const pid = provider as any as ProviderId;
+    const token = await exchangeCode(pid, code);
+    storeToken(pid, token);
+    res.send(`<h3>✓ ${escapeHtml(provider)} authorized</h3><p>You can close this tab and return to Virgo — your workspace can now deploy to ${escapeHtml(provider)}.</p>`);
+  } catch (e: any) {
+    res.status(400).send(`<h3>Could not authorize ${escapeHtml(provider)}</h3><p>${escapeHtml(e.message)}</p>`);
+  }
 });
 
 app.post('/api/build/export', async (req, res) => {
@@ -488,6 +540,10 @@ httpServer.listen(PORT, () => {
   console.log(`   REST API:  http://localhost:${PORT}/api`);
   console.log(`   Websocket: ws://localhost:${PORT}/\n`);
 });
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+}
 
 function truncateGoal(s: string, n = 140): string {
   return s.length > n ? s.slice(0, n) + '…' : s;
