@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import { PanelId } from '@/stores/workspace';
 import { useWorkspaceStore } from '@/stores/workspace';
+import { useIsMobile } from '@/lib/media';
 
 type WindowProps = {
   panelId: PanelId;
@@ -24,6 +25,8 @@ export function Window({ panelId, children, title, icon, accent = '#3375ff', onF
   const hidePanel = useWorkspaceStore((s) => s.hidePanel);
   const minimizePanel = useWorkspaceStore((s) => s.minimizePanel);
   const maximizePanel = useWorkspaceStore((s) => s.maximizePanel);
+  const activePanel = useWorkspaceStore((s) => s.activePanel);
+  const isMobile = useIsMobile();
 
   const [dragStart, setDragStart] = useState<{ x: number; y: number; px: number; py: number } | null>(null);
   const [resizing, setResizing] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
@@ -34,6 +37,21 @@ export function Window({ panelId, children, title, icon, accent = '#3375ff', onF
   if (!panel) return null;
 
   const { x, y, w, h, z, minimized, maximized } = panel.position;
+
+  // Mobile/tablet: show a single fullscreen window at a time, switched from the dock.
+  if (isMobile) {
+    if (activePanel !== panelId || !panel.visible) return null;
+    return (
+      <div className="absolute inset-0 z-50 flex flex-col bg-void-950/60" style={{ zIndex: z + 10 }}>
+        <div className="flex items-center gap-2 px-3 py-2 bg-void-900/80 border-b border-white/10">
+          <Icon size={14} style={{ color: accent }} />
+          <span className="text-xs font-medium text-gray-300 truncate flex-1">{title}</span>
+          <span className="text-[9px] text-white/25 uppercase tracking-wider">{isMobile ? 'mobile' : ''}</span>
+        </div>
+        <div className="flex-1 overflow-hidden bg-void-950/40">{minimized ? null : children}</div>
+      </div>
+    );
+  }
 
   const handlePointerDown = (e: React.PointerEvent) => {
     onFocus?.();

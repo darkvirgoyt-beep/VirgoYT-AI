@@ -40,10 +40,13 @@ export function AiChat() {
     const model = AI_MODELS.find((m) => m.id === selectedModel);
 
     try {
-      const res = await api.post<{ content: string; model: string; provider: string; keyConfigured: boolean }>(
-        '/api/ai/chat',
-        { model: selectedModel, prompt: text }
-      );
+      // Bound the request so a missing/hung backend can never leave the
+      // send button stuck in the disabled "loading" state.
+      const req = api.post<{ content: string; model: string; keyConfigured: boolean }>('/api/ai/chat', {
+        model: selectedModel,
+        prompt: text,
+      });
+      const res = await withTimeout(req, 12000);
       if (res.content) {
         setBackendOnline(true);
         const shownModel = res.model === selectedModel || !res.model ? model?.name ?? res.model : res.model;
@@ -57,12 +60,19 @@ export function AiChat() {
     }
 
     // Local fallback (backend offline)
-    setTimeout(() => {
-      setLoading(false);
-      const reply = generateReply(text);
-      addAssistantMessage(reply, `${model?.name ?? 'auto'}${backendOnline ? '' : ' (offline)'}`);
-    }, 500 + Math.random() * 400);
+    const reply = generateReply(text);
+    addAssistantMessage(reply, `${model?.name ?? 'auto'}${offlineLabel()}`);
+    setLoading(false);
   };
+
+  const offlineLabel = () => (backendOnline ? '' : ' (offline)');
+
+  function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+    ]);
+  }
 
   const generateReply = (prompt: string): string => {
     const p = prompt.toLowerCase();

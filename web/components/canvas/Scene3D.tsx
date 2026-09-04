@@ -30,7 +30,7 @@ export function Scene3D({
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="absolute inset-0 w-full h-full">
+    <div className="pointer-events-none absolute inset-0 w-full h-full fixed-scene" aria-hidden="true">
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [0, 2, 12], fov: 60 }}

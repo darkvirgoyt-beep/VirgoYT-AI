@@ -63,20 +63,30 @@ const PANEL_META: Record<PanelId, { title: string; icon: string; pos: { x: numbe
   settings: { title: 'Settings', icon: 'Settings', pos: { x: 720, y: 380 } },
 };
 
+function viewport(): { w: number; h: number } {
+  return { w: typeof window !== 'undefined' ? window.innerWidth : 1280, h: typeof window !== 'undefined' ? window.innerHeight : 800 };
+}
+
 function initialState(): Record<PanelId, PanelState> {
+  const { w: vw, h: vh } = viewport();
   const panels = {} as Record<PanelId, PanelState>;
   (Object.keys(PANEL_META) as PanelId[]).forEach((id, i) => {
     const meta = PANEL_META[id];
     const visible = id === 'editor' || id === 'terminal' || id === 'files' || id === 'agent';
+    let w = Math.min(DEFAULT_SIZE.w, Math.max(320, vw - 32));
+    let h = Math.min(DEFAULT_SIZE.h, Math.max(260, vh - 108));
+    // clamp default position so every window starts fully on-screen
+    const px = Math.min(meta.pos.x + (i % 3) * 20, Math.max(0, vw - w - 40));
+    const py = Math.min(meta.pos.y + (i % 2) * 20, Math.max(0, vh - h - 80));
     panels[id] = {
       id,
       title: meta.title,
       icon: meta.icon,
       position: {
-        x: meta.pos.x + (i % 3) * 20,
-        y: meta.pos.y + (i % 2) * 20,
-        w: DEFAULT_SIZE.w,
-        h: DEFAULT_SIZE.h,
+        x: Math.max(8, px),
+        y: Math.max(8, py),
+        w,
+        h,
         z: i + 1,
         minimized: false,
         maximized: false,
@@ -141,20 +151,37 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }),
 
       movePanel: (id, x, y) =>
-        set((s) => ({
-          panels: {
-            ...s.panels,
-            [id]: { ...s.panels[id], position: { ...s.panels[id].position, x, y } },
-          },
-        })),
+        set((s) => {
+          const p = s.panels[id].position;
+          const { w: vw, h: vh } = viewport();
+          const nx = Math.min(Math.max(8, x), Math.max(8, vw - p.w - 8));
+          const ny = Math.min(Math.max(8, y), Math.max(8, vh - p.h - 8));
+          return {
+            panels: {
+              ...s.panels,
+              [id]: { ...s.panels[id], position: { ...p, x: nx, y: ny } },
+            },
+          };
+        }),
 
       resizePanel: (id, w, h) =>
-        set((s) => ({
-          panels: {
-            ...s.panels,
-            [id]: { ...s.panels[id], position: { ...s.panels[id].position, w, h } },
-          },
-        })),
+        set((s) => {
+          const p = s.panels[id].position;
+          const { w: vw, h: vh } = viewport();
+          return {
+            panels: {
+              ...s.panels,
+              [id]: {
+                ...s.panels[id],
+                position: {
+                  ...p,
+                  w: Math.min(Math.max(320, w), Math.max(320, vw - 40)),
+                  h: Math.min(Math.max(240, h), Math.max(240, vh - 40)),
+                },
+              },
+            },
+          };
+        }),
 
       setZ: (id, z) =>
         set((s) => ({

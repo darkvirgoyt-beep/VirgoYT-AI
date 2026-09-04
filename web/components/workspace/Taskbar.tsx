@@ -4,6 +4,7 @@ import * as Icons from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWorkspaceStore, PanelId } from '@/stores/workspace';
 import { useSystemStore } from '@/stores/system';
+import { useIsMobile } from '@/lib/media';
 
 const DOCK_ITEMS: { id: PanelId; icon: string; label: string; color: string }[] = [
   { id: 'editor', icon: 'Code2', label: 'Editor', color: '#3375ff' },
@@ -19,7 +20,10 @@ export function Taskbar() {
   const panels = useWorkspaceStore((s) => s.panels);
   const togglePanel = useWorkspaceStore((s) => s.togglePanel);
   const showPanel = useWorkspaceStore((s) => s.showPanel);
+  const focusPanel = useWorkspaceStore((s) => s.focusPanel);
+  const activePanel = useWorkspaceStore((s) => s.activePanel);
   const connected = useSystemStore((s) => s.connected);
+  const isMobile = useIsMobile();
 
   return (
     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[9999]">
@@ -32,11 +36,21 @@ export function Taskbar() {
         {DOCK_ITEMS.map((item) => {
           const panel = panels[item.id];
           const Icon = (Icons as Record<string, any>)[item.icon] ?? Icons.Box;
-          const active = panel?.visible ?? false;
+          const active = isMobile ? activePanel === item.id : (panel?.visible ?? false);
           return (
             <button
               key={item.id}
-              onClick={() => (active ? togglePanel(item.id) : showPanel(item.id))}
+              onClick={() => {
+                if (isMobile) {
+                  // toggle the fullscreen window
+                  if (activePanel === item.id) togglePanel(item.id);
+                  else {
+                    focusPanel(item.id);
+                    showPanel(item.id);
+                  }
+                } else if (active) togglePanel(item.id);
+                else showPanel(item.id);
+              }}
               className="relative p-2 rounded-xl hover:bg-white/10 transition-colors group"
               aria-label={item.label}
             >
