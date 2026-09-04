@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "skills": {
+    "apple-notes": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/apple/apple-notes/SKILL.md",
+      "computedHash": "1ba042cb17e3aca06a68415526e926ada464bf873c8592c3326125cd72cb397f"
+    },
+    "apple-reminders": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/apple/apple-reminders/SKILL.md",
+      "computedHash": "ee5084f2d7ec196488bef2c74248fb3d8328d1b2e3277ddda3f0de9da6fc7131"
+    },
+    "findmy": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/apple/findmy/SKILL.md",
+      "computedHash": "19ec56e3b7f9f0be13c26d99948ed5684d8fb1f9c478da078c19356b5df63f57"
+    },
+    "imessage": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/apple/imessage/SKILL.md",
+      "computedHash": "bc68b1648e301409bc25b1084ec26766213ca9f3c1b2fd3d3d6ebe3dbde9e967"
+    },
+    "claude-code": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/autonomous-ai-agents/claude-code/SKILL.md",
+      "computedHash": "3fd7c81f2c6c19f8ce77303f76d1407cf88f8f43add0f811cb6d467eef5eaca6"
+    },
+    "codex": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/autonomous-ai-agents/codex/SKILL.md",
+      "computedHash": "3ed457c2b8d5d9c33ab3817cea9753cbcf7f165105eb9da488633a624216d51f"
+    },
+    "computer-use": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/autonomous-ai-agents/computer-use/SKILL.md",
+      "computedHash": "e3d11184959bd06106fa73f315dfde9721502e9542621d62c398024de27eb4cd"
+    },
+    "hermes-agent": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/autonomous-ai-agents/hermes-agent/SKILL.md",
+      "computedHash": "a111466ce81ccdad8bccc7f670c7946df9d9f8b639399f28bd2958f5bce92c56"
+    },
+    "opencode": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/autonomous-ai-agents/opencode/SKILL.md",
+      "computedHash": "afb3ea1f1b4300705f4a44f41ef2bb6f36c45e474b677dcb3c0aa4e6b3740595"
+    },
+    "cloud-computer": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/cloud-computer/SKILL.md",
+      "computedHash": "dcd41f482d0c38ac31f146cf344a3b6ef5c52ce789b566e30cec4e70ffd0fc0c"
+    },
+    "architecture-diagram": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/architecture-diagram/SKILL.md",
+      "computedHash": "0e7e2736aafe052e409c2ad27863d51ef3007c116711e584033787ccb5d99d3f"
+    },
+    "ascii-video": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/ascii-video/SKILL.md",
+      "computedHash": "3bd3f39985a52954e2693866608bd8105f4dc0efbca5b6baa3045c2b641bda26"
+    },
+    "baoyu-infographic": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/baoyu-infographic/SKILL.md",
+      "computedHash": "89e25da6d8ea1cac79b18d9e6c4c3b8d7a522df2eef559f151f19c6ce5b2a002"
+    },
+    "claude-design": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/claude-design/SKILL.md",
+      "computedHash": "1582b0d49e48bdf937b2f555098484e0979cdfa285c6cc9fa329ba8e416d347a"
+    },
+    "design-md": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/design-md/SKILL.md",
+      "computedHash": "7ed56bba40ffc9573fa51b33b2424f37fb5f774e9ecb7e76e737797afd0b62ae"
+    },
+    "humanizer": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/humanizer/SKILL.md",
+      "computedHash": "887d5e3467a682da9b166e5293007f8bbbc299f8a6718ae00f26161b7d062b04"
+    },
+    "manim-video": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/manim-video/SKILL.md",
+      "computedHash": "467376469fc2043e2674a843509f8eea52660791e76fb2e142074ecd4abc7e69"
+    },
+    "p5js": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/p5js/SKILL.md",
+      "computedHash": "3b39b75303e082af69b3f4e2deab7a55b27d60293eff6a561fb627188194a33e"
+    },
+    "popular-web-designs": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/popular-web-designs/SKILL.md",
+      "computedHash": "cd89bdb86008bb30b35d9bdd30e06587f75ee54055c54e1a79afb20418264b3d"
+    },
+    "songwriting-and-ai-music": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/creative/songwriting-and-ai-music/SKILL.md",
+      "computedHash": "5dbf92dc336e9b17be45c35c92a5bb307e4655e39a86617f07b7654678f92583"
+    },
+    "sdlc-review": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/devops/sdlc-review/SKILL.md",
+      "computedHash": "ce90e8a3e145cce69c62880dc85921700110879f9290952d6cec28218503155f"
+    },
+    "email-inbox-triage": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/email/email-inbox-triage/SKILL.md",
+      "computedHash": "cd57ccc9d563b5186012b41d6bbf52e96c2837c5b8e79d524e8e5e6a44af6021"
+    },
+    "himalaya": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/email/himalaya/SKILL.md",
+      "computedHash": "0f6c9bb4c0a5c4f4627e139b6beb2b1ba0addd7145895196528b8125929e3837"
+    },
+    "manus-compat": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/manus-compat/SKILL.md",
+      "computedHash": "699b17d37fa9c60567615deb516c4f0b93adadc6a3a6602fc3432f06a144b4e4"
+    },
+    "gif-search": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/media/gif-search/SKILL.md",
+      "computedHash": "a8349043740a8805d4ebfeb3a21f67ec0e9a9733a84f96403ca142c88a312b5d"
+    },
+    "songsee": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/media/songsee/SKILL.md",
+      "computedHash": "d9d8d1394c630bd83329cd54cd8f18e0e3cd140debe31c3ccf5d9667f054de07"
+    },
+    "youtube-content": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/media/youtube-content/SKILL.md",
+      "computedHash": "52349e30ac74a3c2693c43588e9392a53236526b4b7d92769a64045a9782308e"
+    },
+    "obsidian": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/note-taking/obsidian/SKILL.md",
+      "computedHash": "7aea4e8f89f94ab2876d79898d10a5d4cdab31390c53f72ad6934b071179f826"
+    },
+    "airtable": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/airtable/SKILL.md",
+      "computedHash": "28253f1e20c4d250725eb7f475c886952a4c6a1ef43ef6900c2dc0e75ebb40e6"
+    },
+    "box": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/box/SKILL.md",
+      "computedHash": "e9672412333de4feff348e6dc387d9022d32005247360347a10a7131fb87eb13"
+    },
+    "document-to-action-items": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/document-to-action-items/SKILL.md",
+      "computedHash": "8a7556754aca2a7d04d38847131fb4db8d6705fa2106fcb154279e26117b41ee"
+    },
+    "docx": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/docx/SKILL.md",
+      "computedHash": "9678b14d5e7841d588b969f6a4696cd46bcc46c3e4ac1479edc7656a051aa5ff"
+    },
+    "google-workspace": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/google-workspace/SKILL.md",
+      "computedHash": "5bdca0d898744fbf4d66df611116b5c776b1297b964fbcfd86b3004c20e46fd7"
+    },
+    "maps": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/maps/SKILL.md",
+      "computedHash": "775ef9f79be9cd147bc81e0c4a4ef952230a04736a6082f44dbac78554ef89ab"
+    },
+    "meeting-action-items": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/meeting-action-items/SKILL.md",
+      "computedHash": "1902f782551da96ee1f9b34d6f13af627f06150a498d874b0cc2a75d06d35aa8"
+    },
+    "notion": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/notion/SKILL.md",
+      "computedHash": "798ad178ead72ad3056f5301e83b447fce3407de07d5ff8b0209b134b4eae866"
+    },
+    "pdf": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/pdf/SKILL.md",
+      "computedHash": "c16b9c159a3a0b49353bfcd10c498b02aef3d319207b1019aa7dc8db129d06ab"
+    },
+    "powerpoint": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/powerpoint/SKILL.md",
+      "computedHash": "b71d29d9809c4464d7f8d10afabf4f22f6a26c647cf7aacb6f9faf196ebe82f2"
+    },
+    "product-price-monitor": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/product-price-monitor/SKILL.md",
+      "computedHash": "b87bf2102fed13d2c7c64759fa153f24f5e43a0afcf6f8ec5e13def92a6642ef"
+    },
+    "teams-meeting-pipeline": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/teams-meeting-pipeline/SKILL.md",
+      "computedHash": "ae1b08f044d7dfd9abb01c643cac3b69e4a3a1cbe7fd5782dd17785964cdc441"
+    },
+    "weekly-review-planning": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/weekly-review-planning/SKILL.md",
+      "computedHash": "a689257facb937cfca9bc5507dd9e729f287f0cd3f6abbf73448eb25f73fbaab"
+    },
+    "xlsx": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/xlsx/SKILL.md",
+      "computedHash": "b302d7ac997843a757ab3c11513ea012889ebdae32f842edb44faa9a4485f19b"
+    },
+    "arxiv": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/research/arxiv/SKILL.md",
+      "computedHash": "9b41877bcb64166dc2355a43aedd3198c3e5214af67f09e1d1b717a989d92f72"
+    },
+    "competitor-news-monitor": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/research/competitor-news-monitor/SKILL.md",
+      "computedHash": "bcc92cdcb4811ec2a8b6b13527b952552fccfc2a749837dfee24a8b561415cef"
+    },
+    "grounded-citations": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/research/grounded-citations/SKILL.md",
+      "computedHash": "55083f47af62d04ab0cf25608193e20bedc422eda4265a5d2b28d04064d7b14a"
+    },
+    "llm-wiki": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/research/llm-wiki/SKILL.md",
+      "computedHash": "0229e37c1783fcac5b77cfb3242703666cf4aa472d2ae85b6bd5279756b515b6"
+    },
+    "xurl": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/social-media/xurl/SKILL.md",
+      "computedHash": "5457319ee337284b1152dc9f60146c72685ade489299afed08e0b46ca5a97080"
+    },
+    "codebase-inspection": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/codebase-inspection/SKILL.md",
+      "computedHash": "d62554263461919dff7d77c3c0c284c2190c894f312a84d7a770a030dab642dc"
+    },
+    "dogfood": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/dogfood/SKILL.md",
+      "computedHash": "1b2793734493dbc624a1d1f1c0667cb510e191fa79b1c740d866706550190560"
+    },
+    "github": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/github/SKILL.md",
+      "computedHash": "9d70e7c842fe7db75b5a50526552a69862f5bcfc1e59aa93785241649a09d5a3"
+    },
+    "hermes-agent-skill-authoring": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/hermes-agent-skill-authoring/SKILL.md",
+      "computedHash": "3a274d5b42fa0a958f48bcc4eb0691712e0a1dcf3d7b99d09ec9029c4499ef3b"
+    },
+    "inspecting-hermes-desktop-dom": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/inspecting-hermes-desktop-dom/SKILL.md",
+      "computedHash": "a78a5f8d277a1d6d39fccd5ecf1e76ce519a1ace831f06078dfcc91cb54a3399"
+    },
+    "node-inspect-debugger": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/node-inspect-debugger/SKILL.md",
+      "computedHash": "bc89942b76387834272b6bf3bbf99caad72400c41338ab0420a740b7abe77d02"
+    },
+    "python-debugpy": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/python-debugpy/SKILL.md",
+      "computedHash": "24258d93eb080e7bbf89a81ba3e614b09d5d09637cdceaafac487f4df07f3f53"
+    },
+    "requesting-code-review": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/requesting-code-review/SKILL.md",
+      "computedHash": "7576ef182345b42e23a0516c0af98250faf347b2d55d5f29fc25629cde241dbf"
+    },
+    "simplify-code": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/simplify-code/SKILL.md",
+      "computedHash": "9ee977c3362a1c07f2e327198e066ddb3c0ed67709706fc410165ee820b2ca01"
+    },
+    "spike": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/spike/SKILL.md",
+      "computedHash": "573d8fc0d6699eaf5308e742402bc02c883152ffeebe14607f164c6c538495c2"
+    },
+    "systematic-debugging": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/systematic-debugging/SKILL.md",
+      "computedHash": "bd480f51a2e9969c88544003c30b7539b7df0b7358703f99b0495514c2dd878a"
+    },
+    "test-driven-development": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/software-development/test-driven-development/SKILL.md",
+      "computedHash": "649e6ab89bd8aaad2f9b162c60321f227cff8a8cda56393f07a81d1c6825a692"
+    },
+    "ui-ux-pro-max": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9"
+    },
+    "blocked-page-recovery": {
+      "source": "darkvirgoyt-beep/VirgoYT-Hermes",
+      "sourceType": "github",
+      "skillPath": "skills/web/blocked-page-recovery/SKILL.md",
+      "computedHash": "7f7d321f177399ca928e11ab38942cfa76d6e931a82d887671c50661fb411d51"
+    }
+  }
+}
