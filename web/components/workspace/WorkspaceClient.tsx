@@ -13,6 +13,7 @@ import { FileManager } from '@/components/workspace/FileManager';
 import { AiChat } from '@/components/workspace/AiChat';
 import { AgentPanel } from '@/components/workspace/AgentPanel';
 import { BrowserSandbox } from '@/components/workspace/BrowserSandbox';
+import { DesktopComputer } from '@/components/workspace/DesktopComputer';
 import { SystemMonitor } from '@/components/workspace/SystemMonitor';
 import WelcomeOverlay from '@/components/workspace/WelcomeOverlay';
 import { useWorkspaceStore } from '@/stores/workspace';
@@ -104,6 +105,10 @@ export function WorkspaceClient() {
 
         <Window panelId="browser" title="Browser Sandbox" icon="Globe" accent="#00d4ff">
           <BrowserSandbox />
+        </Window>
+
+        <Window panelId="computer" title="VirgoYT Computer" icon="Monitor" accent="#00e5ff">
+          <DesktopComputer />
         </Window>
 
         <Window panelId="monitor" title="System Monitor" icon="Activity" accent="#ff5c7a">
