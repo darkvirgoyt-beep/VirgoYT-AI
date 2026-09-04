@@ -5,6 +5,7 @@
   "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://server-darkvirgoyt-6238s-projects.vercel.app",
-    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": ""
+    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "",
+    "NEXT_PUBLIC_DESKTOP_URL": "https://desktop-production-7018.up.railway.app"
   }
 }
