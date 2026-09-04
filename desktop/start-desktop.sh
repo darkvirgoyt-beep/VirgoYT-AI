@@ -16,6 +16,9 @@ fi
 if [[ -L /tmp/.X11-unix ]]; then rm -f /tmp/.X11-unix; fi
 mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
+# Make the (possibly volume-backed) home directory writable by the desktop user
+chown -R virgo:virgo /home/virgo 2>/dev/null || true
+
 mkdir -p /home/virgo/.vnc
 x11vnc -storepasswd "${DESKTOP_PASSWORD}" /home/virgo/.vnc/passwd >/dev/null
 chown -R virgo:virgo /home/virgo/.vnc
