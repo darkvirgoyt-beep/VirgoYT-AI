@@ -31,14 +31,20 @@ jobs:
 
       - name: Refresh Vercel access token
         run: |
+          set -e
           TOKEN=$(curl -s -X POST "https://api.vercel.com/login/oauth/token" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             -H "User-Agent: vercel-cli" \
             --data-urlencode "client_id=cl_HYyOPBNtFMfHhaUn9L4QPfTZz6TP47bp" \
             --data-urlencode "grant_type=refresh_token" \
             --data-urlencode "refresh_token=${{ secrets.VERCEL_REFRESH_TOKEN }}" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-          echo "VERCEL_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('access_token') or '')" )
+          if [ -z "$TOKEN" ]; then
+            echo "refresh-token stale, falling back to VERCEL_TOKEN secret"
+            echo "VERCEL_TOKEN=${{ secrets.VERCEL_TOKEN }}" >> "$GITHUB_ENV"
+          else
+            echo "VERCEL_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+          fi
 
       - name: Deploy to Vercel (Production)
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
