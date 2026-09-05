@@ -4,8 +4,8 @@
   "devCommand": "next dev",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://server-darkvirgoyt-6238s-projects.vercel.app",
-    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "",
+    "NEXT_PUBLIC_API_URL": "https://virgoyt-ai-production-709e.up.railway.app",
+    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "843250458750-4hqiuoa2t0k3c9ksn45vb76kb0e2q94q.apps.googleusercontent.com",
     "NEXT_PUBLIC_DESKTOP_URL": "https://desktop-production-7018.up.railway.app"
   }
 }
